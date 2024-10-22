@@ -1,10 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import {apiRouter} from './server/api.js';
 
 const app = express();
 const PORT = process.env.PORT || 4001;
-const apiRouter = require('./server/api');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -15,4 +15,4 @@ app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
 
-module.exports = app;
+export default app;
