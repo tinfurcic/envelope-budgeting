@@ -1,0 +1,36 @@
+@use "../base/global";
+
+$width: 9rem;
+
+.envelope {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  border: 1px solid global.$border-color;
+  padding: 0 0.25rem;
+  min-width: $width;
+  border-radius: 2px;
+
+  &__name {
+    width: 100%;
+
+    font-size: 20px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__amount-left {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    &--absolute {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

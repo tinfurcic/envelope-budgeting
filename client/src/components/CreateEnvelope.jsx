@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { createEnvelope } from "../util/createEnvelope";
 import AmountField from "./AmountField";
 
-const CreateEnvelope = ({
-  newEnvelopeName,
-  setNewEnvelopeName,
-  newEnvelopeBudget,
-  setNewEnvelopeBudget,
-  newEnvelopeCurrentAmount,
-  setNewEnvelopeCurrentAmount,
-  setEnvelopes,
-}) => {
+const CreateEnvelope = () => {
+  const { setEnvelopes } = useOutletContext();
+
+  const [newEnvelopeName, setNewEnvelopeName] = useState("");
+  const [newEnvelopeBudget, setNewEnvelopeBudget] = useState(0);
+  const [newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount] = useState(0);
+
   const handleCreateEnvelope = async () => {
     const result = await createEnvelope(
       newEnvelopeName,

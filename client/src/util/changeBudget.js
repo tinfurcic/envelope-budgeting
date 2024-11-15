@@ -9,14 +9,17 @@ export const changeBudget = async (amount, setAmount, id) => {
     };
   }
   let endpoint;
+  let method;
   let body;
   if (id === -1 || id === "-1") {
+    method = "post";
     endpoint = "/budget";
     body = {
       amount: amount.toString(),
     };
   } else {
     console.log("envelope recognized");
+    method = "patch";
     endpoint = `/envelopes/${id}`;
     body = {
       id: id,
@@ -24,7 +27,10 @@ export const changeBudget = async (amount, setAmount, id) => {
     };
   }
   try {
-    const res = await axios.post(`http://localhost:4001/api${endpoint}`, body);
+    const res = await axios[method](
+      `http://localhost:4001/api${endpoint}`,
+      body,
+    );
     const newAmount = parseFloat(res.data.amount);
     setAmount(newAmount);
     return { success: true, data: newAmount };

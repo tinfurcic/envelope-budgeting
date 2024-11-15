@@ -1,0 +1,11 @@
+.app {
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    border: 1px solid blue;
+  }
+  &__main {
+    padding: 0 1rem;
+  }
+}

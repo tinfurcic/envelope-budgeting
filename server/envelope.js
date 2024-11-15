@@ -1,6 +1,8 @@
 import { findEnvelopeIndexById } from "./utils/findEnvelopeIndexById.js";
+import { fakeEnvelopes } from "./utils/fakedb.js";
 
-export let envelopes = [];
+//export let envelopes = [];
+export let envelopes = fakeEnvelopes;
 
 let envelopeId = 1;
 
@@ -16,7 +18,6 @@ export const getAllEnvelopes = () => {
 };
 
 export const getEnvelopeById = (envelopeId) => {
-  // try... catch should probably be used here
   try {
     const envelopeIndex = findEnvelopeIndexById(envelopeId);
     if (envelopeIndex !== undefined) {

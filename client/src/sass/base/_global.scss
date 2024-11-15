@@ -1,0 +1,21 @@
+@use "typography";
+
+$background-color: hsl(180, 15%, 90%);
+$border-color: hsl(180, 14%, 70%);
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: typography.$font-size-base;
+}
+
+body {
+  font-family: typography.$font-primary;
+  font-size: typography.$font-size-base;
+  font-weight: typography.$font-weight-regular;
+  line-height: typography.$line-height-base;
+  letter-spacing: typography.$letter-spacing-normal;
+  background-color: $background-color;
+}

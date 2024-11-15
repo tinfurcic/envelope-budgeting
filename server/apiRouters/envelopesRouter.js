@@ -58,7 +58,7 @@ envelopesRouter.get("/:envelopeId", (req, res, next) => {
   }
 });
 
-envelopesRouter.post("/:envelopeId", (req, res, next) => {
+envelopesRouter.patch("/:envelopeId", (req, res, next) => {
   // change budget, name, or current amount
   // The data is sent through request body (JSON).
   // Provided key-value pairs will be updated.

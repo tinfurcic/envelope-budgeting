@@ -1,0 +1,7 @@
+.budget-manager {
+  &__income,
+  &__envelopes {
+    display: flex;
+    gap: 0.5rem;
+  }
+}

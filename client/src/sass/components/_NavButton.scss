@@ -1,0 +1,13 @@
+@use "../abstracts";
+@use "../base";
+
+.button-wrapper {
+  @include abstracts.flexCenter();
+  &__button {
+    font-weight: 200;
+    font-size: 1.5rem;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid base.$border-color;
+  }
+}
