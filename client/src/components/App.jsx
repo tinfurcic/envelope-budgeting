@@ -5,6 +5,7 @@ import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
 import Navigation from "./Navigation";
 import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
+import { AuthProvider } from "./AuthContext";
 
 const App = () => {
   const [totalBudget, setTotalBudget] = useState(0);
@@ -34,7 +35,8 @@ const App = () => {
   }, [totalBudget, envelopes]);
 
   return (
-    <div className="app">
+    <AuthProvider>
+      <div className="app">
       <header className="app__header">
         <Navigation />
       </header>
@@ -42,6 +44,7 @@ const App = () => {
         <Outlet context={appData} />
       </main>
     </div>
+    </AuthProvider>
   );
 };
 
