@@ -1,4 +1,8 @@
-const express = require('express');
-const apiRouter = express.Router();
+import express from "express";
+import { envelopesRouter } from "./apiRouters/envelopesRouter.js";
+import { budgetRouter } from "./apiRouters/budgetRouter.js";
 
-module.exports = apiRouter;
+export const apiRouter = express.Router();
+
+apiRouter.use("/envelopes", envelopesRouter);
+apiRouter.use("/budget", budgetRouter);
