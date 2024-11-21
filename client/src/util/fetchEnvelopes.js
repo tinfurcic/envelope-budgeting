@@ -1,8 +1,8 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 export const fetchEnvelopes = async () => {
   try {
-    const res = await axios.get("http://localhost:4001/api/envelopes");
+    const res = await axiosInstance.get("/envelopes");
     return res.data;
   } catch (err) {
     console.error("fetchEnvelopes() error: " + err);

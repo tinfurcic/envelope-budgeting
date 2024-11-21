@@ -1,5 +1,5 @@
-import axios from "axios";
 import { isNumberWithTwoDecimalsAtMost } from "./isNumberWithTwoDecimalsAtMost";
+import axiosInstance from "./axiosInstance";
 
 export const createEnvelope = async (
   newEnvelopeName,
@@ -14,7 +14,7 @@ export const createEnvelope = async (
     Number(newEnvelopeCurrentAmount) <= Number(newEnvelopeBudget)
   ) {
     try {
-      const res = await axios.post("http://localhost:4001/api/envelopes", {
+      const res = await axiosInstance.post("/envelopes", {
         name: newEnvelopeName,
         budget: newEnvelopeBudget,
         currentAmount: newEnvelopeCurrentAmount,

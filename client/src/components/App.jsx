@@ -5,20 +5,27 @@ import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
 import Navigation from "./Navigation";
 import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
-import { AuthProvider } from "./AuthContext";
 
 const App = () => {
   const [totalBudget, setTotalBudget] = useState(0);
   const [envelopes, setEnvelopes] = useState([]);
   const [shortTermSavings, setShortTermSavings] = useState(200);
   const [unassignedBudget, setUnassignedBudget] = useState(0);
-  const appData = { envelopes, setEnvelopes, totalBudget, setTotalBudget };
+  const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
+  const appData = {
+    envelopes,
+    setEnvelopes,
+    loadingEnvelopes,
+    totalBudget,
+    setTotalBudget,
+  };
 
   // Fetch data on load
   useEffect(() => {
     const loadStuff = async () => {
       try {
         const fetchedEnvelopes = await fetchEnvelopes();
+        setLoadingEnvelopes(false);
         setEnvelopes(fetchedEnvelopes);
         console.log(fetchedEnvelopes);
         const fetchedTotalBudget = await fetchTotalBudget();
@@ -35,8 +42,7 @@ const App = () => {
   }, [totalBudget, envelopes]);
 
   return (
-    <AuthProvider>
-      <div className="app">
+    <div className="app">
       <header className="app__header">
         <Navigation />
       </header>
@@ -44,7 +50,6 @@ const App = () => {
         <Outlet context={appData} />
       </main>
     </div>
-    </AuthProvider>
   );
 };
 

@@ -18,8 +18,7 @@ const Logout = () => {
         <img src={logoutImage ? logoutImage : "asdff"} alt="Log Out" />
       </button>
     </div>
-  )
+  );
 };
 
 export default Logout;
-

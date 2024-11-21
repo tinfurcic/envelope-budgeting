@@ -13,15 +13,21 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
-      <Route path="/" element={<App />}>
-        <Route path="/home" element={<PrivateRoute> <Home /> </PrivateRoute>} />
-        <Route path="/create" element={<PrivateRoute> <CreateEnvelope /> </PrivateRoute>} />
-        <Route path="/budget" element={<PrivateRoute> <BudgetManager /> </PrivateRoute>} />
-        <Route path="/savings" element={<PrivateRoute> <SavingsManager /> </PrivateRoute>} />
-        <Route path="/goals" element={<PrivateRoute> <GoalsManager /> </PrivateRoute>} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <App />
+          </PrivateRoute>
+        }
+      >
+        <Route path="/home" element={<Home />} />
+        <Route path="/create" element={<CreateEnvelope />} />
+        <Route path="/budget" element={<BudgetManager />} />
+        <Route path="/savings" element={<SavingsManager />} />
+        <Route path="/goals" element={<GoalsManager />} />
       </Route>
       <Route path="/login" element={<Login />} />
-      
     </Routes>
   );
 }

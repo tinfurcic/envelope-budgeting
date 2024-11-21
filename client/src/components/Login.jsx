@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "../firebase-config";
+import { useNavigate } from "react-router-dom";
 import Logout from "./Logout";
 
 const Login = () => {
@@ -9,32 +13,46 @@ const Login = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
 
+  const navigate = useNavigate();
 
   const handleSignup = async (event, email, password) => {
     event.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('User signed up:', userCredential.user);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      console.log("User signed up:", userCredential.user);
+      navigate("/home");
     } catch (error) {
-      console.error('Error signing up:', error.message);
+      console.error("Error signing up:", error.message);
     }
   };
 
   const handleLogin = async (event, email, password) => {
     event.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('User signed in:', userCredential.user);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      console.log("User signed in:", userCredential.user);
+      navigate("/home");
     } catch (error) {
-      console.error('Error signing in:', error.message);
+      console.error("Error signing in:", error.message);
     }
   };
 
   return (
     <div>
       <h2>Log in:</h2>
-      <form name="login" onSubmit={(e) => handleLogin(e, loginEmail, loginPassword)}>
-      <label>E-mail:</label>
+      <form
+        name="login"
+        onSubmit={(e) => handleLogin(e, loginEmail, loginPassword)}
+      >
+        <label>E-mail:</label>
         <input
           type="text"
           value={loginEmail}
@@ -47,11 +65,14 @@ const Login = () => {
           onChange={(e) => setLoginPassword(e.target.value)}
         />
         <button type="submit">Log in</button>
-        </form>
-      
+      </form>
+
       <h2>Sign up:</h2>
-      <form name="signup" onSubmit={(e) => handleSignup(e, signupEmail, signupPassword)}>
-      <label>E-mail:</label>
+      <form
+        name="signup"
+        onSubmit={(e) => handleSignup(e, signupEmail, signupPassword)}
+      >
+        <label>E-mail:</label>
         <input
           type="text"
           value={signupEmail}
@@ -66,9 +87,8 @@ const Login = () => {
         <button type="submit">Sign up</button>
       </form>
       <Logout />
-
     </div>
   );
-}
+};
 
 export default Login;
