@@ -1,8 +1,8 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 export const fetchTotalBudget = async () => {
   try {
-    const res = await axios.get("http://localhost:4001/api/budget");
+    const res = await axiosInstance.get("/budget");
     console.log("Total budget: " + parseFloat(res.data.totalBudget));
     return parseFloat(res.data.totalBudget);
   } catch (error) {

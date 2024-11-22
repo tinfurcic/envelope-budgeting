@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { fetchEnvelopes } from "./fetchEnvelopes";
 
 export const handleTransfer = async (
@@ -7,8 +7,8 @@ export const handleTransfer = async (
   amount,
 ) => {
   try {
-    await axios.post(
-      `http://localhost:4001/api/envelopes/transfer/${givingEnvelopeId}/${receivingEnvelopeId}/${amount}`,
+    await axiosInstance.post(
+      `/envelopes/transfer/${givingEnvelopeId}/${receivingEnvelopeId}/${amount}`,
     );
     fetchEnvelopes(); // Refresh envelopes after transfer
   } catch (err) {

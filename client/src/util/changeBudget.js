@@ -1,5 +1,5 @@
-import axios from "axios";
 import { isNumberWithTwoDecimalsAtMost } from "./isNumberWithTwoDecimalsAtMost";
+import axiosInstance from "./axiosInstance";
 
 export const changeBudget = async (amount, setAmount, id) => {
   if (!isNumberWithTwoDecimalsAtMost(amount)) {
@@ -27,10 +27,7 @@ export const changeBudget = async (amount, setAmount, id) => {
     };
   }
   try {
-    const res = await axios[method](
-      `http://localhost:4001/api${endpoint}`,
-      body,
-    );
+    const res = await axiosInstance[method](`${endpoint}`, body);
     const newAmount = parseFloat(res.data.amount);
     setAmount(newAmount);
     return { success: true, data: newAmount };

@@ -11,13 +11,21 @@ const App = () => {
   const [envelopes, setEnvelopes] = useState([]);
   const [shortTermSavings, setShortTermSavings] = useState(200);
   const [unassignedBudget, setUnassignedBudget] = useState(0);
-  const appData = { envelopes, setEnvelopes, totalBudget, setTotalBudget };
+  const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
+  const appData = {
+    envelopes,
+    setEnvelopes,
+    loadingEnvelopes,
+    totalBudget,
+    setTotalBudget,
+  };
 
   // Fetch data on load
   useEffect(() => {
     const loadStuff = async () => {
       try {
         const fetchedEnvelopes = await fetchEnvelopes();
+        setLoadingEnvelopes(false);
         setEnvelopes(fetchedEnvelopes);
         console.log(fetchedEnvelopes);
         const fetchedTotalBudget = await fetchTotalBudget();
