@@ -1,7 +1,7 @@
 import { findEnvelopeIndexById } from "./utils/findEnvelopeIndexById.js";
 
 //export let envelopes = [];
-export const fakeEnvelopes = [
+const fakeEnvelopes = [
   {
     id: "1",
     name: "first",

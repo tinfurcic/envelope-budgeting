@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { fetchEnvelopes } from "../util/fetchEnvelopes";
-import { fetchTotalBudget } from "../util/fetchTotalBudget";
+import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
+import { fetchTotalBudget } from "../util/axios/fetchTotalBudget";
 import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
 import Navigation from "./Navigation";
 import { Outlet } from "react-router-dom";
