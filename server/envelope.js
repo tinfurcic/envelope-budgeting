@@ -1,139 +1,95 @@
-import { findEnvelopeIndexById } from "./utils/findEnvelopeIndexById.js";
+import { db } from "../firebase-admin.js";
 
-//export let envelopes = [];
-const fakeEnvelopes = [
-  {
-    id: "1",
-    name: "first",
-    budget: 10,
-    currentAmount: 5,
-  },
-  {
-    id: "2",
-    name: "second",
-    budget: 100,
-    currentAmount: 50,
-  },
-  {
-    id: "3",
-    name: "third",
-    budget: 200,
-    currentAmount: 150,
-  },
-  {
-    id: "4",
-    name: "fourth",
-    budget: 400,
-    currentAmount: 240,
-  },
-  {
-    id: "5",
-    name: "fifth",
-    budget: 1000,
-    currentAmount: 800,
-  },
-  {
-    id: "6",
-    name: "sixth",
-    budget: 2000,
-    currentAmount: 500,
-  },
-  {
-    id: "7",
-    name: "seventh",
-    budget: 3000,
-    currentAmount: 1200,
-  },
-  {
-    id: "8",
-    name: "eighth",
-    budget: 4000,
-    currentAmount: 3200,
-  },
-  {
-    id: "9",
-    name: "ninth",
-    budget: 5000,
-    currentAmount: 3000,
-  },
-  {
-    id: "10",
-    name: "tenth",
-    budget: 8000,
-    currentAmount: 5400,
-  },
-];
-export let envelopes = fakeEnvelopes;
-
-let envelopeId = 1;
-
-export let isValidEnvelopeId = (envelopeId) => {
-  const foundEnvelope = envelopes.find(
-    (envelope) => envelope.id === envelopeId,
-  );
-  return foundEnvelope; // truthy if found, undefined (falsy) if not found
-};
-
-export const getAllEnvelopes = () => {
-  return envelopes;
-};
-
-export const getEnvelopeById = (envelopeId) => {
+export const getAllEnvelopes = async () => {
   try {
-    const envelopeIndex = findEnvelopeIndexById(envelopeId);
-    if (envelopeIndex !== undefined) {
-      const envelope = envelopes[envelopeIndex];
-      return envelope;
+    const envelopesRef = db.collection("envelopes"); // Top-level "envelopes" collection
+    const querySnapshot = await envelopesRef.get();
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching all envelopes (Admin SDK):", error);
+    throw new Error("Failed to fetch envelopes.");
+  }
+};
+
+export const getEnvelopeById = async (envelopeId) => {
+  try {
+    const envelopeRef = db.collection("envelopes").doc(String(envelopeId));
+    const envelopeDoc = await envelopeRef.get();
+
+    if (!envelopeDoc.exists) {
+      return null;
     }
+
+    return { id: envelopeDoc.id, ...envelopeDoc.data() };
   } catch (error) {
-    console.error(
-      "An error occurred in findEnvelopeIndexById():",
-      error.message,
-    );
+    console.error("Error fetching envelope by ID (Admin SDK):", error.message);
+    throw new Error("Failed to fetch the envelope.");
   }
 };
 
-export const createEnvelope = (name, budget, currentAmount) => {
-  if (name !== "" && Number(budget) !== 0) {
-    const envelope = {
-      id: `${envelopeId++}`,
-      name: `${name}`,
-      budget: `${budget}`,
-      currentAmount: `${currentAmount}`,
-    };
-    envelopes.push(envelope);
-    return envelope;
-  } else {
-    throw new Error("Missing name or budget!");
-  }
-};
 
-export const updateEnvelope = (
-  envelopeId,
-  newName,
-  newBudget,
-  newCurrentAmount,
-) => {
-  // hm, why not just (envelopeId, envelope)
-  // this function will handle all kinds of updates. All provided parameters will be changed.
-  // If a parameter is not provided, old values will be kept.
+export const createEnvelope = async (name, budget, currentAmount) => {
   try {
-    const envelopeIndex = findEnvelopeIndexById(envelopeId);
-    const envelope = envelopes[envelopeIndex];
+    const settingsRef = db.collection("settings").doc("nextId");
+    const envelopesRef = db.collection("envelopes");
 
-    envelope.name = newName ?? envelope.name;
-    envelope.budget = newBudget ?? envelope.budget;
-    envelope.currentAmount = newCurrentAmount ?? envelope.currentAmount;
+    let nextId;
 
-    envelopes[envelopeIndex] = envelope;
+    // Use a transaction to ensure atomicity
+    await db.runTransaction(async (transaction) => {
+      const settingsDoc = await transaction.get(settingsRef);
+
+      if (!settingsDoc.exists) {
+        throw new Error("Settings document not found!");
+      }
+
+      nextId = settingsDoc.data().nextId;
+
+      // Increment nextId
+      transaction.update(settingsRef, { nextId: nextId + 1 });
+
+      // Create a new envelope with the current nextId
+      const newEnvelope = {
+        id: nextId,
+        name,
+        budget: parseFloat(budget),
+        currentAmount: parseFloat(currentAmount),
+      };
+      const newDocRef = envelopesRef.doc(String(nextId));
+      transaction.set(newDocRef, newEnvelope);
+    });
+
+    return { id: nextId, name, budget: parseFloat(budget), currentAmount: parseFloat(currentAmount) };
   } catch (error) {
-    console.error(
-      "An error occurred in findEnvelopeIndexById():",
-      error.message,
-    );
+    console.error("Error creating envelope:", error);
+    throw new Error("Failed to create the envelope.");
   }
 };
 
-export const deleteEnvelope = (envelopeId) => {
-  envelopes = envelopes.filter((element) => element.id !== envelopeId);
+// return the complete updated envelope, or just the stuff that changed?
+export const updateEnvelope = async (envelopeId, newName, newBudget, newCurrentAmount) => {
+  try {
+    const updates = {};
+    if (newName) updates.name = newName;
+    if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
+    if (newCurrentAmount !== undefined) updates.currentAmount = parseFloat(newCurrentAmount);
+
+    const envelopeRef = db.collection("envelopes").doc(envelopeId);
+    await envelopeRef.update(updates);
+
+    return { id: envelopeId, ...updates };
+  } catch (error) {
+    console.error("Error updating envelope (Admin SDK):", error);
+    throw new Error("Failed to update the envelope.");
+  }
+};
+
+export const deleteEnvelope = async (envelopeId) => {
+  try {
+    const envelopeRef = db.collection("envelopes").doc(envelopeId);
+    await envelopeRef.delete();
+  } catch (error) {
+    console.error("Error deleting envelope (Admin SDK):", error);
+    throw new Error("Failed to delete the envelope.");
+  }
 };
