@@ -1,44 +1,49 @@
 import { db } from "../firebase-admin.js";
-const budgetDoc = db.collection("settings").doc("budget");
 
-export const getTotalBudget = async () => {
+// Fetch the total budget for a specific user
+export const getTotalBudget = async (userId) => {
   try {
-    const docSnapshot = await budgetDoc.get();
+    const userDoc = db.collection("users").doc(userId);
+    const docSnapshot = await userDoc.get();
     if (docSnapshot.exists) {
-      return docSnapshot.data().totalBudget;
+      return docSnapshot.data().totalBudget || 0; // Default to 0 if not set
     } else {
-      throw new Error("Budget document does not exist.");
+      throw new Error("User document does not exist.");
     }
   } catch (error) {
-    console.error("Error fetching total budget:", error);
+    console.error("Error fetching total budget:", error.message);
     throw new Error("Failed to fetch total budget.");
   }
 };
 
-export const setTotalBudget = async (amount) => {
+// Set the total budget for a specific user
+export const setTotalBudget = async (userId, amount) => {
   if (typeof amount !== "number") {
     throw new Error("The budget must be a number!");
   }
 
   try {
-    await budgetDoc.set({ totalBudget: amount });
+    const userDoc = db.collection("users").doc(userId);
+    await userDoc.set({ totalBudget: amount }, { merge: true }); // Merge to avoid overwriting other fields
     return amount;
   } catch (error) {
-    console.error("Error setting total budget:", error);
+    console.error("Error setting total budget:", error.message);
     throw new Error("Failed to set total budget.");
   }
 };
 
-export const updateTotalBudget = async (amount) => {
+// Update the total budget for a specific user
+export const updateTotalBudget = async (userId, amount) => {
   if (typeof amount !== "number") {
     throw new Error("The budget must be a number!");
   }
 
   try {
-    await budgetDoc.update({ totalBudget: amount });
+    const userDoc = db.collection("users").doc(userId);
+    await userDoc.update({ totalBudget: amount });
     return amount;
   } catch (error) {
-    console.error("Error updating total budget:", error);
+    console.error("Error updating total budget:", error.message);
     throw new Error("Failed to update total budget.");
   }
 };

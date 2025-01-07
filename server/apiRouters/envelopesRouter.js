@@ -9,9 +9,8 @@ import {
 
 export const envelopesRouter = express.Router();
 
-// Middleware to extract userId from the request (assuming authentication adds it)
 envelopesRouter.use((req, res, next) => {
-  const userId = req.user?.uid; // Adjust this based on how authentication is implemented
+  const userId = req.user?.uid;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized: Missing user ID" });
   }
@@ -19,7 +18,6 @@ envelopesRouter.use((req, res, next) => {
   next();
 });
 
-// Endpoint to get all envelopes
 envelopesRouter.get("/", async (req, res) => {
   try {
     const envelopes = await getAllEnvelopes(req.userId);
@@ -30,7 +28,6 @@ envelopesRouter.get("/", async (req, res) => {
   }
 });
 
-// Endpoint to get an envelope by ID
 envelopesRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -46,7 +43,6 @@ envelopesRouter.get("/:id", async (req, res) => {
   }
 });
 
-// Endpoint to create a new envelope
 envelopesRouter.post("/", async (req, res) => {
   const { name, budget, currentAmount } = req.body;
   if (!name || isNaN(budget) || isNaN(currentAmount)) {
@@ -62,7 +58,6 @@ envelopesRouter.post("/", async (req, res) => {
   }
 });
 
-// Endpoint to update an envelope by ID
 envelopesRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const { name, budget, currentAmount } = req.body;
@@ -76,7 +71,6 @@ envelopesRouter.patch("/:id", async (req, res) => {
   }
 });
 
-// Endpoint to delete an envelope by ID
 envelopesRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
 

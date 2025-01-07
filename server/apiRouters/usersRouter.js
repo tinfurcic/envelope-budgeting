@@ -24,6 +24,7 @@ usersRouter.post("/", async (req, res) => {
     await userRef.set({
       email,
       createdAt: new Date().toISOString(),
+      totalBudget: 0,
     });
 
     // Create a "metadata" document in the "envelopes" subcollection
