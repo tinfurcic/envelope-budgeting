@@ -9,10 +9,20 @@ import {
 
 export const envelopesRouter = express.Router();
 
+// Middleware to extract userId from the request (assuming authentication adds it)
+envelopesRouter.use((req, res, next) => {
+  const userId = req.user?.uid; // Adjust this based on how authentication is implemented
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: Missing user ID" });
+  }
+  req.userId = userId;
+  next();
+});
+
 // Endpoint to get all envelopes
 envelopesRouter.get("/", async (req, res) => {
   try {
-    const envelopes = await getAllEnvelopes();
+    const envelopes = await getAllEnvelopes(req.userId);
     res.status(200).json(envelopes);
   } catch (error) {
     console.error("Error fetching envelopes:", error.message);
@@ -24,7 +34,7 @@ envelopesRouter.get("/", async (req, res) => {
 envelopesRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const envelope = await getEnvelopeById(id);
+    const envelope = await getEnvelopeById(req.userId, id);
     if (envelope) {
       res.status(200).json(envelope);
     } else {
@@ -36,7 +46,6 @@ envelopesRouter.get("/:id", async (req, res) => {
   }
 });
 
-
 // Endpoint to create a new envelope
 envelopesRouter.post("/", async (req, res) => {
   const { name, budget, currentAmount } = req.body;
@@ -45,7 +54,7 @@ envelopesRouter.post("/", async (req, res) => {
   }
 
   try {
-    const newEnvelope = await createEnvelope(name, budget, currentAmount);
+    const newEnvelope = await createEnvelope(req.userId, name, budget, currentAmount);
     res.status(201).json(newEnvelope);
   } catch (error) {
     console.error("Error creating envelope:", error.message);
@@ -59,7 +68,7 @@ envelopesRouter.patch("/:id", async (req, res) => {
   const { name, budget, currentAmount } = req.body;
 
   try {
-    const updatedEnvelope = await updateEnvelope(id, name, budget, currentAmount);
+    const updatedEnvelope = await updateEnvelope(req.userId, id, name, budget, currentAmount);
     res.status(200).json(updatedEnvelope);
   } catch (error) {
     console.error("Error updating envelope:", error.message);
@@ -72,7 +81,7 @@ envelopesRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    await deleteEnvelope(id);
+    await deleteEnvelope(req.userId, id);
     res.status(204).send(); // No content
   } catch (error) {
     console.error("Error deleting envelope:", error.message);

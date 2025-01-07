@@ -49,5 +49,3 @@ budgetRouter.patch("/", async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 });
-
-export default budgetRouter;

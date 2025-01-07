@@ -1,9 +1,11 @@
 import { db } from "../firebase-admin.js";
 
-export const getAllEnvelopes = async () => {
+// Get all envelopes for a specific user
+export const getAllEnvelopes = async (userId) => {
   try {
-    const envelopesRef = db.collection("envelopes"); // Top-level "envelopes" collection
-    const querySnapshot = await envelopesRef.get();
+    const envelopesRef = db.collection("users").doc(userId).collection("envelopes");
+    const querySnapshot = await envelopesRef.where("__name__", "!=", "metadata").get();
+
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error fetching all envelopes (Admin SDK):", error);
@@ -11,9 +13,10 @@ export const getAllEnvelopes = async () => {
   }
 };
 
-export const getEnvelopeById = async (envelopeId) => {
+// Get a specific envelope by ID for a user
+export const getEnvelopeById = async (userId, envelopeId) => {
   try {
-    const envelopeRef = db.collection("envelopes").doc(String(envelopeId));
+    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
     const envelopeDoc = await envelopeRef.get();
 
     if (!envelopeDoc.exists) {
@@ -27,54 +30,37 @@ export const getEnvelopeById = async (envelopeId) => {
   }
 };
 
-
-export const createEnvelope = async (name, budget, currentAmount) => {
+// Create a new envelope for a user
+export const createEnvelope = async (userId, name, budget, currentAmount) => {
   try {
-    const settingsRef = db.collection("settings").doc("nextId");
-    const envelopesRef = db.collection("envelopes");
+    const envelopesRef = db.collection("users").doc(userId).collection("envelopes");
 
-    let nextId;
+    // Automatically generate a new document ID
+    const newDocRef = envelopesRef.doc();
+    const newEnvelope = {
+      name,
+      budget: parseFloat(budget),
+      currentAmount: parseFloat(currentAmount),
+      createdAt: new Date().toISOString(),
+    };
+    await newDocRef.set(newEnvelope);
 
-    // Use a transaction to ensure atomicity
-    await db.runTransaction(async (transaction) => {
-      const settingsDoc = await transaction.get(settingsRef);
-
-      if (!settingsDoc.exists) {
-        throw new Error("Settings document not found!");
-      }
-
-      nextId = settingsDoc.data().nextId;
-
-      // Increment nextId
-      transaction.update(settingsRef, { nextId: nextId + 1 });
-
-      // Create a new envelope with the current nextId
-      const newEnvelope = {
-        id: nextId,
-        name,
-        budget: parseFloat(budget),
-        currentAmount: parseFloat(currentAmount),
-      };
-      const newDocRef = envelopesRef.doc(String(nextId));
-      transaction.set(newDocRef, newEnvelope);
-    });
-
-    return { id: nextId, name, budget: parseFloat(budget), currentAmount: parseFloat(currentAmount) };
+    return { id: newDocRef.id, ...newEnvelope };
   } catch (error) {
     console.error("Error creating envelope:", error);
     throw new Error("Failed to create the envelope.");
   }
 };
 
-// return the complete updated envelope, or just the stuff that changed?
-export const updateEnvelope = async (envelopeId, newName, newBudget, newCurrentAmount) => {
+// Update an envelope for a user
+export const updateEnvelope = async (userId, envelopeId, newName, newBudget, newCurrentAmount) => {
   try {
     const updates = {};
     if (newName) updates.name = newName;
     if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
     if (newCurrentAmount !== undefined) updates.currentAmount = parseFloat(newCurrentAmount);
 
-    const envelopeRef = db.collection("envelopes").doc(envelopeId);
+    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
     await envelopeRef.update(updates);
 
     return { id: envelopeId, ...updates };
@@ -84,9 +70,10 @@ export const updateEnvelope = async (envelopeId, newName, newBudget, newCurrentA
   }
 };
 
-export const deleteEnvelope = async (envelopeId) => {
+// Delete an envelope for a user
+export const deleteEnvelope = async (userId, envelopeId) => {
   try {
-    const envelopeRef = db.collection("envelopes").doc(envelopeId);
+    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
     await envelopeRef.delete();
   } catch (error) {
     console.error("Error deleting envelope (Admin SDK):", error);
