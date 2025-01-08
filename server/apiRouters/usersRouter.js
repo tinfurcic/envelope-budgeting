@@ -25,6 +25,7 @@ usersRouter.post("/", async (req, res) => {
       email,
       createdAt: new Date().toISOString(),
       totalBudget: 0,
+      nextEnvelopeId: 1,
     });
 
     // Create a "metadata" document in the "envelopes" subcollection

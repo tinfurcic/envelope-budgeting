@@ -33,19 +33,33 @@ export const getEnvelopeById = async (userId, envelopeId) => {
 // Create a new envelope for a user
 export const createEnvelope = async (userId, name, budget, currentAmount) => {
   try {
-    const envelopesRef = db.collection("users").doc(userId).collection("envelopes");
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
 
-    // Automatically generate a new document ID
-    const newDocRef = envelopesRef.doc();
+    if (!userDoc.exists) {
+      throw new Error("User not found.");
+    }
+
+    const { nextEnvelopeId = 1 } = userDoc.data(); // Default to 1 if not set
+
+    const envelopeRef = userRef.collection("envelopes").doc(String(nextEnvelopeId));
+
     const newEnvelope = {
+      id: nextEnvelopeId,
       name,
       budget: parseFloat(budget),
       currentAmount: parseFloat(currentAmount),
       createdAt: new Date().toISOString(),
     };
-    await newDocRef.set(newEnvelope);
 
-    return { id: newDocRef.id, ...newEnvelope };
+    // Use Firestore batch for atomic operation
+    const batch = db.batch();
+    batch.set(envelopeRef, newEnvelope);
+    batch.update(userRef, { nextEnvelopeId: nextEnvelopeId + 1 });
+
+    await batch.commit();
+
+    return newEnvelope;
   } catch (error) {
     console.error("Error creating envelope:", error);
     throw new Error("Failed to create the envelope.");
