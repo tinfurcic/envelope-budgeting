@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { changeBudget } from "../util/changeBudget";
-import { fetchTotalBudget } from "../util/fetchTotalBudget";
+import { changeBudget } from "../util/axios/changeBudget";
+import { fetchTotalBudget } from "../util/axios/fetchTotalBudget";
 
 const AmountField = ({ label, amount, setAmount, id, showSaveButton }) => {
   const [inputValue, setInputValue] = useState(amount?.toString() || "");

@@ -1,4 +1,4 @@
-import { isNumberWithTwoDecimalsAtMost } from "./isNumberWithTwoDecimalsAtMost";
+import { isNumberWithTwoDecimalsAtMost } from "../isNumberWithTwoDecimalsAtMost";
 import axiosInstance from "./axiosInstance";
 
 export const createEnvelope = async (

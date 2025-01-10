@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { createEnvelope } from "../util/createEnvelope";
+import { createEnvelope } from "../util/axios/createEnvelope";
 import AmountField from "./AmountField";
 
 const CreateEnvelope = () => {

@@ -1,39 +1,54 @@
 import express from "express";
-import { getTotalBudget, setTotalBudget } from "../budget.js";
+import {
+  getTotalBudget,
+  setTotalBudget,
+  updateTotalBudget,
+} from "../budget.js";
 
 export const budgetRouter = express.Router();
 
-budgetRouter.get("/", (req, res, next) => {
-  // get total budget
-  const result = getTotalBudget();
-  if (result !== undefined) {
-    res.status(200).send({ totalBudget: result });
-  } else {
-    res.status(404).send();
+budgetRouter.get("/", async (req, res) => {
+  const userId = req.user.uid;
+  try {
+    const totalBudget = await getTotalBudget(userId);
+    res.status(200).json({ totalBudget });
+  } catch (error) {
+    console.error("Error fetching total budget:", error.message);
+    res.status(500).send({ error: "Internal server error" });
   }
 });
 
-budgetRouter.post("/", (req, res, next) => {
-  const newBudgetBody = req.body;
-  if (Object.hasOwn(newBudgetBody, "amount")) {
-    const budget = parseFloat(newBudgetBody.amount);
-    console.log(
-      "[budgetRouter] The budget is " +
-        budget +
-        ", which is of type " +
-        typeof budget,
+budgetRouter.post("/", async (req, res) => {
+  const userId = req.user.uid;
+  const { totalBudget } = req.body;
+  if (!totalBudget || isNaN(totalBudget)) {
+    return res.status(400).send({ error: "Invalid total budget value" });
+  }
+
+  try {
+    const newBudget = await setTotalBudget(userId, parseFloat(totalBudget));
+    res.status(201).json({ totalBudget: newBudget });
+  } catch (error) {
+    console.error("Error setting total budget:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+budgetRouter.patch("/", async (req, res) => {
+  const userId = req.user.uid;
+  const { totalBudget } = req.body;
+  if (!totalBudget || isNaN(totalBudget)) {
+    return res.status(400).send({ error: "Invalid total budget value" });
+  }
+
+  try {
+    const updatedBudget = await updateTotalBudget(
+      userId,
+      parseFloat(totalBudget),
     );
-    if (isNaN(budget)) {
-      return res.status(400).json({ error: "Amount must be a valid number" });
-    }
-    try {
-      setTotalBudget(budget);
-      res.status(201).json({ amount: budget });
-    } catch (error) {
-      console.error("An error occurred in setTotalBudget():", error.message);
-      res.status(500).json({ error: "Failed to set budget" });
-    }
-  } else {
-    res.status(400).json({ error: "Amount is required" });
+    res.status(200).json({ totalBudget: updatedBudget });
+  } catch (error) {
+    console.error("Error updating total budget:", error.message);
+    res.status(500).send({ error: "Internal server error" });
   }
 });

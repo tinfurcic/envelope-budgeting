@@ -1,4 +1,4 @@
-import admin from "../../firebase-admin.js";
+import admin from "firebase-admin";
 
 const authenticateToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1]; // Extract token from the "Authorization" header

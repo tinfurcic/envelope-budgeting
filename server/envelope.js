@@ -1,139 +1,122 @@
-import { findEnvelopeIndexById } from "./utils/findEnvelopeIndexById.js";
+import { db } from "../firebase-admin.js";
 
-//export let envelopes = [];
-export const fakeEnvelopes = [
-  {
-    id: "1",
-    name: "first",
-    budget: 10,
-    currentAmount: 5,
-  },
-  {
-    id: "2",
-    name: "second",
-    budget: 100,
-    currentAmount: 50,
-  },
-  {
-    id: "3",
-    name: "third",
-    budget: 200,
-    currentAmount: 150,
-  },
-  {
-    id: "4",
-    name: "fourth",
-    budget: 400,
-    currentAmount: 240,
-  },
-  {
-    id: "5",
-    name: "fifth",
-    budget: 1000,
-    currentAmount: 800,
-  },
-  {
-    id: "6",
-    name: "sixth",
-    budget: 2000,
-    currentAmount: 500,
-  },
-  {
-    id: "7",
-    name: "seventh",
-    budget: 3000,
-    currentAmount: 1200,
-  },
-  {
-    id: "8",
-    name: "eighth",
-    budget: 4000,
-    currentAmount: 3200,
-  },
-  {
-    id: "9",
-    name: "ninth",
-    budget: 5000,
-    currentAmount: 3000,
-  },
-  {
-    id: "10",
-    name: "tenth",
-    budget: 8000,
-    currentAmount: 5400,
-  },
-];
-export let envelopes = fakeEnvelopes;
-
-let envelopeId = 1;
-
-export let isValidEnvelopeId = (envelopeId) => {
-  const foundEnvelope = envelopes.find(
-    (envelope) => envelope.id === envelopeId,
-  );
-  return foundEnvelope; // truthy if found, undefined (falsy) if not found
-};
-
-export const getAllEnvelopes = () => {
-  return envelopes;
-};
-
-export const getEnvelopeById = (envelopeId) => {
+// Get all envelopes for a specific user
+export const getAllEnvelopes = async (userId) => {
   try {
-    const envelopeIndex = findEnvelopeIndexById(envelopeId);
-    if (envelopeIndex !== undefined) {
-      const envelope = envelopes[envelopeIndex];
-      return envelope;
-    }
+    const envelopesRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes");
+    const querySnapshot = await envelopesRef
+      .where("__name__", "!=", "metadata")
+      .get();
+
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error(
-      "An error occurred in findEnvelopeIndexById():",
-      error.message,
-    );
+    console.error("Error fetching all envelopes (Admin SDK):", error);
+    throw new Error("Failed to fetch envelopes.");
   }
 };
 
-export const createEnvelope = (name, budget, currentAmount) => {
-  if (name !== "" && Number(budget) !== 0) {
-    const envelope = {
-      id: `${envelopeId++}`,
-      name: `${name}`,
-      budget: `${budget}`,
-      currentAmount: `${currentAmount}`,
+// Get a specific envelope by ID for a user
+export const getEnvelopeById = async (userId, envelopeId) => {
+  try {
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
+    const envelopeDoc = await envelopeRef.get();
+
+    if (!envelopeDoc.exists) {
+      return null;
+    }
+
+    return { id: envelopeDoc.id, ...envelopeDoc.data() };
+  } catch (error) {
+    console.error("Error fetching envelope by ID (Admin SDK):", error.message);
+    throw new Error("Failed to fetch the envelope.");
+  }
+};
+
+// Create a new envelope for a user
+export const createEnvelope = async (userId, name, budget, currentAmount) => {
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      throw new Error("User not found.");
+    }
+
+    const { nextEnvelopeId = 1 } = userDoc.data(); // Default to 1 if not set
+
+    const envelopeRef = userRef
+      .collection("envelopes")
+      .doc(String(nextEnvelopeId));
+
+    const newEnvelope = {
+      id: nextEnvelopeId,
+      name,
+      budget: parseFloat(budget),
+      currentAmount: parseFloat(currentAmount),
+      createdAt: new Date().toISOString(),
     };
-    envelopes.push(envelope);
-    return envelope;
-  } else {
-    throw new Error("Missing name or budget!");
+
+    // Use Firestore batch for atomic operation
+    const batch = db.batch();
+    batch.set(envelopeRef, newEnvelope);
+    batch.update(userRef, { nextEnvelopeId: nextEnvelopeId + 1 });
+
+    await batch.commit();
+
+    return newEnvelope;
+  } catch (error) {
+    console.error("Error creating envelope:", error);
+    throw new Error("Failed to create the envelope.");
   }
 };
 
-export const updateEnvelope = (
+// Update an envelope for a user
+export const updateEnvelope = async (
+  userId,
   envelopeId,
   newName,
   newBudget,
   newCurrentAmount,
 ) => {
-  // hm, why not just (envelopeId, envelope)
-  // this function will handle all kinds of updates. All provided parameters will be changed.
-  // If a parameter is not provided, old values will be kept.
   try {
-    const envelopeIndex = findEnvelopeIndexById(envelopeId);
-    const envelope = envelopes[envelopeIndex];
+    const updates = {};
+    if (newName) updates.name = newName;
+    if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
+    if (newCurrentAmount !== undefined)
+      updates.currentAmount = parseFloat(newCurrentAmount);
 
-    envelope.name = newName ?? envelope.name;
-    envelope.budget = newBudget ?? envelope.budget;
-    envelope.currentAmount = newCurrentAmount ?? envelope.currentAmount;
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
+    await envelopeRef.update(updates);
 
-    envelopes[envelopeIndex] = envelope;
+    return { id: envelopeId, ...updates };
   } catch (error) {
-    console.error(
-      "An error occurred in findEnvelopeIndexById():",
-      error.message,
-    );
+    console.error("Error updating envelope (Admin SDK):", error);
+    throw new Error("Failed to update the envelope.");
   }
 };
 
-export const deleteEnvelope = (envelopeId) => {
-  envelopes = envelopes.filter((element) => element.id !== envelopeId);
+// Delete an envelope for a user
+export const deleteEnvelope = async (userId, envelopeId) => {
+  try {
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
+    await envelopeRef.delete();
+  } catch (error) {
+    console.error("Error deleting envelope (Admin SDK):", error);
+    throw new Error("Failed to delete the envelope.");
+  }
 };

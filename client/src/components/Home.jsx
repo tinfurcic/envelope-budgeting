@@ -1,7 +1,7 @@
 import React from "react";
 import { useOutletContext } from "react-router-dom";
 import Envelope from "./Envelope";
-import { fetchEnvelopes } from "../util/fetchEnvelopes";
+import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
 import { useAuth } from "./AuthContext";
 
 const Home = () => {
