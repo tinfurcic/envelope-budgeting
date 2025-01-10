@@ -19,17 +19,21 @@ const Login = () => {
   const handleSignup = async (event, email, password) => {
     event.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
-  
+
       console.log("User signed up:", user);
-  
+
       // Call the backend using axiosInstance
       await axiosInstance.post("/users", {
         uid: user.uid,
         email: user.email,
       });
-  
+
       navigate("/home");
     } catch (error) {
       console.error("Error signing up:", error.message);

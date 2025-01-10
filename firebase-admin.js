@@ -11,7 +11,10 @@ dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Resolve the path to the service account JSON file
-const serviceAccountPath = resolve(__dirname, process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+const serviceAccountPath = resolve(
+  __dirname,
+  process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
+);
 
 // Read and parse the service account JSON file manually
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf-8"));

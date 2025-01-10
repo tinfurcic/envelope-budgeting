@@ -42,7 +42,10 @@ budgetRouter.patch("/", async (req, res) => {
   }
 
   try {
-    const updatedBudget = await updateTotalBudget(userId, parseFloat(totalBudget));
+    const updatedBudget = await updateTotalBudget(
+      userId,
+      parseFloat(totalBudget),
+    );
     res.status(200).json({ totalBudget: updatedBudget });
   } catch (error) {
     console.error("Error updating total budget:", error.message);

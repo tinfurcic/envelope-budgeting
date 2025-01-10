@@ -50,7 +50,12 @@ envelopesRouter.post("/", async (req, res) => {
   }
 
   try {
-    const newEnvelope = await createEnvelope(req.userId, name, budget, currentAmount);
+    const newEnvelope = await createEnvelope(
+      req.userId,
+      name,
+      budget,
+      currentAmount,
+    );
     res.status(201).json(newEnvelope);
   } catch (error) {
     console.error("Error creating envelope:", error.message);
@@ -63,7 +68,13 @@ envelopesRouter.patch("/:id", async (req, res) => {
   const { name, budget, currentAmount } = req.body;
 
   try {
-    const updatedEnvelope = await updateEnvelope(req.userId, id, name, budget, currentAmount);
+    const updatedEnvelope = await updateEnvelope(
+      req.userId,
+      id,
+      name,
+      budget,
+      currentAmount,
+    );
     res.status(200).json(updatedEnvelope);
   } catch (error) {
     console.error("Error updating envelope:", error.message);

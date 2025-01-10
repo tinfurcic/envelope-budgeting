@@ -3,8 +3,13 @@ import { db } from "../firebase-admin.js";
 // Get all envelopes for a specific user
 export const getAllEnvelopes = async (userId) => {
   try {
-    const envelopesRef = db.collection("users").doc(userId).collection("envelopes");
-    const querySnapshot = await envelopesRef.where("__name__", "!=", "metadata").get();
+    const envelopesRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes");
+    const querySnapshot = await envelopesRef
+      .where("__name__", "!=", "metadata")
+      .get();
 
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
@@ -16,7 +21,11 @@ export const getAllEnvelopes = async (userId) => {
 // Get a specific envelope by ID for a user
 export const getEnvelopeById = async (userId, envelopeId) => {
   try {
-    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
     const envelopeDoc = await envelopeRef.get();
 
     if (!envelopeDoc.exists) {
@@ -42,7 +51,9 @@ export const createEnvelope = async (userId, name, budget, currentAmount) => {
 
     const { nextEnvelopeId = 1 } = userDoc.data(); // Default to 1 if not set
 
-    const envelopeRef = userRef.collection("envelopes").doc(String(nextEnvelopeId));
+    const envelopeRef = userRef
+      .collection("envelopes")
+      .doc(String(nextEnvelopeId));
 
     const newEnvelope = {
       id: nextEnvelopeId,
@@ -67,14 +78,25 @@ export const createEnvelope = async (userId, name, budget, currentAmount) => {
 };
 
 // Update an envelope for a user
-export const updateEnvelope = async (userId, envelopeId, newName, newBudget, newCurrentAmount) => {
+export const updateEnvelope = async (
+  userId,
+  envelopeId,
+  newName,
+  newBudget,
+  newCurrentAmount,
+) => {
   try {
     const updates = {};
     if (newName) updates.name = newName;
     if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
-    if (newCurrentAmount !== undefined) updates.currentAmount = parseFloat(newCurrentAmount);
+    if (newCurrentAmount !== undefined)
+      updates.currentAmount = parseFloat(newCurrentAmount);
 
-    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
     await envelopeRef.update(updates);
 
     return { id: envelopeId, ...updates };
@@ -87,7 +109,11 @@ export const updateEnvelope = async (userId, envelopeId, newName, newBudget, new
 // Delete an envelope for a user
 export const deleteEnvelope = async (userId, envelopeId) => {
   try {
-    const envelopeRef = db.collection("users").doc(userId).collection("envelopes").doc(envelopeId);
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
     await envelopeRef.delete();
   } catch (error) {
     console.error("Error deleting envelope (Admin SDK):", error);

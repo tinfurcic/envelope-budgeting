@@ -1,5 +1,5 @@
 import { doc, setDoc, collection } from "firebase/firestore";
-import { db } from "./firebase-config";
+import { db } from "../../firebase-config";
 
 export const saveEnvelope = async (userId, envelopeData) => {
   try {
