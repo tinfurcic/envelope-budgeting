@@ -1,0 +1,50 @@
+@use "../base/global";
+
+.funds-page {
+  &__exit {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+
+    &__btn {
+      font-size: 2rem;
+      font-weight: 300;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+    }
+  }
+
+  &__regular-income,
+  &__extra-income {
+    &__value {
+      color: global.$green;
+    }
+
+    &__edit-icon {
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+  }
+
+  &__warning {
+    display: flex;
+    border: 3px solid hsl(240, 84%, 80%);
+    background-color: hsl(240, 34%, 80%);
+
+    &__text {
+      padding: 0 0.5rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  &__short-term-savings,
+  &__long-term-savings {
+    &__value {
+      font-size: 1.125rem;
+      margin-left: 2rem;
+    }
+  }
+}
+
+// a lot of redundant stuff here

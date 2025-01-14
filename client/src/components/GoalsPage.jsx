@@ -1,6 +1,6 @@
 import React from "react";
 
-const GoalsManager = () => {
+const GoalsPage = () => {
   return (
     <div>
       <p>haha goals</p>
@@ -8,4 +8,4 @@ const GoalsManager = () => {
   );
 };
 
-export default GoalsManager;
+export default GoalsPage;

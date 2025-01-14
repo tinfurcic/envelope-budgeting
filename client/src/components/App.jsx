@@ -2,32 +2,40 @@ import React, { useState, useEffect } from "react";
 import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
 import { fetchTotalBudget } from "../util/axios/fetchTotalBudget";
 import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
-import Navigation from "./Navigation";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import "../sass/main.scss";
+import Navigation from "./Navigation";
 
 const App = () => {
   const [totalBudget, setTotalBudget] = useState(0);
   const [envelopes, setEnvelopes] = useState([]);
-  const [shortTermSavings, setShortTermSavings] = useState(200);
   const [unassignedBudget, setUnassignedBudget] = useState(0);
   const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
+  const [date, setDate] = useState(new Date());
+
   const appData = {
     envelopes,
     setEnvelopes,
-    loadingEnvelopes,
     totalBudget,
     setTotalBudget,
+    unassignedBudget,
+    loadingEnvelopes,
+    date,
   };
+
+  const location = useLocation();
+  const navRoutes = ["/home", "/envelopes", "/goals"];
+  const isNavRoute = navRoutes.includes(location.pathname);
 
   // Fetch data on load
   useEffect(() => {
+    setDate(new Date());
+
     const loadStuff = async () => {
       try {
         const fetchedEnvelopes = await fetchEnvelopes();
         setLoadingEnvelopes(false);
         setEnvelopes(fetchedEnvelopes);
-        console.log(fetchedEnvelopes);
         const fetchedTotalBudget = await fetchTotalBudget();
         setTotalBudget(fetchedTotalBudget);
       } catch (error) {
@@ -43,12 +51,10 @@ const App = () => {
 
   return (
     <div className="app">
-      <header className="app__header">
-        <Navigation />
-      </header>
-      <main className="app__main">
+      {isNavRoute && <Navigation />}
+      <div className="app__outlet">
         <Outlet context={appData} />
-      </main>
+      </div>
     </div>
   );
 };
