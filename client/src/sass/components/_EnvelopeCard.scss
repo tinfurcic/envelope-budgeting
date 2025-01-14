@@ -1,36 +1,61 @@
 @use "../base/global";
 
-$width: 9rem;
+$width: 10rem;
+$padding: 0.25rem;
 
 .envelope-card {
+  --font-size: 1rem;
+
   display: flex;
-  align-items: flex-start;
   flex-direction: column;
-  border: 1px solid global.$border-color;
-  padding: 0 0.25rem;
+  align-items: flex-start;
+
   min-width: $width;
+  min-height: 4.3421rem;
+  aspect-ratio: 9.5 / 4.125;
+
+  padding: 0 $padding;
   border-radius: 2px;
+  border: 2px solid global.$border-color;
 
   &__name {
     width: 100%;
 
-    font-size: 20px;
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    font-size: calc(var(--font-size) * 1.125);
   }
 
   &__amount-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+
     width: 100%;
     max-width: 100%;
-    display: flex;
-    justify-content: space-between;
+    flex-grow: 1;
+    padding-bottom: $padding;
+    position: relative;
 
     &--absolute {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      font-size: calc(var(--font-size) * 1.5);
+      line-height: 1;
+    }
+
+    &--percentage {
+      position: absolute;
+      bottom: 0;
+      right: $padding;
+
+      font-size: calc(var(--font-size) * 0.9375);
     }
   }
 }
