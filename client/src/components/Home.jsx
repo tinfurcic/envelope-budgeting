@@ -1,37 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { useOutletContext } from "react-router-dom";
-import ProgressBar from "./ProgressBar";
-import SettingsButton from "./SettingsButton";
 import { useAuth } from "./AuthContext";
+import ProgressBar from "./ProgressBar";
+import Button from "./Button";
+import gearIcon from "../media/gear-icon.png";
 
 const Home = () => {
   const { user } = useAuth();
   console.log(user);
-
-  const navigate = useNavigate();
-  const fakeEnvelopeSum = 1000;
   const { totalBudget } = useOutletContext();
-  const [percentage, setPercentage] = useState(
-    Math.round((fakeEnvelopeSum * 100) / totalBudget),
-  );
-
-  useEffect(() => {
-    setPercentage(Math.round((fakeEnvelopeSum * 100) / totalBudget));
-  }, [fakeEnvelopeSum, totalBudget]);
-  // fakeEnvelopeSum will later be a useState variable
 
   return (
     <>
       <div className="budget-overview">
         <div className="budget-overview__header">
           <h2>My funds</h2>
-          <SettingsButton
-            handleClick={() => navigate("/funds")}
-            buttonText="Manage funds"
-          />
+          <Button type="button" className="button" navigateTo="/funds" variant="blue" isDisabled={false} >
+            <img
+              src={gearIcon}
+              alt="Gear Icon"
+              className="button__gear-icon"
+              width="16"
+            ></img>{" "}
+            Manage funds
+          </Button>
         </div>
-        <ProgressBar percentage={percentage} />
+        <ProgressBar totalBudget={totalBudget} />
       </div>
       <div className="latest-expenses">
         <h2>Latest expenses</h2>
@@ -45,8 +39,3 @@ const Home = () => {
 };
 
 export default Home;
-
-//import { useAuth } from "./AuthContext";
-//const { user } = useAuth();
-//<h1>HENLO {user ? user.email : "Guestinho"}</h1>
-//{console.log(user)}

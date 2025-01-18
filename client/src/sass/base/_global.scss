@@ -1,9 +1,11 @@
 @use "typography";
 
-$background-color: hsl(180, 14%, 90%);
-$button-color: #10bcbc;
-$green: #10bc66;
-$red: #bc1010;
+$background-color: #e2e9e9;
+$primary-blue: #10bcbc;
+$primary-green: #10bc66;
+$primary-red: #bc1010;
+$primary-yellow: #bcbc10;
+$pale-light-yellow: #f6f6d5;
 $border-color: hsl(180, 14%, 70%);
 
 * {
@@ -21,4 +23,12 @@ body {
   line-height: typography.$line-height-base;
   letter-spacing: typography.$letter-spacing-normal;
   background-color: $background-color;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.no-margin-top {
+  margin-top: 0;
 }

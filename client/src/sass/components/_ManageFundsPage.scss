@@ -1,24 +1,15 @@
 @use "../base/global";
 
 .funds-page {
-  &__exit {
+  &__nav-back {
     margin-top: 1rem;
-    display: flex;
-    justify-content: flex-end;
-
-    &__btn {
-      font-size: 2rem;
-      font-weight: 300;
-      border: none;
-      background-color: transparent;
-      cursor: pointer;
-    }
+    margin-bottom: 0.625rem;
   }
 
   &__regular-income,
   &__extra-income {
     &__value {
-      color: global.$green;
+      color: global.$primary-green;
     }
 
     &__edit-icon {

@@ -7,7 +7,7 @@ import "../sass/main.scss";
 import Navigation from "./Navigation";
 
 const App = () => {
-  const [totalBudget, setTotalBudget] = useState(0);
+  const [totalBudget, setTotalBudget] = useState(null);
   const [envelopes, setEnvelopes] = useState([]);
   const [unassignedBudget, setUnassignedBudget] = useState(0);
   const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);

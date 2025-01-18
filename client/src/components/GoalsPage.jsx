@@ -2,9 +2,9 @@ import React from "react";
 
 const GoalsPage = () => {
   return (
-    <div>
-      <p>haha goals</p>
-    </div>
+    <>
+      <h1>My Goals</h1>
+    </>
   );
 };
 

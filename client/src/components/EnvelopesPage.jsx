@@ -1,14 +1,20 @@
 import React from "react";
 import { useOutletContext } from "react-router-dom";
 import EnvelopeCard from "./EnvelopeCard";
-import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
+import Button from "./Button";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes } = useOutletContext();
 
   return (
-    <>
-      <h2>My Envelopes</h2>
+    <div className="envelopes-page">
+      <div className="envelopes-page__header">
+        <h2 className="envelopes-page__header__heading" >My Envelopes</h2>
+        <Button type="button" className="button" navigateTo ="/create" variant="blue" isDisabled={false} > 
+          New Envelope
+        </Button>
+      </div>
+      
       {/* Add grid/slider view button*/}
       <div className="envelopes">
         {loadingEnvelopes ? (
@@ -23,12 +29,11 @@ const EnvelopesPage = () => {
             <EnvelopeCard
               key={envelope.id}
               envelope={envelope}
-              fetchEnvelopes={fetchEnvelopes}
             />
           ))
         )}
       </div>
-    </>
+    </div>
   );
 };
 

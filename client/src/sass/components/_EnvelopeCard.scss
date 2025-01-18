@@ -18,6 +18,13 @@ $padding: 0.25rem;
   border-radius: 2px;
   border: 2px solid global.$border-color;
 
+  cursor: pointer;
+  background-color: hsl(180, 44%, 97%);
+
+  &:hover {
+    border: 2px solid #10bcbc;
+  }
+
   &__name {
     width: 100%;
 

@@ -1,0 +1,14 @@
+
+input {
+  border: none;
+  border-radius: 5px;
+  font-size: 1.125rem;
+
+  &[type="text"]:focus {
+    outline: 2px solid #10bcbc;
+  }
+}
+
+label {
+  font-size: 1.125rem;
+}

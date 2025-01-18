@@ -1,8 +1,30 @@
 @use "./EnvelopeCard";
 
+.envelopes-page {
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__envelopes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(EnvelopeCard.$width, 1fr));
+    justify-items: stretch;
+    gap: 10px;
+  }
+}
+
 .envelopes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(EnvelopeCard.$width, 1fr));
   justify-items: stretch;
   gap: 10px;
+}
+
+.envelopes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

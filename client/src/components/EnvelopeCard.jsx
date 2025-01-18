@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const EnvelopeCard = ({ envelope, fetchEnvelopes }) => {
+const EnvelopeCard = ({ envelope }) => {
   const containerRef = useRef(null);
-  const [name, setName] = useState(envelope.name);
-  const [budget, setBudget] = useState(envelope.budget);
-  const [currentAmount, setCurrentAmount] = useState(envelope.currentAmount);
+  const navigate = useNavigate();
+  const { name, budget, currentAmount, id } = envelope;
 
-  const currency = "$"; // this should be a global setting, somewhere
+  const currency = "€"; // this should be a global setting, somewhere
 
   useEffect(() => {
     const updateFontSize = () => {
@@ -26,7 +26,7 @@ const EnvelopeCard = ({ envelope, fetchEnvelopes }) => {
   }, []);
 
   return (
-    <div className="envelope-card" ref={containerRef}>
+    <div className="envelope-card" ref={containerRef} onClick={() => navigate(`/envelopes/${id}`)}>
       <span className="envelope-card__name">{name}</span>
       <div className="envelope-card__amount-left">
         <span className="envelope-card__amount-left--absolute">

@@ -1,7 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-const ProgressBar = ({ percentage }) => {
+const ProgressBar = ({ totalBudget }) => {
   const componentRef = useRef(null);
+
+  const fakeEnvelopeSum = 1000;
+  const [percentage, setPercentage] = useState(
+    Math.round((fakeEnvelopeSum * 100) / totalBudget),
+  );
+
+  useEffect(() => {
+    setPercentage(Math.round((fakeEnvelopeSum * 100) / totalBudget));
+  }, [fakeEnvelopeSum, totalBudget]);
+  // fakeEnvelopeSum will later be a useState variable
 
   useEffect(() => {
     if (componentRef.current) {
@@ -16,7 +26,7 @@ const ProgressBar = ({ percentage }) => {
         className="progress-bar-container__progress-bar"
       ></div>
       <span className="progress-bar-container__percentage">
-        {percentage === Infinity ? "Loading..." : `${percentage}%`}
+        {totalBudget === null ? "Loading..." : (totalBudget !== 0 ? `${percentage}%` : "Your income is 0")}
       </span>
     </div>
   );
