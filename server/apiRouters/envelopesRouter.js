@@ -44,7 +44,7 @@ envelopesRouter.get("/:id", async (req, res) => {
 });
 
 envelopesRouter.post("/", async (req, res) => {
-  const { name, budget, currentAmount } = req.body;
+  const { name, budget, currentAmount, description, color } = req.body;
   if (!name || isNaN(budget) || isNaN(currentAmount)) {
     return res.status(400).send({ error: "Invalid envelope data" });
   }
@@ -55,6 +55,8 @@ envelopesRouter.post("/", async (req, res) => {
       name,
       budget,
       currentAmount,
+      description,
+      color
     );
     res.status(201).json(newEnvelope);
   } catch (error) {
@@ -65,7 +67,7 @@ envelopesRouter.post("/", async (req, res) => {
 
 envelopesRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, budget, currentAmount } = req.body;
+  const { name, budget, currentAmount, description, color } = req.body;
 
   try {
     const updatedEnvelope = await updateEnvelope(
@@ -74,6 +76,8 @@ envelopesRouter.patch("/:id", async (req, res) => {
       name,
       budget,
       currentAmount,
+      description,
+      color
     );
     res.status(200).json(updatedEnvelope);
   } catch (error) {

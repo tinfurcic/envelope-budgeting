@@ -5,6 +5,8 @@ export const createEnvelope = async (
   newEnvelopeName,
   newEnvelopeBudget,
   newEnvelopeCurrentAmount,
+  newEnvelopeDescription,
+  newEnvelopeColor,
   setEnvelopes,
 ) => {
   if (
@@ -18,6 +20,8 @@ export const createEnvelope = async (
         name: newEnvelopeName,
         budget: newEnvelopeBudget,
         currentAmount: newEnvelopeCurrentAmount,
+        description: newEnvelopeDescription,
+        color: newEnvelopeColor,
       });
       setEnvelopes((prevEnvelopes) => [...prevEnvelopes, res.data]);
       return { success: true, data: res.data };
@@ -25,18 +29,6 @@ export const createEnvelope = async (
       return { success: false, error: err.message };
     }
   } else {
-    console.log("typeof newEnvelopeName is: " + typeof newEnvelopeName);
-    console.log(
-      "isNumberWithTwoDecimalsAtMost(newEnvelopeBudget) = " +
-        isNumberWithTwoDecimalsAtMost(newEnvelopeBudget),
-    );
-    console.log(
-      "isNumberWithTwoDecimalsAtMost(newEnvelopeCurrentAmount) = " +
-        isNumberWithTwoDecimalsAtMost(newEnvelopeCurrentAmount),
-    );
-    console.log(
-      `newEnvelopeCurrentAmount <= newEnvelopeBudget is ${Number(newEnvelopeCurrentAmount) <= Number(newEnvelopeBudget)}`,
-    );
     return { success: false, error: "Invalid input value(s)." };
   }
 };

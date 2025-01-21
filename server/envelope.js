@@ -40,7 +40,14 @@ export const getEnvelopeById = async (userId, envelopeId) => {
 };
 
 // Create a new envelope for a user
-export const createEnvelope = async (userId, name, budget, currentAmount) => {
+export const createEnvelope = async (
+  userId,
+  name,
+  budget,
+  currentAmount,
+  description,
+  color
+) => {
   try {
     const userRef = db.collection("users").doc(userId);
     const userDoc = await userRef.get();
@@ -49,7 +56,7 @@ export const createEnvelope = async (userId, name, budget, currentAmount) => {
       throw new Error("User not found.");
     }
 
-    const { nextEnvelopeId = 1 } = userDoc.data(); // Default to 1 if not set
+    const { nextEnvelopeId = 1 } = userDoc.data();
 
     const envelopeRef = userRef
       .collection("envelopes")
@@ -60,10 +67,11 @@ export const createEnvelope = async (userId, name, budget, currentAmount) => {
       name,
       budget: parseFloat(budget),
       currentAmount: parseFloat(currentAmount),
+      description,
+      color,
       createdAt: new Date().toISOString(),
     };
 
-    // Use Firestore batch for atomic operation
     const batch = db.batch();
     batch.set(envelopeRef, newEnvelope);
     batch.update(userRef, { nextEnvelopeId: nextEnvelopeId + 1 });
@@ -84,6 +92,8 @@ export const updateEnvelope = async (
   newName,
   newBudget,
   newCurrentAmount,
+  newDescription,
+  newColor
 ) => {
   try {
     const updates = {};
@@ -91,6 +101,8 @@ export const updateEnvelope = async (
     if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
     if (newCurrentAmount !== undefined)
       updates.currentAmount = parseFloat(newCurrentAmount);
+    if (newDescription !== undefined) updates.description = newDescription;
+    if (newColor !== undefined) updates.color = newColor;
 
     const envelopeRef = db
       .collection("users")
