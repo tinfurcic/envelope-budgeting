@@ -2,5 +2,9 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 4rem;
+  margin-top: 1rem;
+}
+
+.nav-link img {
+  display: block; // removes the padding
 }

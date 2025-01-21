@@ -1,0 +1,22 @@
+@use "../base/global";
+
+.currency-dropdown-container {
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+
+  &__save-btn {
+    margin-left: 1rem;
+  }
+}
+
+.dropdown {
+  background-color: white;
+  margin-left: 0.5rem;
+  border-radius: 5px;
+  border: none;
+
+  &:focus {
+    outline: 1px solid global.$primary-blue;
+  }
+}

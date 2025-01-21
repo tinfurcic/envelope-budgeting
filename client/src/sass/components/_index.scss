@@ -1,6 +1,21 @@
 @forward "App";
-@forward "Envelope";
 @forward "Navigation";
-@forward "BudgetManager";
+@forward "NavLink";
+
 @forward "Home";
-@forward "NavButton";
+@forward "ProgressBar";
+
+@forward "EnvelopesPage";
+@forward "EnvelopeCard";
+@forward "Envelope";
+@forward "CreateEnvelopePage";
+
+@forward "GoalsPage";
+@forward "Goal";
+
+@forward "ProfilePage";
+@forward "CurrencyDropdown";
+
+@forward "Login";
+
+@forward "Button";

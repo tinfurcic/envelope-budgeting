@@ -1,0 +1,76 @@
+@use "../base/global";
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  box-shadow:
+    rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  &--blue {
+    background-color: global.$primary-blue;
+  }
+
+  &--green {
+    background-color: global.$primary-green;
+  }
+
+  &--red {
+    background-color: global.$secondary-red;
+  }
+
+  &--login {
+    flex-grow: 1;
+    background-color: global.$primary-green;
+  }
+
+  &--back {
+    border: none;
+    background-color: transparent;
+  }
+
+  &--edit {
+    padding: 0.125rem;
+    border-radius: 5px;
+    border: 1px solid black;
+    background-color: transparent;
+
+    & img {
+      display: block;
+      width: 1em;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &__gear-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .button__gear-icon {
+    animation: spin 2s linear infinite;
+  }
+
+  &:active .button__gear-icon {
+    animation: spin 0.5s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

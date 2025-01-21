@@ -1,6 +1,12 @@
 @use "typography";
 
-$background-color: hsl(180, 15%, 90%);
+$background-color: #e2e9e9;
+$primary-blue: #10bcbc;
+$primary-green: #10bc66;
+$primary-red: #bc1010;
+$secondary-red: hsl(0, 84%, 64%);
+$primary-yellow: #bcbc10;
+$pale-light-yellow: #f6f6d5;
 $border-color: hsl(180, 14%, 70%);
 
 * {
@@ -18,4 +24,12 @@ body {
   line-height: typography.$line-height-base;
   letter-spacing: typography.$letter-spacing-normal;
   background-color: $background-color;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.no-margin-top {
+  margin-top: 0;
 }

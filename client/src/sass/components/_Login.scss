@@ -1,0 +1,32 @@
+.login-page {
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__greeting {
+    font-size: 2rem;
+    margin-bottom: 0;
+  }
+
+  &__switch-mode {
+    margin-top: 0.25rem;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+
+    &__submit-btn {
+      margin-top: 0.5rem;
+      display: flex;
+    }
+  }
+}

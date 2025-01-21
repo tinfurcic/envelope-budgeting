@@ -1,42 +1,30 @@
 import React from "react";
 import { useOutletContext } from "react-router-dom";
-import Envelope from "./Envelope";
-import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
 import { useAuth } from "./AuthContext";
+import ProgressBar from "./ProgressBar";
 
 const Home = () => {
-  const { envelopes, loadingEnvelopes } = useOutletContext();
   const { user } = useAuth();
+  console.log(user);
+  const { totalBudget } = useOutletContext();
 
   return (
-    <>
-      <h1>HENLO {user ? user.email : "Guestinho"}</h1>
-      {console.log(user)}
-      <h2>My Envelopes</h2>
-      {/* Add grid/slider view button*/}
-      <div className="envelopes">
-        {loadingEnvelopes ? (
-          <span>Loading your envelopes...</span>
-        ) : envelopes.length === 0 ? (
-          <>
-            <span>You don't have any envelopes yet. </span>
-            <button>Create one!</button>
-          </>
-        ) : (
-          envelopes.map((envelope) => (
-            <Envelope
-              key={envelope.id}
-              envelope={envelope}
-              fetchEnvelopes={fetchEnvelopes}
-            />
-          ))
-        )}
+    <div className="home-page">
+      <h1 className="home-page__heading">Home</h1>
+      <div className="budget-overview">
+        <h2 className="budget-overview__heading">Budget overview</h2>
+        <ProgressBar totalBudget={totalBudget} />
       </div>
-      <div className="transactions-section">
-        <h2>Recent transactions</h2>
+      <div className="home-page__latest-expenses">
+        <h2 className="home-page__latest-expenses__heading">Latest expenses</h2>
         {/* Show saved transactions, from newest to oldest */}
       </div>
-    </>
+      <div className="home-page__this-month-stats">
+        <h2 className="home-page__this-month-stats__heading">
+          This month's stats
+        </h2>
+      </div>
+    </div>
   );
 };
 

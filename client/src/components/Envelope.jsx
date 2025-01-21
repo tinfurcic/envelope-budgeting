@@ -1,24 +1,57 @@
-import React, { useState } from "react";
+import React from "react";
+import { useParams, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Button from "./Button";
+import backArrow from "../media/back-arrow.png";
+import editIcon from "../media/edit-icon.png";
 
-const Envelope = ({ envelope, fetchEnvelopes }) => {
-  const [name, setName] = useState(envelope.name);
-  const [budget, setBudget] = useState(envelope.budget);
-  const [currentAmount, setCurrentAmount] = useState(envelope.currentAmount);
+const Envelope = () => {
+  const { id } = useParams();
+  const { envelopes } = useOutletContext();
+  const navigate = useNavigate();
 
-  const currency = "$"; // this should be a global setting, somewhere
+  const envelope = envelopes.find((env) => env.id.toString() === id);
+
+  if (!envelope) {
+    return <span>Envelope not found.</span>;
+  }
 
   return (
-    <div className="envelope">
-      <span className="envelope__name">{name}</span>
-      <div className="envelope__amount-left">
-        <span className="envelope__amount-left--absolute">
-          {currency}
-          {currentAmount}
-        </span>
-        <span className="envelope__amount-left--percentage">
-          ({Math.round((currentAmount * 100) / budget)}%)
-        </span>
+    <div className="envelope-overview">
+      <div className="envelope-overview__nav-back">
+        <Button
+          type="button"
+          className="button"
+          onClick={() => navigate("/envelopes")}
+          variant="back"
+          isDisabled={false}
+        >
+          <img src={backArrow} alt="Back" width="20" /> to My Envelopes
+        </Button>
       </div>
+      <h1 className="envelope-overview__heading">
+        {envelope.name}
+        <div className="envelope-overview__heading__edit-icon">
+          <Button
+            type="button"
+            className="button"
+            onClick={null}
+            variant="edit"
+            isDisabled={false}
+          >
+            <img src={editIcon} alt="Edit Icon" />
+          </Button>
+        </div>
+      </h1>
+      <p className="envelope-overview__description">
+        Envelope description here
+      </p>
+      <p>Budget: ${envelope.budget}</p>
+      <p>Current Amount: ${envelope.currentAmount}</p>
+
+      <h2 className="envelope-overview__this-month-expenses">
+        This month's expenses
+      </h2>
     </div>
   );
 };
