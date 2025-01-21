@@ -1,15 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
-const Button = ({ type, className, navigateTo, variant, isDisabled, children }) => {
-  const navigate = useNavigate();
-
+const Button = ({
+  type,
+  className,
+  onClick,
+  variant,
+  isDisabled,
+  children,
+}) => {
   return (
-    <button 
-      type={type} 
-      className={`${className} ${variant && `${className}--${variant}`}`} 
-      onClick={navigateTo ? () => navigate(`${navigateTo}`) : null} 
-      disabled={isDisabled} 
+    <button
+      type={type}
+      className={`${className} ${variant && `${className}--${variant}`}`}
+      onClick={onClick}
+      disabled={isDisabled}
     >
       {children}
     </button>

@@ -26,14 +26,18 @@ const EnvelopeCard = ({ envelope }) => {
   }, []);
 
   return (
-    <div className="envelope-card" ref={containerRef} onClick={() => navigate(`/envelopes/${id}`)}>
+    <div
+      className="envelope-card"
+      ref={containerRef}
+      onClick={() => navigate(`/envelopes/${id}`)}
+    >
       <span className="envelope-card__name">{name}</span>
       <div className="envelope-card__amount-left">
-        <span className="envelope-card__amount-left--absolute">
+        <span className="envelope-card__amount-absolute">
           {currency}
           {currentAmount}
         </span>
-        <span className="envelope-card__amount-left--percentage">
+        <span className="envelope-card__amount-percentage">
           ({Math.round((currentAmount * 100) / budget)}%)
         </span>
       </div>

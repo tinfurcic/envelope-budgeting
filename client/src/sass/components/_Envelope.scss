@@ -1,0 +1,16 @@
+.envelope-overview {
+  &__nav-back {
+    margin-top: 1rem;
+    margin-bottom: 0.625rem;
+  }
+
+  &__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__edit-icon {
+      margin-left: auto;
+    }
+  }
+}

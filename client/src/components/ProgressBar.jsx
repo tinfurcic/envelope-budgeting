@@ -26,7 +26,11 @@ const ProgressBar = ({ totalBudget }) => {
         className="progress-bar-container__progress-bar"
       ></div>
       <span className="progress-bar-container__percentage">
-        {totalBudget === null ? "Loading..." : (totalBudget !== 0 ? `${percentage}%` : "Your income is 0")}
+        {totalBudget === null
+          ? "Loading..."
+          : totalBudget !== 0
+            ? `${percentage}%`
+            : "Your income is 0"}
       </span>
     </div>
   );

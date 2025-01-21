@@ -24,7 +24,7 @@ const App = () => {
   };
 
   const location = useLocation();
-  const navRoutes = ["/home", "/envelopes", "/goals"];
+  const navRoutes = ["/home", "/envelopes", "/goals", "/profile"];
   const isNavRoute = navRoutes.includes(location.pathname);
 
   // Fetch data on load

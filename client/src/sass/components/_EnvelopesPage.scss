@@ -1,6 +1,11 @@
 @use "./EnvelopeCard";
 
 .envelopes-page {
+  &__loading-message {
+    display: flex;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
 
   &__header {
     display: flex;
@@ -8,23 +13,13 @@
     align-items: center;
   }
 
-  &__envelopes {
+  &__cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(EnvelopeCard.$width, 1fr));
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(EnvelopeCard.$min-width, 1fr)
+    );
     justify-items: stretch;
     gap: 10px;
   }
-}
-
-.envelopes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(EnvelopeCard.$width, 1fr));
-  justify-items: stretch;
-  gap: 10px;
-}
-
-.envelopes-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }

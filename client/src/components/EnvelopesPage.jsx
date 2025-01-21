@@ -1,36 +1,46 @@
 import React from "react";
 import { useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes } = useOutletContext();
+  const navigate = useNavigate();
 
   return (
     <div className="envelopes-page">
       <div className="envelopes-page__header">
-        <h2 className="envelopes-page__header__heading" >My Envelopes</h2>
-        <Button type="button" className="button" navigateTo ="/create" variant="blue" isDisabled={false} > 
+        <h2 className="envelopes-page__heading">My Envelopes</h2>
+        <Button
+          type="button"
+          className="button"
+          onClick={() => navigate("/create")}
+          variant="blue"
+          isDisabled={false}
+        >
           New Envelope
         </Button>
       </div>
-      
+
       {/* Add grid/slider view button*/}
-      <div className="envelopes">
+      <div className="envelopes-page__envelopes">
         {loadingEnvelopes ? (
-          <span>Loading your envelopes...</span>
+          <span className="envelopes-page__loading-message">
+            Loading your envelopes...
+          </span>
         ) : envelopes.length === 0 ? (
-          <>
-            <span>You don't have any envelopes yet. </span>
-            <button>Create one!</button>
-          </>
+          <div className="envelopes-page__no-items">
+            <span className="envelopes-page__no-items-message">
+              You don't have any envelopes yet. Create one!
+            </span>
+          </div>
         ) : (
-          envelopes.map((envelope) => (
-            <EnvelopeCard
-              key={envelope.id}
-              envelope={envelope}
-            />
-          ))
+          <div className="envelopes-page__cards-container">
+            {envelopes.map((envelope) => (
+              <EnvelopeCard key={envelope.id} envelope={envelope} />
+            ))}
+          </div>
         )}
       </div>
     </div>

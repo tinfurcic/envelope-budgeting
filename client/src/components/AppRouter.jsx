@@ -1,13 +1,13 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import PrivateRoute from "./PrivateRoute";
+import Login from "./Login";
 import App from "./App";
 import Home from "./Home";
 import EnvelopesPage from "./EnvelopesPage";
 import GoalsPage from "./GoalsPage";
+import ProfilePage from "./ProfilePage";
 import CreateEnvelopePage from "./CreateEnvelopePage";
-import ManageFundsPage from "./ManageFundsPage";
-import Login from "./Login";
-import PrivateRoute from "./PrivateRoute";
 import Envelope from "./Envelope";
 
 function AppRouter() {
@@ -15,7 +15,7 @@ function AppRouter() {
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={<Login />} />
-      
+
       {/* Default Redirect */}
       <Route path="/" element={<Navigate to="/home" />} />
 
@@ -34,7 +34,7 @@ function AppRouter() {
         <Route path="/envelopes/:id" element={<Envelope />} />
         <Route path="/goals" element={<GoalsPage />} />
         <Route path="/create" element={<CreateEnvelopePage />} />
-        <Route path="/funds" element={<ManageFundsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   );
