@@ -28,11 +28,18 @@ usersRouter.post("/", async (req, res) => {
       nextEnvelopeId: 1,
     });
 
-    // Create a "metadata" document in the "envelopes" subcollection
+    // Initialize envelopes metadata (to initialize)
     const envelopesRef = userRef.collection("envelopes");
     await envelopesRef.doc("metadata").set({
       initialized: true,
     });
+
+    // Initialize income with default values
+    const incomeRef = userRef.collection("income");
+    await Promise.all([
+      incomeRef.doc("regularIncome").set({ value: 0 }),
+      incomeRef.doc("extraIncome").set({ value: 0 }),
+    ]);
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {

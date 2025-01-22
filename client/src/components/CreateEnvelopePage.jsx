@@ -13,6 +13,7 @@ const CreateEnvelopePage = () => {
   const [newEnvelopeBudget, setNewEnvelopeBudget] = useState("");
   const [newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount] = useState("");
   const [newEnvelopeDescription, setNewEnvelopeDescription] = useState("");
+  const [newEnvelopeColor, setNewEnvelopeColor] = useState("#FFFFFF");
   const [isChecked, setIsChecked] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
 
@@ -24,7 +25,9 @@ const CreateEnvelopePage = () => {
       newEnvelopeName,
       Number(newEnvelopeBudget),
       Number(newEnvelopeCurrentAmount),
-      setEnvelopes,
+      newEnvelopeDescription,
+      newEnvelopeColor,
+      setEnvelopes
     );
 
     if (!result.success) {
