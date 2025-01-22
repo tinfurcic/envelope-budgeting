@@ -29,17 +29,28 @@ incomeRouter.patch("/", async (req, res) => {
 
   // Ensure both fields are provided
   if (regularIncome === undefined || extraIncome === undefined) {
-    return res.status(400).json({ error: "'regularIncome' and 'extraIncome' must be provided." });
+    return res
+      .status(400)
+      .json({ error: "'regularIncome' and 'extraIncome' must be provided." });
   }
 
   // Ensure both fields are numbers
   if (isNaN(regularIncome) || isNaN(extraIncome)) {
-    return res.status(400).json({ error: "Invalid values. 'regularIncome' and 'extraIncome' must be numbers." });
+    return res
+      .status(400)
+      .json({
+        error:
+          "Invalid values. 'regularIncome' and 'extraIncome' must be numbers.",
+      });
   }
 
   try {
     // Update both income types simultaneously
-    const updatedIncome = await updateIncome(req.userId, regularIncome, extraIncome);
+    const updatedIncome = await updateIncome(
+      req.userId,
+      regularIncome,
+      extraIncome,
+    );
     res.status(200).json(updatedIncome);
   } catch (error) {
     console.error("Error updating income:", error.message);

@@ -29,17 +29,30 @@ savingsRouter.patch("/", async (req, res) => {
 
   // Ensure both fields are provided
   if (shortTermSavings === undefined || longTermSavings === undefined) {
-    return res.status(400).json({ error: "'shortTermSavings' and 'longTermSavings' must be provided." });
+    return res
+      .status(400)
+      .json({
+        error: "'shortTermSavings' and 'longTermSavings' must be provided.",
+      });
   }
 
   // Ensure both fields are numbers
   if (isNaN(shortTermSavings) || isNaN(longTermSavings)) {
-    return res.status(400).json({ error: "Invalid values. 'shortTermSavings' and 'longTermSavings' must be numbers." });
+    return res
+      .status(400)
+      .json({
+        error:
+          "Invalid values. 'shortTermSavings' and 'longTermSavings' must be numbers.",
+      });
   }
 
   try {
     // Update both savings types simultaneously
-    const updatedSavings = await updateSavings(req.userId, shortTermSavings, longTermSavings);
+    const updatedSavings = await updateSavings(
+      req.userId,
+      shortTermSavings,
+      longTermSavings,
+    );
     res.status(200).json(updatedSavings);
   } catch (error) {
     console.error("Error updating savings:", error.message);
@@ -63,7 +76,11 @@ savingsRouter.patch("/:savingsType", async (req, res) => {
   }
 
   try {
-    const updatedSavings = await updateSavingsType(req.userId, savingsType, value);
+    const updatedSavings = await updateSavingsType(
+      req.userId,
+      savingsType,
+      value,
+    );
     res.status(200).json(updatedSavings);
   } catch (error) {
     console.error("Error updating savings:", error.message);

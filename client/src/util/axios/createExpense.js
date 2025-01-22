@@ -6,7 +6,7 @@ export const createExpense = async (
   source,
   description,
   isLockedIn,
-  setExpenses
+  setExpenses,
 ) => {
   try {
     const res = await axiosInstance.post("/expenses", {

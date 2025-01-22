@@ -46,6 +46,7 @@ envelopesRouter.get("/:id", async (req, res) => {
 envelopesRouter.post("/", async (req, res) => {
   const { name, budget, currentAmount, description, color } = req.body;
   if (!name || isNaN(budget) || isNaN(currentAmount)) {
+    // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
     return res.status(400).send({ error: "Invalid envelope data" });
   }
 
@@ -56,7 +57,7 @@ envelopesRouter.post("/", async (req, res) => {
       budget,
       currentAmount,
       description,
-      color
+      color,
     );
     res.status(201).json(newEnvelope);
   } catch (error) {
@@ -77,7 +78,7 @@ envelopesRouter.patch("/:id", async (req, res) => {
       budget,
       currentAmount,
       description,
-      color
+      color,
     );
     res.status(200).json(updatedEnvelope);
   } catch (error) {

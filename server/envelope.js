@@ -40,13 +40,15 @@ export const getEnvelopeById = async (userId, envelopeId) => {
 };
 
 // Create a new envelope for a user
+// By adding `|| ""` after a property, I can make sending through request body optional
+// It's probably better to make user actions pass some values by default
 export const createEnvelope = async (
   userId,
   name,
   budget,
   currentAmount,
   description,
-  color
+  color,
 ) => {
   try {
     const userRef = db.collection("users").doc(userId);
@@ -93,7 +95,7 @@ export const updateEnvelope = async (
   newBudget,
   newCurrentAmount,
   newDescription,
-  newColor
+  newColor,
 ) => {
   try {
     const updates = {};

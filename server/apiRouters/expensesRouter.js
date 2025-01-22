@@ -45,18 +45,19 @@ expensesRouter.get("/:id", async (req, res) => {
 
 expensesRouter.post("/", async (req, res) => {
   const { amount, date, source, description, isLockedIn } = req.body;
-  if (isNaN(amount) || !date || !source) {
+  if (isNaN(amount) || !date || !source || !isLockedIn) {
+    // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
     return res.status(400).send({ error: "Invalid expense data" });
   }
 
   try {
     const newExpense = await createExpense(
       req.userId,
-      parseFloat(amount),
+      amount,
       date,
       source, // "e:id" for envelopes, "STS" / "LTS" for short/long term savings?
       description,
-      isLockedIn
+      isLockedIn,
     );
     res.status(201).json(newExpense);
   } catch (error) {
@@ -77,7 +78,7 @@ expensesRouter.patch("/:id", async (req, res) => {
       date,
       source,
       description,
-      isLockedIn
+      isLockedIn,
     );
     res.status(200).json(updatedExpense);
   } catch (error) {

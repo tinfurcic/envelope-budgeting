@@ -27,7 +27,7 @@ const CreateEnvelopePage = () => {
       Number(newEnvelopeCurrentAmount),
       newEnvelopeDescription,
       newEnvelopeColor,
-      setEnvelopes
+      setEnvelopes,
     );
 
     if (!result.success) {

@@ -3,7 +3,11 @@ import { db } from "../firebase-admin.js";
 // Get all savings for a user
 export const getSavings = async (userId) => {
   try {
-    const savingsSnapshot = await db.collection("users").doc(userId).collection("savings").get();
+    const savingsSnapshot = await db
+      .collection("users")
+      .doc(userId)
+      .collection("savings")
+      .get();
 
     const savings = {};
     savingsSnapshot.forEach((doc) => {
@@ -17,14 +21,22 @@ export const getSavings = async (userId) => {
   }
 };
 
-export const updateSavings = async (userId, shortTermSavings, longTermSavings) => {
+export const updateSavings = async (
+  userId,
+  shortTermSavings,
+  longTermSavings,
+) => {
   try {
     const savingsRef = db.collection("users").doc(userId).collection("savings");
 
     // Set both savings fields in the savings collection
     await Promise.all([
-      savingsRef.doc("shortTermSavings").set({ value: parseFloat(shortTermSavings) }, { merge: true }),
-      savingsRef.doc("longTermSavings").set({ value: parseFloat(longTermSavings) }, { merge: true }),
+      savingsRef
+        .doc("shortTermSavings")
+        .set({ value: parseFloat(shortTermSavings) }, { merge: true }),
+      savingsRef
+        .doc("longTermSavings")
+        .set({ value: parseFloat(longTermSavings) }, { merge: true }),
     ]);
 
     return { shortTermSavings, longTermSavings };
@@ -38,7 +50,11 @@ export const updateSavings = async (userId, shortTermSavings, longTermSavings) =
 // Isn't used on the front end
 export const updateSavingsType = async (userId, savingsType, value) => {
   try {
-    const savingsRef = db.collection("users").doc(userId).collection("savings").doc(savingsType);
+    const savingsRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("savings")
+      .doc(savingsType);
     await savingsRef.set({ value: parseFloat(value) }, { merge: true });
 
     return { [savingsType]: value };

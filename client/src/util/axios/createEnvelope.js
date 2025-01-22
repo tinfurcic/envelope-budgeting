@@ -21,7 +21,7 @@ export const createEnvelope = async (
         budget: newEnvelopeBudget,
         currentAmount: newEnvelopeCurrentAmount,
         description: newEnvelopeDescription,
-        color: newEnvelopeColor
+        color: newEnvelopeColor,
       });
       setEnvelopes((prevEnvelopes) => [...prevEnvelopes, res.data]);
       return { success: true, data: res.data };

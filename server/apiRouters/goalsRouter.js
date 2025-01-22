@@ -1,0 +1,100 @@
+import express from "express";
+import {
+  getAllGoals,
+  getGoalById,
+  createGoal,
+  updateGoal,
+  deleteGoal,
+} from "../goal.js";
+
+export const goalsRouter = express.Router();
+
+goalsRouter.use((req, res, next) => {
+  const userId = req.user?.uid;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: Missing user ID" });
+  }
+  req.userId = userId;
+  next();
+});
+
+goalsRouter.get("/", async (req, res) => {
+  try {
+    const goals = await getAllGoals(req.userId);
+    res.status(200).json(goals);
+  } catch (error) {
+    console.error("Error fetching goals:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+goalsRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const goal = await getGoalById(req.userId, id);
+    if (goal) {
+      res.status(200).json(goal);
+    } else {
+      res.status(404).send({ error: "Goal not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching goal by ID:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+goalsRouter.post("/", async (req, res) => {
+  const { goalAmount, deadline, monthlyAmount, description } = req.body;
+  if (!goalAmount || !deadline || !monthlyAmount) {
+    // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
+    return res.status(400).send({ error: "Invalid goal data" });
+  }
+
+  try {
+    const newGoal = await createGoal(
+      req.userId,
+      goalAmount,
+      deadline,
+      monthlyAmount,
+      description,
+    );
+    res.status(201).json(newGoal);
+  } catch (error) {
+    console.error("Error creating goal:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+goalsRouter.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { goalAmount, deadline, monthlyAmount, description } = req.body;
+
+  try {
+    const updatedGoal = await updateGoal(
+      req.userId,
+      id,
+      goalAmount,
+      deadline,
+      monthlyAmount,
+      description,
+    );
+    res.status(200).json(updatedGoal);
+  } catch (error) {
+    console.error("Error updating goal:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+goalsRouter.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await deleteGoal(req.userId, id);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting goal:", error.message);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+export default goalsRouter;

@@ -27,7 +27,7 @@ usersRouter.post("/", async (req, res) => {
       totalBudget: 0,
       nextEnvelopeId: 1,
       nextExpenseId: 1,
-      nextGoalId: 1
+      nextGoalId: 1,
     });
 
     // Adding a metadata doc because collections without documents can't exist on firebase
@@ -38,6 +38,11 @@ usersRouter.post("/", async (req, res) => {
 
     const expensesRef = userRef.collection("expenses");
     await expensesRef.doc("metadata").set({
+      initialized: true,
+    });
+
+    const goalsRef = userRef.collection("goals");
+    await goalsRef.doc("metadata").set({
       initialized: true,
     });
 

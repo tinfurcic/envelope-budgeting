@@ -3,7 +3,11 @@ import { db } from "../firebase-admin.js";
 // Get all income for a user
 export const getIncome = async (userId) => {
   try {
-    const incomeSnapshot = await db.collection("users").doc(userId).collection("income").get();
+    const incomeSnapshot = await db
+      .collection("users")
+      .doc(userId)
+      .collection("income")
+      .get();
 
     const income = {};
     incomeSnapshot.forEach((doc) => {
@@ -23,8 +27,12 @@ export const updateIncome = async (userId, regularIncome, extraIncome) => {
 
     // Set both income fields in the income collection
     await Promise.all([
-      incomeRef.doc("regularIncome").set({ value: parseFloat(regularIncome) }, { merge: true }),
-      incomeRef.doc("extraIncome").set({ value: parseFloat(extraIncome) }, { merge: true }),
+      incomeRef
+        .doc("regularIncome")
+        .set({ value: parseFloat(regularIncome) }, { merge: true }),
+      incomeRef
+        .doc("extraIncome")
+        .set({ value: parseFloat(extraIncome) }, { merge: true }),
     ]);
 
     return { regularIncome, extraIncome };
@@ -38,7 +46,11 @@ export const updateIncome = async (userId, regularIncome, extraIncome) => {
 // Isn't used on the front end
 export const updateIncomeType = async (userId, incomeType, value) => {
   try {
-    const incomeRef = db.collection("users").doc(userId).collection("income").doc(incomeType);
+    const incomeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("income")
+      .doc(incomeType);
     await incomeRef.set({ value: parseFloat(value) }, { merge: true });
 
     return { [incomeType]: value };
