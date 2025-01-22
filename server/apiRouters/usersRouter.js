@@ -41,6 +41,13 @@ usersRouter.post("/", async (req, res) => {
       incomeRef.doc("extraIncome").set({ value: 0 }),
     ]);
 
+    // Initialize savings with default values
+    const savingsRef = userRef.collection("savings");
+    await Promise.all([
+      savingsRef.doc("shortTermSavings").set({ value: 0 }),
+      savingsRef.doc("longTermSavings").set({ value: 0 }),
+    ]);
+
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user document:", error.message);

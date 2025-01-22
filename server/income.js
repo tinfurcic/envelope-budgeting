@@ -5,13 +5,8 @@ export const getIncome = async (userId) => {
   try {
     const incomeSnapshot = await db.collection("users").doc(userId).collection("income").get();
 
-    if (incomeSnapshot.empty) {
-      console.log("No income documents found for user:", userId);
-    }
-
     const income = {};
     incomeSnapshot.forEach((doc) => {
-      console.log(`Income doc found: ${doc.id} -> ${doc.data().value}`);
       income[doc.id] = doc.data().value || 0;
     });
 
@@ -21,7 +16,6 @@ export const getIncome = async (userId) => {
     throw new Error("Failed to fetch income.");
   }
 };
-
 
 export const updateIncome = async (userId, regularIncome, extraIncome) => {
   try {

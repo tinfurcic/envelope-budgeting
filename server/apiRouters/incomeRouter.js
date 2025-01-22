@@ -1,5 +1,5 @@
 import express from "express";
-import { getIncome, updateIncomeType, updateIncome } from "../Income.js";
+import { getIncome, updateIncomeType, updateIncome } from "../income.js";
 
 export const incomeRouter = express.Router();
 
