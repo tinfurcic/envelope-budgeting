@@ -26,11 +26,18 @@ usersRouter.post("/", async (req, res) => {
       createdAt: new Date().toISOString(),
       totalBudget: 0,
       nextEnvelopeId: 1,
+      nextExpenseId: 1,
+      nextGoalId: 1
     });
 
-    // Initialize envelopes metadata (to initialize)
+    // Adding a metadata doc because collections without documents can't exist on firebase
     const envelopesRef = userRef.collection("envelopes");
     await envelopesRef.doc("metadata").set({
+      initialized: true,
+    });
+
+    const expensesRef = userRef.collection("expenses");
+    await expensesRef.doc("metadata").set({
       initialized: true,
     });
 
