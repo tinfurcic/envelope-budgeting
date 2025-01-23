@@ -39,6 +39,7 @@ const CreateEnvelopePage = () => {
       setNewEnvelopeBudget("");
       setNewEnvelopeCurrentAmount("");
       setNewEnvelopeDescription("");
+      setNewEnvelopeColor("#FFFFFF")
     }
   };
 
@@ -72,9 +73,9 @@ const CreateEnvelopePage = () => {
   useEffect(() => {
     setIsDisabled(
       newEnvelopeName === "" ||
-        newEnvelopeBudget === "" ||
-        newEnvelopeBudget === "0" ||
-        newEnvelopeCurrentAmount === "",
+      newEnvelopeBudget === "" ||
+      newEnvelopeBudget === "0" ||
+      newEnvelopeCurrentAmount === "",
     );
   }, [newEnvelopeName, newEnvelopeBudget, newEnvelopeCurrentAmount]);
 

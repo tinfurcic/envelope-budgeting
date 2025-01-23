@@ -4,7 +4,8 @@ export const fetchGoals = async () => {
   try {
     const res = await axiosInstance.get("/goals");
     return res.data;
-  } catch (err) {
-    console.error("Error fetching goals:", err);
+  } catch (error) {
+    console.error("Error fetching goals:", error.message);
+    return null;
   }
 };

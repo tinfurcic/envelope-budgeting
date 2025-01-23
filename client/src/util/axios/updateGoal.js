@@ -14,8 +14,9 @@ export const updateGoal = async (
       monthlyAmount,
       description,
     });
-    return res.data;
-  } catch (err) {
-    console.error("Error updating goal:", err);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error updating goal:", error.message);
+    return { success: false, error: error.message };
   }
 };

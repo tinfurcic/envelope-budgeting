@@ -5,6 +5,7 @@ export const fetchExpenses = async () => {
     const res = await axiosInstance.get("/expenses");
     return res.data;
   } catch (error) {
-    console.error("Error fetching expenses:", error);
+    console.error("Error fetching expenses:", error.message);
+    return null;
   }
 };

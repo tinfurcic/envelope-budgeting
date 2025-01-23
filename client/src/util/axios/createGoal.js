@@ -5,6 +5,7 @@ export const createGoal = async (
   deadline,
   monthlyAmount,
   description,
+  setGoals,
 ) => {
   try {
     const res = await axiosInstance.post("/goals", {
@@ -13,8 +14,10 @@ export const createGoal = async (
       monthlyAmount,
       description,
     });
-    return res.data;
-  } catch (err) {
-    console.error("Error creating goal:", err);
+    setGoals((prevGoals) => [...prevGoals, res.data]);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error creating goal:", error);
+    return { success: false, error: error.message };
   }
 };
