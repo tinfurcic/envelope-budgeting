@@ -52,13 +52,14 @@ export const createExpense = async (
 ) => {
   try {
     const userRef = db.collection("users").doc(userId);
-    const userDoc = await userRef.get();
+    const expenseMetadataRef = userRef.collection("expenses").doc("metadata");
+    const expenseMetadataDoc = await expenseMetadataRef.get();
 
-    if (!userDoc.exists) {
-      throw new Error("User not found.");
+    if (!expenseMetadataDoc.exists) {
+      throw new Error("Metadata not found.");
     }
 
-    const { nextExpenseId = 1 } = userDoc.data();
+    const { nextExpenseId = 1 } = expenseMetadataDoc.data();
 
     const expensesRef = userRef
       .collection("expenses")
@@ -76,7 +77,7 @@ export const createExpense = async (
 
     const batch = db.batch();
     batch.set(expensesRef, newExpense);
-    batch.update(userRef, { nextExpenseId: nextExpenseId + 1 });
+    batch.update(expenseMetadataRef, { nextExpenseId: nextExpenseId + 1 });
 
     await batch.commit();
 

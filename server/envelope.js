@@ -52,13 +52,14 @@ export const createEnvelope = async (
 ) => {
   try {
     const userRef = db.collection("users").doc(userId);
-    const userDoc = await userRef.get();
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+    const envelopeMetadataDoc = await envelopeMetadataRef.get();
 
-    if (!userDoc.exists) {
-      throw new Error("User not found.");
+    if (!envelopeMetadataDoc.exists) {
+      throw new Error("Metadata not found.");
     }
 
-    const { nextEnvelopeId = 1 } = userDoc.data();
+    const { nextEnvelopeId = 1 } = envelopeMetadataDoc.data();
 
     const envelopeRef = userRef
       .collection("envelopes")
@@ -76,7 +77,7 @@ export const createEnvelope = async (
 
     const batch = db.batch();
     batch.set(envelopeRef, newEnvelope);
-    batch.update(userRef, { nextEnvelopeId: nextEnvelopeId + 1 });
+    batch.update(envelopeMetadataRef, { nextEnvelopeId: nextEnvelopeId + 1 });
 
     await batch.commit();
 

@@ -48,13 +48,14 @@ export const createGoal = async (
 ) => {
   try {
     const userRef = db.collection("users").doc(userId);
-    const userDoc = await userRef.get();
+    const goalsMetadataRef = userRef.collection("goals").doc("metadata");
+    const goalsMetadataDoc = await goalsMetadataRef.get();
 
-    if (!userDoc.exists) {
-      throw new Error("User not found.");
+    if (!goalsMetadataDoc.exists) {
+      throw new Error("Metadata not found.");
     }
 
-    const { nextGoalId = 1 } = userDoc.data();
+    const { nextGoalId = 1 } = goalsMetadataDoc.data();
 
     const goalsRef = userRef.collection("goals").doc(String(nextGoalId));
 
@@ -69,7 +70,7 @@ export const createGoal = async (
 
     const batch = db.batch();
     batch.set(goalsRef, newGoal);
-    batch.update(userRef, { nextGoalId: nextGoalId + 1 });
+    batch.update(goalsMetadataRef, { nextGoalId: nextGoalId + 1 });
 
     await batch.commit();
 
