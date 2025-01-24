@@ -13,6 +13,7 @@ const CreateEnvelopePage = () => {
   const [newEnvelopeBudget, setNewEnvelopeBudget] = useState("");
   const [newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount] = useState("");
   const [newEnvelopeDescription, setNewEnvelopeDescription] = useState("");
+  const [newEnvelopeColor, setNewEnvelopeColor] = useState("#FFFFFF");
   const [isChecked, setIsChecked] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
 
@@ -24,6 +25,8 @@ const CreateEnvelopePage = () => {
       newEnvelopeName,
       Number(newEnvelopeBudget),
       Number(newEnvelopeCurrentAmount),
+      newEnvelopeDescription,
+      newEnvelopeColor,
       setEnvelopes,
     );
 
@@ -36,6 +39,7 @@ const CreateEnvelopePage = () => {
       setNewEnvelopeBudget("");
       setNewEnvelopeCurrentAmount("");
       setNewEnvelopeDescription("");
+      setNewEnvelopeColor("#FFFFFF")
     }
   };
 
@@ -69,9 +73,9 @@ const CreateEnvelopePage = () => {
   useEffect(() => {
     setIsDisabled(
       newEnvelopeName === "" ||
-        newEnvelopeBudget === "" ||
-        newEnvelopeBudget === "0" ||
-        newEnvelopeCurrentAmount === "",
+      newEnvelopeBudget === "" ||
+      newEnvelopeBudget === "0" ||
+      newEnvelopeCurrentAmount === "",
     );
   }, [newEnvelopeName, newEnvelopeBudget, newEnvelopeCurrentAmount]);
 

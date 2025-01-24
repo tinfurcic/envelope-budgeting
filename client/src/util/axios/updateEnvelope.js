@@ -7,8 +7,9 @@ export const handleUpdate = async (id, name, budget, currentAmount) => {
       budget,
       currentAmount,
     });
-    return res.data;
+    return { success: true, data: res.data };
   } catch (error) {
-    console.error(error);
+    console.error("Error updating envelope:", error.message);
+    return { success: false, error: error.message };
   }
 };

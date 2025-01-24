@@ -20,19 +20,52 @@ usersRouter.post("/", async (req, res) => {
       return res.status(200).json({ message: "User already exists" });
     }
 
-    // Create the user document
-    await userRef.set({
+    // Create a batch instance
+    const batch = db.batch();
+
+    // Add the user document
+    batch.set(userRef, {
       email,
       createdAt: new Date().toISOString(),
       totalBudget: 0,
-      nextEnvelopeId: 1,
     });
 
-    // Create a "metadata" document in the "envelopes" subcollection
-    const envelopesRef = userRef.collection("envelopes");
-    await envelopesRef.doc("metadata").set({
+    // Adding a metadata docs because collections without documents can't exist on firebase
+    batch.set(userRef.collection("envelopes").doc("metadata"), {
       initialized: true,
+      nextEnvelopeId: 1,
     });
+    batch.set(userRef.collection("expenses").doc("metadata"), {
+      initialized: true,
+      nextExpenseId: 1,
+    });
+    batch.set(userRef.collection("goals").doc("metadata"), {
+      initialized: true,
+      nextGoalId: 1,
+    });
+
+    // Initialize income collection
+    batch.set(userRef.collection("income").doc("regularIncome"), { value: 0 });
+    batch.set(userRef.collection("income").doc("extraIncome"), { value: 0 });
+
+    // Initialize savings collection
+    batch.set(userRef.collection("savings").doc("shortTermSavings"), {
+      value: 0,
+    });
+    batch.set(userRef.collection("savings").doc("longTermSavings"), {
+      value: 0,
+    });
+
+    // Initialize settings collection
+    batch.set(userRef.collection("settings").doc("currencyType"), {
+      value: "USD",
+    });
+    batch.set(userRef.collection("settings").doc("enableDebt"), {
+      value: false,
+    });
+
+    // Commit the batch
+    await batch.commit();
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {

@@ -4,7 +4,8 @@ export const fetchEnvelopes = async () => {
   try {
     const res = await axiosInstance.get("/envelopes");
     return res.data;
-  } catch (err) {
-    console.error("fetchEnvelopes() error: " + err);
+  } catch (error) {
+    console.error("Error fetching envelopes:", error.message);
+    return null;
   }
 };
