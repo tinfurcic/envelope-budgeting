@@ -1,5 +1,9 @@
 import express from "express";
-import { getSettings, updateSettingsType, updateSettings } from "../settings.js";
+import {
+  getSettings,
+  updateSettingsType,
+  updateSettings,
+} from "../settings.js";
 
 export const settingsRouter = express.Router();
 
@@ -37,12 +41,17 @@ settingsRouter.patch("/", async (req, res) => {
   // Ensure valid types
   if (typeof currencyType !== "string" || typeof enableDebt !== "boolean") {
     return res.status(400).json({
-      error: "'currencyType' must be a string, and 'enableDebt' must be a boolean.",
+      error:
+        "'currencyType' must be a string, and 'enableDebt' must be a boolean.",
     });
   }
 
   try {
-    const updatedSettings = await updateSettings(req.userId, currencyType, enableDebt);
+    const updatedSettings = await updateSettings(
+      req.userId,
+      currencyType,
+      enableDebt,
+    );
     res.status(200).json(updatedSettings);
   } catch (error) {
     console.error("Error updating settings:", error.message);
@@ -65,11 +74,17 @@ settingsRouter.patch("/:settingType", async (req, res) => {
     (settingType === "currencyType" && typeof value !== "string") ||
     (settingType === "enableDebt" && typeof value !== "boolean")
   ) {
-    return res.status(400).json({ error: "Invalid value for the setting type." });
+    return res
+      .status(400)
+      .json({ error: "Invalid value for the setting type." });
   }
 
   try {
-    const updatedSetting = await updateSettingsType(req.userId, settingType, value);
+    const updatedSetting = await updateSettingsType(
+      req.userId,
+      settingType,
+      value,
+    );
     res.status(200).json(updatedSetting);
   } catch (error) {
     console.error("Error updating setting:", error.message);

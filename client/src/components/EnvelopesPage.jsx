@@ -5,7 +5,7 @@ import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
 
 const EnvelopesPage = () => {
-  const { envelopes, loadingEnvelopes } = useOutletContext();
+  const { envelopes, loadingData } = useOutletContext();
   const navigate = useNavigate();
 
   return (
@@ -25,7 +25,7 @@ const EnvelopesPage = () => {
 
       {/* Add grid/slider view button*/}
       <div className="envelopes-page__envelopes">
-        {loadingEnvelopes ? (
+        {loadingData ? (
           <span className="envelopes-page__loading-message">
             Loading your envelopes...
           </span>

@@ -12,6 +12,7 @@ export const getAllExpenses = async (userId) => {
       .get();
 
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    //Firebase document ID and the id property are set up to match, but we're explicitly returning doc.id in case that ever changes
   } catch (error) {
     console.error("Error fetching expenses:", error);
     throw new Error("Failed to fetch expenses.");

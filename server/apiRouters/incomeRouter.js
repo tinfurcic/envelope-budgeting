@@ -36,12 +36,10 @@ incomeRouter.patch("/", async (req, res) => {
 
   // Ensure both fields are numbers
   if (isNaN(regularIncome) || isNaN(extraIncome)) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Invalid values. 'regularIncome' and 'extraIncome' must be numbers.",
-      });
+    return res.status(400).json({
+      error:
+        "Invalid values. 'regularIncome' and 'extraIncome' must be numbers.",
+    });
   }
 
   try {

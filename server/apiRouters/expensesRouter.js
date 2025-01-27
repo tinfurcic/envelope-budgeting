@@ -45,7 +45,12 @@ expensesRouter.get("/:id", async (req, res) => {
 
 expensesRouter.post("/", async (req, res) => {
   const { amount, date, source, description, isLockedIn } = req.body;
-  if (isNaN(amount) || !date || !source || (isLockedIn !== true && isLockedIn !== false)) {
+  if (
+    isNaN(amount) ||
+    !date ||
+    !source ||
+    (isLockedIn !== true && isLockedIn !== false)
+  ) {
     // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
     return res.status(400).send({ error: "Invalid expense data" });
   }

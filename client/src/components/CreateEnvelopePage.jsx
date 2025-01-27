@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { createEnvelope } from "../util/axios/createEnvelope";
+import { createEnvelope } from "../util/axios/createFunctions";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
@@ -39,7 +39,7 @@ const CreateEnvelopePage = () => {
       setNewEnvelopeBudget("");
       setNewEnvelopeCurrentAmount("");
       setNewEnvelopeDescription("");
-      setNewEnvelopeColor("#FFFFFF")
+      setNewEnvelopeColor("#FFFFFF");
     }
   };
 
@@ -73,9 +73,9 @@ const CreateEnvelopePage = () => {
   useEffect(() => {
     setIsDisabled(
       newEnvelopeName === "" ||
-      newEnvelopeBudget === "" ||
-      newEnvelopeBudget === "0" ||
-      newEnvelopeCurrentAmount === "",
+        newEnvelopeBudget === "" ||
+        newEnvelopeBudget === "0" ||
+        newEnvelopeCurrentAmount === "",
     );
   }, [newEnvelopeName, newEnvelopeBudget, newEnvelopeCurrentAmount]);
 
