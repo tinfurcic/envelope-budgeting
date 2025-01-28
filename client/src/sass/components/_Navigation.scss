@@ -1,10 +1,68 @@
+@use "../base/global";
+
 .navbar {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 1rem;
-}
 
-.nav-link img {
-  display: block; // removes the padding
+  .nav-link {
+    &.active {
+      font-weight: bold;
+    }
+  }
+
+  &--icon {
+    background-color: #fff;
+
+    .nav-link {
+      flex-grow: 1;
+      padding: 8px 0;
+      border-left: 1px solid global.$background-color;
+      border-right: 1px solid global.$background-color;
+
+      &:first-child {
+        border-left: 1px solid transparent;
+      }
+
+      &:last-child {
+        border-right: 1px solid transparent;
+      }
+
+      &.active {
+        background-color: global.$background-color;
+        border: 1px solid black;
+      }
+
+      .nav-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 3rem;
+      }
+
+      img {
+        display: block;
+      }
+
+      .nav-name {
+        display: none;
+      }
+    }
+  }
+
+  // Text-based navigation (useText = true)
+  &--text {
+    .nav-link {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      .nav-name {
+        font-size: 1.5rem;
+      }
+    }
+  }
 }

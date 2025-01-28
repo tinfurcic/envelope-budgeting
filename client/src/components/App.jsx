@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllData } from "../util/fetchAllData";
 import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
-import Navigation from "./Navigation";
+import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
+
   const [envelopes, setEnvelopes] = useState(null);
   const [goals, setGoals] = useState(null);
   const [expenses, setExpenses] = useState(null);
@@ -38,10 +39,6 @@ const App = () => {
     loadingData,
     date,
   };
-
-  const location = useLocation();
-  const navRoutes = ["/home", "/envelopes", "/goals", "/profile"];
-  const isNavRoute = navRoutes.includes(location.pathname);
 
   // Fetch data on load
   useEffect(() => {
@@ -77,10 +74,11 @@ const App = () => {
 
   return (
     <div className="app">
-      {isNavRoute && <Navigation />}
-      <div className="app__outlet">
-        <Outlet context={appData} />
-      </div>
+      <ResponsiveLayout>
+        <div className="app__outlet">
+          <Outlet context={appData} />
+        </div>
+      </ResponsiveLayout>
     </div>
   );
 };
