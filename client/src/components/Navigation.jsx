@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import homeIcon from "../media/home-nav-icon.png";
 import envelopesIcon from "../media/envelopes-nav-icon.png";
 //import envelopesIcon from "../media/envelope-lines-thin.png";
-//import envelopesIcon from "../media/mail.png";
 import goalsIcon from "../media/goals-nav-icon.png";
 import profileIcon from "../media/profile-nav-icon.png";
 const Navigation = ({ useText }) => {

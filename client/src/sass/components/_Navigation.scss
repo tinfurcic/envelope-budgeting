@@ -4,6 +4,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
+  border-bottom: 1px solid black;
 
   .nav-link {
     &.active {
@@ -16,7 +17,7 @@
 
     .nav-link {
       flex-grow: 1;
-      padding: 8px 0;
+      padding: 0.5rem 0;
       border-left: 1px solid global.$background-color;
       border-right: 1px solid global.$background-color;
 
@@ -51,8 +52,9 @@
     }
   }
 
-  // Text-based navigation (useText = true)
   &--text {
+    padding: 0.5rem 0;
+
     .nav-link {
       text-decoration: none;
 

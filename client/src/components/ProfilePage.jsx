@@ -6,7 +6,7 @@ import editIcon from "../media/edit-icon.png";
 import Logout from "./Logout";
 
 const ProfilePage = () => {
-  const { totalBudget, date } = useOutletContext();
+  const { totalIncome, date } = useOutletContext();
   const fakeCurrency = "€";
   const fakeExtraIncome = 1500;
   const fakeShortTermSavings = 432;
@@ -45,7 +45,7 @@ const ProfilePage = () => {
             Regular income:{" "}
             <span className="funds__category__regular-income__value">
               {fakeCurrency}
-              {totalBudget}
+              {totalIncome}
             </span>
           </p>
           <p className="funds__category__extra-income no-margin-top">

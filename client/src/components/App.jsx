@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllData } from "../util/fetchAllData";
-import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
+import { calcTotalBudget } from "../util/calcTotalBudget";
+import { calcTotalCurrentAmount } from "../util/calcTotalCurrentAmount";
 import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
 import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
-
   const [envelopes, setEnvelopes] = useState(null);
   const [goals, setGoals] = useState(null);
   const [expenses, setExpenses] = useState(null);
@@ -14,8 +14,9 @@ const App = () => {
   const [savings, setSavings] = useState(null);
   const [settings, setSettings] = useState(null);
 
+  const [totalIncome, setTotalIncome] = useState(null);
   const [totalBudget, setTotalBudget] = useState(null);
-  const [unassignedBudget, setUnassignedBudget] = useState(0);
+  const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
 
   const [loadingData, setLoadingData] = useState(true);
   const [date, setDate] = useState(new Date());
@@ -33,9 +34,10 @@ const App = () => {
     setSavings,
     settings,
     setSettings,
+    totalIncome,
+    setTotalIncome,
     totalBudget,
-    setTotalBudget,
-    unassignedBudget,
+    totalCurrentAmount,
     loadingData,
     date,
   };
@@ -64,13 +66,14 @@ const App = () => {
 
   useEffect(() => {
     if (income !== null) {
-      setTotalBudget(income.extraIncome + income.regularIncome);
+      setTotalIncome(income.extraIncome + income.regularIncome);
     }
   }, [income]);
 
   useEffect(() => {
-    setUnassignedBudget(calcUnassignedBudget(envelopes, totalBudget));
-  }, [totalBudget, envelopes]);
+    setTotalBudget(calcTotalBudget(envelopes));
+    setTotalCurrentAmount(calcTotalCurrentAmount(envelopes));
+  }, [envelopes]);
 
   return (
     <div className="app">

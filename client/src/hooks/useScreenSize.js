@@ -10,8 +10,8 @@ const useScreenSize = () => {
   }, []);
 
   return {
-    isSmall: screenWidth <= 400,
-    isLarge: screenWidth > 400,
+    isSmall: screenWidth <= 440,
+    isLarge: screenWidth > 440,
     screenWidth,
   };
 };

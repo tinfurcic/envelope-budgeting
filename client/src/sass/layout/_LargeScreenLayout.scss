@@ -1,3 +1,10 @@
 .large-screen-layout {
-  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  &__main {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
 }

@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
+import expenseIcon from "../media/expense.png";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingData } = useOutletContext();
@@ -42,6 +43,17 @@ const EnvelopesPage = () => {
             ))}
           </div>
         )}
+      </div>
+      <div className="new-expense-button">
+        <Button
+          type="button"
+          className="button"
+          onClick={null}
+          variant="new-expense"
+          isDisabled={false}
+        >
+          <img src={expenseIcon} alt="New expense" />
+        </Button>
       </div>
     </div>
   );
