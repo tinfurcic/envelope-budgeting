@@ -1,6 +1,4 @@
 export const findEnvelopeIndexById = (envelopes, envelopeId) => {
-  console.log(envelopeId);
-  console.log(envelopes);
   const envelopeIdNum = Number(envelopeId);
   const envelopeIndex = envelopes.findIndex(
     (element) => element.id === envelopeIdNum,

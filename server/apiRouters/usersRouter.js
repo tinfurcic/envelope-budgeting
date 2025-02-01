@@ -32,14 +32,17 @@ usersRouter.post("/", async (req, res) => {
     // Adding a metadata docs because collections without documents can't exist on firebase
     batch.set(userRef.collection("envelopes").doc("metadata"), {
       initialized: true,
+      id: -1,
       nextEnvelopeId: 1,
     });
     batch.set(userRef.collection("expenses").doc("metadata"), {
       initialized: true,
+      id: -1,
       nextExpenseId: 1,
     });
     batch.set(userRef.collection("goals").doc("metadata"), {
       initialized: true,
+      id: -1,
       nextGoalId: 1,
     });
 

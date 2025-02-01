@@ -8,11 +8,16 @@ import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
   const [envelopes, setEnvelopes] = useState(null);
-  const [goals, setGoals] = useState(null);
   const [expenses, setExpenses] = useState(null);
+  const [goals, setGoals] = useState(null);
   const [income, setIncome] = useState(null);
   const [savings, setSavings] = useState(null);
   const [settings, setSettings] = useState(null);
+
+  const [nextEnvelopeId, setNextEnvelopeId] = useState(null);
+  const [nextGoalId, setNextGoalId] = useState(null);
+  const [nextExpenseId, setNextExpenseId] = useState(null);
+
   const [totalIncome, setTotalIncome] = useState(null);
   const [totalBudget, setTotalBudget] = useState(null);
   const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
@@ -42,10 +47,13 @@ const App = () => {
   const appData = {
     envelopes,
     setEnvelopes,
-    goals,
-    setGoals,
+    nextEnvelopeId,
     expenses,
     setExpenses,
+    nextExpenseId,
+    goals,
+    setGoals,
+    nextGoalId,
     income,
     setIncome,
     savings,
@@ -67,14 +75,19 @@ const App = () => {
       try {
         const data = await fetchAllData();
         setEnvelopes(data.envelopes);
-        setGoals(data.goals);
         setExpenses(data.expenses);
+        setGoals(data.goals);
         setIncome(data.income);
         setSavings(data.savings);
         setSettings(data.settings);
-        setLoadingData(false);
+
+        setNextEnvelopeId(data.nextEnvelopeId);
+        setNextGoalId(data.nextGoalId);
+        setNextExpenseId(data.nextExpenseId);
       } catch (error) {
-        console.error("Unable to load data properly.", error);
+        console.error("Unable to load data properly:", error);
+      } finally {
+        setLoadingData(false); // Ensures loading state is updated even if there's an error
       }
     };
 

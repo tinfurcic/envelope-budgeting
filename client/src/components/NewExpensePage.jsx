@@ -192,6 +192,7 @@ const NewExpensePage = () => {
               value="envelope"
               id="envelope"
               name="source-type"
+              checked={sourceType === "envelope"}
               onChange={() => {
                 setNewExpenseSource("");
                 setSourceType("envelope");
@@ -204,6 +205,7 @@ const NewExpensePage = () => {
               value="savings"
               id="savings"
               name="source-type"
+              checked={sourceType === "savings"}
               onChange={() => {
                 setNewExpenseSource("savings");
                 setSourceType("savings");

@@ -6,14 +6,25 @@ export const getAllEnvelopes = async (userId) => {
     const envelopesRef = db
       .collection("users")
       .doc(userId)
-      .collection("envelopes");
-    const querySnapshot = await envelopesRef
-      .where("__name__", "!=", "metadata")
-      .get();
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    //Firebase document ID and the id property are set up to match, but we're explicitly returning doc.id in case that ever changes
+      .collection("envelopes")
+      .orderBy("id", "asc");
+
+    const querySnapshot = await envelopesRef.get();
+    let metadata = null;
+
+    const envelopes = querySnapshot.docs
+      .map((doc) => {
+        if (doc.id === "metadata") {
+          metadata = { id: doc.id, ...doc.data() };
+          return null;
+        }
+        return { id: doc.id, ...doc.data() };
+      })
+      .filter(Boolean); // Remove null values (metadata)
+
+    return { envelopes, metadata };
   } catch (error) {
-    console.error("Error fetching all envelopes (Admin SDK):", error);
+    console.error("Error fetching all envelopes:", error);
     throw new Error("Failed to fetch envelopes.");
   }
 };

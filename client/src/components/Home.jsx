@@ -9,8 +9,14 @@ import useScreenSize from "../hooks/useScreenSize";
 const Home = () => {
   const { user } = useAuth();
   console.log(user);
-  const { totalBudget, totalCurrentAmount } = useOutletContext();
+  const {
+    totalBudget,
+    totalCurrentAmount,
+    expenses,
+    loadingData,
+  } = useOutletContext();
   const { isSmall } = useScreenSize();
+  const fakeCurrency = "€";
 
   const [percentage, setPercentage] = useState(
     Math.round((totalCurrentAmount * 100) / totalBudget),
@@ -24,6 +30,7 @@ const Home = () => {
     <div className="home-page">
       {isSmall && <h1 className="home-page__heading">Home</h1>}
       <div className="budget-overview">
+        {/* This can be a standalone component */}
         <h2 className="budget-overview__heading">Budget overview</h2>
         <ProgressBar totalBudget={totalBudget} percentage={percentage} />
         <p className="legend-item">
@@ -41,6 +48,7 @@ const Home = () => {
         </p>
       </div>
       <div className="latest-expenses">
+        {/* this can be a standalone component */}
         <div className="latest-expenses__header">
           <h2 className="latest-expenses__heading">Latest expenses</h2>
           <Button
@@ -53,7 +61,25 @@ const Home = () => {
             All expenses
           </Button>
         </div>
-        {/* Show saved transactions, from newest to oldest */}
+
+        <div className="latest_expenses__expenses">
+          {loadingData ? (
+            <p>Loading expenses...</p>
+          ) : expenses.length === 0 ? (
+            <p>You don't have any documented expenses yet.</p>
+          ) : (
+            <ul>
+              {expenses.slice(0, 3).map((expense) => {
+                return (
+                  <li key={expense.id}>
+                    {fakeCurrency}
+                    {expense.amount}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </div>
       <div className="home-page__this-month-stats">
         <h2 className="home-page__this-month-stats__heading">
