@@ -3,6 +3,10 @@
   flex-direction: column;
   height: 100vh;
 
+  &__nav {
+    border-bottom: 1px solid black;
+  }
+
   &__main {
     flex-grow: 1;
     overflow-y: auto;

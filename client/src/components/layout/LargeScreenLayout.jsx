@@ -9,9 +9,11 @@ const LargeScreenLayout = ({ children }) => {
 
   return (
     <div className="large-screen-layout">
-      <div className="large-screen-layout__nav">
-        {isNavRoute && <Navigation useText={true} />}
-      </div>
+      {isNavRoute && (
+        <div className="large-screen-layout__nav">
+          <Navigation useText={true} />
+        </div>
+      )}
       <div className="large-screen-layout__main">{children}</div>
     </div>
   );

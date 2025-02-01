@@ -3,7 +3,8 @@ input {
   border-radius: 5px;
   font-size: 1.125rem;
 
-  &[type="text"]:focus {
+  &[type="text"]:focus,
+  &[type="date"]:focus {
     outline: 2px solid #10bcbc;
   }
 }

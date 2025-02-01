@@ -44,7 +44,9 @@ const CreateEnvelopePage = () => {
   };
 
   const handleValueChange = (event, setValue) => {
-    const value = event.target.value;
+    let value = event.target.value;
+    // Replace comma with dot before checking the value
+    value = value.replace(/,/g, ".");
     const regex = /^(|0|0\.|0\.\d{1,2}|[1-9]\d*(\.|\.\d{1,2})?)$/;
     if (regex.test(value)) {
       setValue(value);
@@ -92,7 +94,6 @@ const CreateEnvelopePage = () => {
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
         </Button>
       </div>
-
       <h1 className="create-envelope-page__heading">Create a New Envelope</h1>
       <p className="create-envelope-page__description">
         Here you can create a new envelope to help you compartmentalize your
@@ -145,7 +146,7 @@ const CreateEnvelopePage = () => {
               checked={isChecked}
               onChange={handleCheckboxChange}
             />
-            <label className="checkbox-group__label" htmlFor="amount">
+            <label className="checkbox-label" htmlFor="amount">
               {" "}
               Immediately assign full amount <span>ⓘ</span>
             </label>

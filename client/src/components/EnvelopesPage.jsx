@@ -48,7 +48,7 @@ const EnvelopesPage = () => {
         <Button
           type="button"
           className="button"
-          onClick={null}
+          onClick={() => navigate("/expense")}
           variant="new-expense"
           isDisabled={false}
         >

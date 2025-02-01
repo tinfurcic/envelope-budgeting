@@ -13,13 +13,31 @@ const App = () => {
   const [income, setIncome] = useState(null);
   const [savings, setSavings] = useState(null);
   const [settings, setSettings] = useState(null);
-
   const [totalIncome, setTotalIncome] = useState(null);
   const [totalBudget, setTotalBudget] = useState(null);
   const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
 
   const [loadingData, setLoadingData] = useState(true);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(getTodayDate());
+  const [fullDate, setFullDate] = useState(new Date());
+
+  function getTodayDate() {
+    const now = new Date();
+    return now.toISOString().split("T")[0];
+  }
+
+  useEffect(() => {
+    const now = new Date();
+    const msUntilMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+      now.getTime();
+
+    const timer = setTimeout(() => {
+      setDate(getTodayDate()); // Update today's date at midnight
+    }, msUntilMidnight);
+
+    return () => clearTimeout(timer);
+  }, [date]);
 
   const appData = {
     envelopes,
@@ -40,12 +58,11 @@ const App = () => {
     totalCurrentAmount,
     loadingData,
     date,
+    fullDate,
   };
 
   // Fetch data on load
   useEffect(() => {
-    setDate(new Date());
-
     const fetchDataOnLoad = async () => {
       try {
         const data = await fetchAllData();
