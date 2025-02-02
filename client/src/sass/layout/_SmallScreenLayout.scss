@@ -1,0 +1,18 @@
+.small-screen-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  &__main {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  &__nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    // background-color: someCoolColor
+    // shadow?
+  }
+}

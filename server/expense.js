@@ -6,12 +6,23 @@ export const getAllExpenses = async (userId) => {
     const expensesRef = db
       .collection("users")
       .doc(userId)
-      .collection("expenses");
-    const querySnapshot = await expensesRef
-      .where("__name__", "!=", "metadata")
-      .get();
+      .collection("expenses")
+      .orderBy("id", "desc");
 
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const querySnapshot = await expensesRef.get();
+    let metadata = null;
+
+    const expenses = querySnapshot.docs
+      .map((doc) => {
+        if (doc.id === "metadata") {
+          metadata = { id: doc.id, ...doc.data() };
+          return null;
+        }
+        return { id: doc.id, ...doc.data() };
+      })
+      .filter(Boolean);
+
+    return { expenses, metadata };
   } catch (error) {
     console.error("Error fetching expenses:", error);
     throw new Error("Failed to fetch expenses.");

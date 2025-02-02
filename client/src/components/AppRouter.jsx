@@ -8,6 +8,7 @@ import EnvelopesPage from "./EnvelopesPage";
 import GoalsPage from "./GoalsPage";
 import ProfilePage from "./ProfilePage";
 import CreateEnvelopePage from "./CreateEnvelopePage";
+import NewExpensePage from "./NewExpensePage";
 import Envelope from "./Envelope";
 
 function AppRouter() {
@@ -34,6 +35,7 @@ function AppRouter() {
         <Route path="/envelopes/:id" element={<Envelope />} />
         <Route path="/goals" element={<GoalsPage />} />
         <Route path="/create" element={<CreateEnvelopePage />} />
+        <Route path="/expense" element={<NewExpensePage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>

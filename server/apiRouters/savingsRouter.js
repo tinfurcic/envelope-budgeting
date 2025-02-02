@@ -29,21 +29,17 @@ savingsRouter.patch("/", async (req, res) => {
 
   // Ensure both fields are provided
   if (shortTermSavings === undefined || longTermSavings === undefined) {
-    return res
-      .status(400)
-      .json({
-        error: "'shortTermSavings' and 'longTermSavings' must be provided.",
-      });
+    return res.status(400).json({
+      error: "'shortTermSavings' and 'longTermSavings' must be provided.",
+    });
   }
 
   // Ensure both fields are numbers
   if (isNaN(shortTermSavings) || isNaN(longTermSavings)) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Invalid values. 'shortTermSavings' and 'longTermSavings' must be numbers.",
-      });
+    return res.status(400).json({
+      error:
+        "Invalid values. 'shortTermSavings' and 'longTermSavings' must be numbers.",
+    });
   }
 
   try {

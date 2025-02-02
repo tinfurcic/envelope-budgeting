@@ -3,9 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
+import expenseIcon from "../media/expense.png";
 
 const EnvelopesPage = () => {
-  const { envelopes, loadingEnvelopes } = useOutletContext();
+  const { envelopes, loadingData } = useOutletContext();
   const navigate = useNavigate();
 
   return (
@@ -25,7 +26,7 @@ const EnvelopesPage = () => {
 
       {/* Add grid/slider view button*/}
       <div className="envelopes-page__envelopes">
-        {loadingEnvelopes ? (
+        {loadingData ? (
           <span className="envelopes-page__loading-message">
             Loading your envelopes...
           </span>
@@ -42,6 +43,17 @@ const EnvelopesPage = () => {
             ))}
           </div>
         )}
+      </div>
+      <div className="new-expense-button">
+        <Button
+          type="button"
+          className="button"
+          onClick={() => navigate("/expense")}
+          variant="new-expense"
+          isDisabled={false}
+        >
+          <img src={expenseIcon} alt="New expense" />
+        </Button>
       </div>
     </div>
   );

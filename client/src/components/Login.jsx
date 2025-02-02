@@ -20,7 +20,7 @@ const Login = () => {
     try {
       const authFunction = isNewUser
         ? createUserWithEmailAndPassword
-        : signInWithEmailAndPassword; // looks mighty sus
+        : signInWithEmailAndPassword;
       const userCredential = await authFunction(auth, email, password);
       console.log(
         `User ${isNewUser ? "signed up" : "logged in"}:`,

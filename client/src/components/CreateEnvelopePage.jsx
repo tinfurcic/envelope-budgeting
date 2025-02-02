@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { createEnvelope } from "../util/axios/createEnvelope";
+import { createEnvelope } from "../util/axios/createFunctions";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
@@ -39,12 +39,14 @@ const CreateEnvelopePage = () => {
       setNewEnvelopeBudget("");
       setNewEnvelopeCurrentAmount("");
       setNewEnvelopeDescription("");
-      setNewEnvelopeColor("#FFFFFF")
+      setNewEnvelopeColor("#FFFFFF");
     }
   };
 
   const handleValueChange = (event, setValue) => {
-    const value = event.target.value;
+    let value = event.target.value;
+    // Replace comma with dot before checking the value
+    value = value.replace(/,/g, ".");
     const regex = /^(|0|0\.|0\.\d{1,2}|[1-9]\d*(\.|\.\d{1,2})?)$/;
     if (regex.test(value)) {
       setValue(value);
@@ -73,9 +75,9 @@ const CreateEnvelopePage = () => {
   useEffect(() => {
     setIsDisabled(
       newEnvelopeName === "" ||
-      newEnvelopeBudget === "" ||
-      newEnvelopeBudget === "0" ||
-      newEnvelopeCurrentAmount === "",
+        newEnvelopeBudget === "" ||
+        newEnvelopeBudget === "0" ||
+        newEnvelopeCurrentAmount === "",
     );
   }, [newEnvelopeName, newEnvelopeBudget, newEnvelopeCurrentAmount]);
 
@@ -92,7 +94,6 @@ const CreateEnvelopePage = () => {
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
         </Button>
       </div>
-
       <h1 className="create-envelope-page__heading">Create a New Envelope</h1>
       <p className="create-envelope-page__description">
         Here you can create a new envelope to help you compartmentalize your
@@ -145,7 +146,7 @@ const CreateEnvelopePage = () => {
               checked={isChecked}
               onChange={handleCheckboxChange}
             />
-            <label className="checkbox-group__label" htmlFor="amount">
+            <label className="checkbox-label" htmlFor="amount">
               {" "}
               Immediately assign full amount <span>ⓘ</span>
             </label>

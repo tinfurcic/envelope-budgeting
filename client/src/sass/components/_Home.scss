@@ -1,0 +1,9 @@
+@use "../base/global";
+
+.home-page {
+  &__heading {
+    margin: 0.5rem 0 0 0;
+    font-size: 1.75rem;
+    text-align: center;
+  }
+}

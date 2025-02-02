@@ -1,0 +1,70 @@
+import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import Button from "./Button";
+
+const TodaysExpenses = () => {
+
+  const { expenses, loadingData, date } = useOutletContext();
+
+  const fakeCurrency = "€";
+
+  const [todaysExpenses, setTodaysExpenses] = useState(null);
+
+  useEffect(() => {
+    if (expenses) {
+      setTodaysExpenses(expenses.filter((expense) => expense.date === date))
+    }
+  }, [expenses, date]);
+
+  useEffect(() => {
+    console.log(todaysExpenses);
+  }, [todaysExpenses]);
+
+  return (
+    <div className="todays-expenses">
+      <div className="todays-expenses__header">
+        <h2 className="todays-expenses__heading">Today's expenses</h2>
+        <Button
+          type="button"
+          className="button"
+          onClick={null}
+          variant="blue"
+          isDisabled={false}
+        >
+          All expenses
+        </Button>
+      </div>
+
+      <div className="todays-expenses__expenses">
+        {loadingData || todaysExpenses === null ? (
+          <p>Loading expenses...</p>
+        ) : todaysExpenses.length === 0 ? (
+          <p>No expenses today.</p>
+        ) : (
+          <table className="todays-expenses__table">
+            <thead className="todays-expenses__table-head">
+              <tr>
+                <th>Amount</th>
+                <th>Source</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody className="todays-expenses__table-body">
+              {
+                todaysExpenses.map((expense, index) => (
+                  <tr key={index} /*className={`todays-expenses__row-${index}`}*/> 
+                    <td>{fakeCurrency}{expense.amount}</td>
+                    <td>{expense.source}</td>
+                    <td>{expense.description || 'N/A'}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TodaysExpenses;

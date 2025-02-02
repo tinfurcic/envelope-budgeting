@@ -1,5 +1,5 @@
 @use "../abstracts/mixins";
 
-.create-envelope-page {
+.new-expense-page {
   @include mixins.form-page-styles;
 }

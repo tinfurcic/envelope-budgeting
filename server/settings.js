@@ -24,10 +24,15 @@ export const getSettings = async (userId) => {
 // Update both settings
 export const updateSettings = async (userId, currencyType, enableDebt) => {
   try {
-    const settingsRef = db.collection("users").doc(userId).collection("settings");
+    const settingsRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("settings");
 
     await Promise.all([
-      settingsRef.doc("currencyType").set({ value: currencyType }, { merge: true }),
+      settingsRef
+        .doc("currencyType")
+        .set({ value: currencyType }, { merge: true }),
       settingsRef.doc("enableDebt").set({ value: enableDebt }, { merge: true }),
     ]);
 

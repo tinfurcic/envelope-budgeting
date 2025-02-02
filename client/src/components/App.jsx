@@ -1,60 +1,117 @@
 import React, { useState, useEffect } from "react";
-import { fetchEnvelopes } from "../util/axios/fetchEnvelopes";
-import { fetchTotalBudget } from "../util/axios/fetchTotalBudget";
-import { calcUnassignedBudget } from "../util/calcUnassignedBudget";
-import { Outlet, useLocation } from "react-router-dom";
+import { fetchAllData } from "../util/fetchAllData";
+import { calcTotalBudget } from "../util/calcTotalBudget";
+import { calcTotalCurrentAmount } from "../util/calcTotalCurrentAmount";
+import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
-import Navigation from "./Navigation";
+import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
+  const [envelopes, setEnvelopes] = useState(null);
+  const [expenses, setExpenses] = useState(null);
+  const [goals, setGoals] = useState(null);
+  const [income, setIncome] = useState(null);
+  const [savings, setSavings] = useState(null);
+  const [settings, setSettings] = useState(null);
+
+  const [nextEnvelopeId, setNextEnvelopeId] = useState(null);
+  const [nextGoalId, setNextGoalId] = useState(null);
+  const [nextExpenseId, setNextExpenseId] = useState(null);
+
+  const [totalIncome, setTotalIncome] = useState(null);
   const [totalBudget, setTotalBudget] = useState(null);
-  const [envelopes, setEnvelopes] = useState([]);
-  const [unassignedBudget, setUnassignedBudget] = useState(0);
-  const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
-  const [date, setDate] = useState(new Date());
+  const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
+
+  const [loadingData, setLoadingData] = useState(true);
+  const [date, setDate] = useState(getTodayDate());
+  const [fullDate, setFullDate] = useState(new Date());
+
+  function getTodayDate() {
+    const now = new Date();
+    return now.toISOString().split("T")[0];
+  }
+
+  useEffect(() => {
+    const now = new Date();
+    const msUntilMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+      now.getTime();
+
+    const timer = setTimeout(() => {
+      setDate(getTodayDate()); // Update today's date at midnight
+    }, msUntilMidnight);
+
+    return () => clearTimeout(timer);
+  }, [date]);
 
   const appData = {
     envelopes,
     setEnvelopes,
+    nextEnvelopeId,
+    expenses,
+    setExpenses,
+    nextExpenseId,
+    goals,
+    setGoals,
+    nextGoalId,
+    income,
+    setIncome,
+    savings,
+    setSavings,
+    settings,
+    setSettings,
+    totalIncome,
+    setTotalIncome,
     totalBudget,
-    setTotalBudget,
-    unassignedBudget,
-    loadingEnvelopes,
+    totalCurrentAmount,
+    loadingData,
     date,
+    fullDate,
   };
-
-  const location = useLocation();
-  const navRoutes = ["/home", "/envelopes", "/goals", "/profile"];
-  const isNavRoute = navRoutes.includes(location.pathname);
 
   // Fetch data on load
   useEffect(() => {
-    setDate(new Date());
-
-    const loadStuff = async () => {
+    const fetchDataOnLoad = async () => {
       try {
-        const fetchedEnvelopes = await fetchEnvelopes();
-        setLoadingEnvelopes(false);
-        setEnvelopes(fetchedEnvelopes);
-        const fetchedTotalBudget = await fetchTotalBudget();
-        setTotalBudget(fetchedTotalBudget);
+        const data = await fetchAllData();
+        setEnvelopes(data.envelopes);
+        setExpenses(data.expenses);
+        setGoals(data.goals);
+        setIncome(data.income);
+        setSavings(data.savings);
+        setSettings(data.settings);
+
+        setNextEnvelopeId(data.nextEnvelopeId);
+        setNextGoalId(data.nextGoalId);
+        setNextExpenseId(data.nextExpenseId);
       } catch (error) {
-        console.error("Unable to load stuff properly.", error);
+        console.error("Unable to load data properly:", error);
+      } finally {
+        setLoadingData(false); // Ensures loading state is updated even if there's an error
       }
     };
-    loadStuff();
+
+    fetchDataOnLoad();
   }, []);
 
   useEffect(() => {
-    setUnassignedBudget(calcUnassignedBudget(envelopes, totalBudget));
-  }, [totalBudget, envelopes]);
+    if (income !== null) {
+      setTotalIncome(income.extraIncome + income.regularIncome);
+    }
+  }, [income]);
+
+  useEffect(() => {
+    setTotalBudget(calcTotalBudget(envelopes));
+    setTotalCurrentAmount(calcTotalCurrentAmount(envelopes));
+  }, [envelopes]);
 
   return (
     <div className="app">
-      {isNavRoute && <Navigation />}
-      <div className="app__outlet">
-        <Outlet context={appData} />
-      </div>
+      <ResponsiveLayout>
+        <div className="app__outlet">
+          <Outlet context={appData} />
+        </div>
+      </ResponsiveLayout>
     </div>
   );
 };

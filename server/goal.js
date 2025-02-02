@@ -4,11 +4,20 @@ import { db } from "../firebase-admin.js";
 export const getAllGoals = async (userId) => {
   try {
     const goalsRef = db.collection("users").doc(userId).collection("goals");
-    const querySnapshot = await goalsRef
-      .where("__name__", "!=", "metadata")
-      .get();
+    const querySnapshot = await goalsRef.get();
+    let metadata = null;
 
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const goals = querySnapshot.docs
+      .map((doc) => {
+        if (doc.id === "metadata") {
+          metadata = { id: doc.id, ...doc.data() };
+          return null;
+        }
+        return { id: doc.id, ...doc.data() };
+      })
+      .filter(Boolean);
+
+    return { goals, metadata };
   } catch (error) {
     console.error("Error fetching all goals:", error);
     throw new Error("Failed to fetch goals.");

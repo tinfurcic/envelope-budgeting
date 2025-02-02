@@ -1,0 +1,41 @@
+.todays-expenses {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__heading {
+    font-size: 1.375rem;
+  }
+
+  &__table {
+    border-collapse: collapse;
+    width: 100%;
+
+    & th, & td {
+      border-left: 2px solid #333;
+      padding: 0.25rem;
+      text-align: center;
+    }
+
+    th {
+      border-bottom: 2px solid #333;
+    }
+
+    td {
+      border-bottom: 1px solid #333;
+    }
+    
+    /* Remove the outer borders */
+    & th:first-child, & td:first-child {
+      border-left: none;
+    }
+    & tr:first-child th, & tr:first-child td {
+      border-top: none;
+    }
+    & tr:last-child td {
+      border-bottom: none;
+    } 
+  }
+}

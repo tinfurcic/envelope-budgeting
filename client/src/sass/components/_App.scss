@@ -1,9 +1,10 @@
 .app {
   display: flex;
   flex-direction: column;
-  padding: 0 0.5rem;
+  height: 100%;
 
   &__outlet {
     padding: 0 0.5rem;
+    height: 100%;
   }
 }
