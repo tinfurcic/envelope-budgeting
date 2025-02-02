@@ -70,7 +70,7 @@ export const createEnvelope = async (
       throw new Error("Metadata not found.");
     }
 
-    const { nextEnvelopeId = 1 } = envelopeMetadataDoc.data();
+    const { nextEnvelopeId = 1, count } = envelopeMetadataDoc.data();
 
     const envelopeRef = userRef
       .collection("envelopes")
@@ -83,12 +83,13 @@ export const createEnvelope = async (
       currentAmount: parseFloat(currentAmount),
       description,
       color,
+      order: count + 1,
       createdAt: new Date().toISOString(),
     };
 
     const batch = db.batch();
     batch.set(envelopeRef, newEnvelope);
-    batch.update(envelopeMetadataRef, { nextEnvelopeId: nextEnvelopeId + 1 });
+    batch.update(envelopeMetadataRef, { nextEnvelopeId: nextEnvelopeId + 1, count: count + 1 });
 
     await batch.commit();
 
@@ -108,6 +109,7 @@ export const updateEnvelope = async (
   newCurrentAmount,
   newDescription,
   newColor,
+  newOrder,
 ) => {
   try {
     const updates = {};
@@ -117,6 +119,7 @@ export const updateEnvelope = async (
       updates.currentAmount = parseFloat(newCurrentAmount);
     if (newDescription !== undefined) updates.description = newDescription;
     if (newColor !== undefined) updates.color = newColor;
+    if (newOrder !== undefined) updates.order = newOrder;
 
     const envelopeRef = db
       .collection("users")
@@ -134,15 +137,30 @@ export const updateEnvelope = async (
 
 // Delete an envelope for a user
 export const deleteEnvelope = async (userId, envelopeId) => {
-  try {
-    const envelopeRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("envelopes")
-      .doc(envelopeId);
-    await envelopeRef.delete();
-  } catch (error) {
-    console.error("Error deleting envelope (Admin SDK):", error);
-    throw new Error("Failed to delete the envelope.");
-  }
+    try {
+      const userRef = db.collection("users").doc(userId);
+      const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+      const envelopeMetadataDoc = await envelopeMetadataRef.get();
+  
+      if (!envelopeMetadataDoc.exists) {
+        throw new Error("Metadata not found.");
+      }
+  
+      const { count } = envelopeMetadataDoc.data();
+  
+      const envelopeRef = db
+        .collection("users")
+        .doc(userId)
+        .collection("envelopes")
+        .doc(envelopeId);
+
+      const batch = db.batch();
+      batch.delete(envelopeRef);
+      batch.update(envelopeMetadataRef, { count: count - 1 });
+      await batch.commit();
+
+    } catch (error) {
+      console.error("Error deleting envelope (Admin SDK):", error);
+      throw new Error("Failed to delete the envelope.");
+    }
 };

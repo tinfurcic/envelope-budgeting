@@ -34,6 +34,7 @@ usersRouter.post("/", async (req, res) => {
       initialized: true,
       id: -1,
       nextEnvelopeId: 1,
+      count: 0,
     });
     batch.set(userRef.collection("expenses").doc("metadata"), {
       initialized: true,

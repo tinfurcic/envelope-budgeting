@@ -1,11 +1,14 @@
 import axiosInstance from "./axiosInstance";
 
-export const updateEnvelope = async (id, name, budget, currentAmount) => {
+export const updateEnvelope = async (id, name, budget, currentAmount, description, color, order) => {
   try {
     const res = await axiosInstance.patch(`/envelopes/${Number(id)}`, {
       name,
       budget,
       currentAmount,
+      description,
+      color,
+      order,
     });
     return { success: true, data: res.data };
   } catch (error) {
