@@ -44,11 +44,11 @@ expensesRouter.get("/:id", async (req, res) => {
 });
 
 expensesRouter.post("/", async (req, res) => {
-  const { amount, date, source, description, isLockedIn } = req.body;
+  const { amount, date, sources, description, isLockedIn } = req.body;
   if (
     isNaN(amount) ||
     !date ||
-    !source ||
+    !sources ||
     (isLockedIn !== true && isLockedIn !== false)
   ) {
     // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
@@ -60,7 +60,7 @@ expensesRouter.post("/", async (req, res) => {
       req.userId,
       amount,
       date,
-      source, // "e:id" for envelopes, "STS" / "LTS" for short/long term savings?
+      sources, // "e:id" for envelopes, "STS" / "LTS" for short/long term savings?
       description,
       isLockedIn,
     );
@@ -73,7 +73,7 @@ expensesRouter.post("/", async (req, res) => {
 
 expensesRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { amount, date, source, description, isLockedIn } = req.body;
+  const { amount, date, sources, description, isLockedIn } = req.body;
 
   try {
     const updatedExpense = await updateExpense(
@@ -81,7 +81,7 @@ expensesRouter.patch("/:id", async (req, res) => {
       id,
       amount,
       date,
-      source,
+      sources,
       description,
       isLockedIn,
     );

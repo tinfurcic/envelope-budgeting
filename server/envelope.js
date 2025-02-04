@@ -89,7 +89,10 @@ export const createEnvelope = async (
 
     const batch = db.batch();
     batch.set(envelopeRef, newEnvelope);
-    batch.update(envelopeMetadataRef, { nextEnvelopeId: nextEnvelopeId + 1, count: count + 1 });
+    batch.update(envelopeMetadataRef, {
+      nextEnvelopeId: nextEnvelopeId + 1,
+      count: count + 1,
+    });
 
     await batch.commit();
 
@@ -137,30 +140,29 @@ export const updateEnvelope = async (
 
 // Delete an envelope for a user
 export const deleteEnvelope = async (userId, envelopeId) => {
-    try {
-      const userRef = db.collection("users").doc(userId);
-      const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
-      const envelopeMetadataDoc = await envelopeMetadataRef.get();
-  
-      if (!envelopeMetadataDoc.exists) {
-        throw new Error("Metadata not found.");
-      }
-  
-      const { count } = envelopeMetadataDoc.data();
-  
-      const envelopeRef = db
-        .collection("users")
-        .doc(userId)
-        .collection("envelopes")
-        .doc(envelopeId);
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+    const envelopeMetadataDoc = await envelopeMetadataRef.get();
 
-      const batch = db.batch();
-      batch.delete(envelopeRef);
-      batch.update(envelopeMetadataRef, { count: count - 1 });
-      await batch.commit();
-
-    } catch (error) {
-      console.error("Error deleting envelope (Admin SDK):", error);
-      throw new Error("Failed to delete the envelope.");
+    if (!envelopeMetadataDoc.exists) {
+      throw new Error("Metadata not found.");
     }
+
+    const { count } = envelopeMetadataDoc.data();
+
+    const envelopeRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("envelopes")
+      .doc(envelopeId);
+
+    const batch = db.batch();
+    batch.delete(envelopeRef);
+    batch.update(envelopeMetadataRef, { count: count - 1 });
+    await batch.commit();
+  } catch (error) {
+    console.error("Error deleting envelope (Admin SDK):", error);
+    throw new Error("Failed to delete the envelope.");
+  }
 };

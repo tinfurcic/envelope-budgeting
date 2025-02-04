@@ -57,7 +57,7 @@ export const createExpense = async (
   userId,
   amount,
   date,
-  source,
+  sources,
   description,
   isLockedIn,
 ) => {
@@ -80,7 +80,7 @@ export const createExpense = async (
       id: nextExpenseId,
       amount: parseFloat(amount),
       date, // might need some conversion here
-      source,
+      sources,
       description,
       isLockedIn,
       createdAt: new Date().toISOString(),
@@ -105,15 +105,15 @@ export const updateExpense = async (
   expenseId,
   amount,
   date,
-  source,
+  sources,
   description,
   isLockedIn,
 ) => {
   try {
     const updates = {};
     if (amount !== undefined) updates.amount = parseFloat(amount);
-    if (date) updates.date = date;
-    if (source) updates.source = source;
+    if (date !== undefined) updates.date = date;
+    if (sources !== undefined) updates.sources = sources;
     if (description !== undefined) updates.description = description;
     if (isLockedIn !== undefined) updates.isLockedIn = isLockedIn;
 

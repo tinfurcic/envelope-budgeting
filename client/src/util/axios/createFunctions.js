@@ -8,26 +8,26 @@ export const createEnvelope = async (
   color,
   setEnvelopes,
 ) => {
-    try {
-      const res = await axiosInstance.post("/envelopes", {
-        name,
-        budget,
-        currentAmount,
-        description,
-        color,
-      });
-      setEnvelopes((prevEnvelopes) => [...prevEnvelopes, res.data]);
-      return { success: true, data: res.data };
-    } catch (error) {
-      console.error("Error creating envelope:", error);
-      return { success: false, error: error.message };
-    }
+  try {
+    const res = await axiosInstance.post("/envelopes", {
+      name,
+      budget,
+      currentAmount,
+      description,
+      color,
+    });
+    setEnvelopes((prevEnvelopes) => [...prevEnvelopes, res.data]);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error creating envelope:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 export const createExpense = async (
   amount,
   date,
-  source,
+  sources,
   description,
   isLockedIn,
   setExpenses,
@@ -36,7 +36,7 @@ export const createExpense = async (
     const res = await axiosInstance.post("/expenses", {
       amount,
       date,
-      source,
+      sources,
       description,
       isLockedIn,
     });

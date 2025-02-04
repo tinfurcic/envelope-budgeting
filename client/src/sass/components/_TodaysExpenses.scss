@@ -13,7 +13,8 @@
     border-collapse: collapse;
     width: 100%;
 
-    & th, & td {
+    & th,
+    & td {
       border-left: 2px solid #333;
       padding: 0.25rem;
       text-align: center;
@@ -26,16 +27,18 @@
     td {
       border-bottom: 1px solid #333;
     }
-    
+
     /* Remove the outer borders */
-    & th:first-child, & td:first-child {
+    & th:first-child,
+    & td:first-child {
       border-left: none;
     }
-    & tr:first-child th, & tr:first-child td {
+    & tr:first-child th,
+    & tr:first-child td {
       border-top: none;
     }
     & tr:last-child td {
       border-bottom: none;
-    } 
+    }
   }
 }
