@@ -4,8 +4,6 @@ import { addSourcesInOrder } from "../util/addSourcesInOrder";
 const SourceCheckboxRaw = ({
   newExpenseAmount,
   newExpenseSources,
-  sourceAmounts,
-  setSourceAmounts,
   setNewExpenseSources,
   envelopes,
   savings,
@@ -13,95 +11,121 @@ const SourceCheckboxRaw = ({
   const fakeCurrency = "€";
 
   // sum of all entered amounts
-  const totalEnteredAmount = Object.values(sourceAmounts).reduce(
-    (sum, val) => sum + (parseFloat(val) || 0),
+  const totalEnteredAmount = newExpenseSources.reduce(
+    (sum, source) => sum + (parseFloat(source.amount) || 0),
     0
   );
 
-  const handlesourceAmountsChange = (event, key) => {
+  const handleSourceAmountsChange = (event, key) => {
     let value = event.target.value;
     value = value.replace(/,/g, ".");
     const regex = /^(|0|0\.|0\.\d{1,2}|[1-9]\d*(\.|\.\d{1,2})?)$/;
+
     if (regex.test(value)) {
       const numericValue = parseFloat(value) || 0;
-      const otherValuesSum = totalEnteredAmount - (parseFloat(sourceAmounts[key]) || 0);
+      const otherValuesSum = totalEnteredAmount - (parseFloat(newExpenseSources.find(source => source.id === key)?.amount) || 0);
 
       if (numericValue + otherValuesSum > newExpenseAmount) {
         value = Math.max(newExpenseAmount - otherValuesSum, 0).toFixed(2).toString();
       }
 
-      setSourceAmounts((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
+      setNewExpenseSources((prevSources) => {
+        const updatedSources = prevSources.map((source) => {
+          // Update the amount for the matching source
+          if (source.id === key || 
+              (key === -1 && source.type === "short-term-savings") || 
+              (key === -2 && source.type === "long-term-savings")) {
+            return {
+              ...source,
+              amount: value, // Update the amount directly in the source
+            };
+          }
+          return source; // If it's not the matching source, leave it unchanged
+        });
+
+        return updatedSources;
+      });
     }
   };
 
   useEffect(() => {
-    setSourceAmounts((prev) => {
-      const resetAmounts = {};
-      Object.keys(prev).forEach((key) => {
-        resetAmounts[key] = "";
+    setNewExpenseSources((prevSources) => {
+      // Reset the amount values in each source object
+      const updatedSources = prevSources.map((source) => {
+        return {
+          ...source,
+          amount: "",  // Reset the amount for each source
+        };
       });
-      return resetAmounts;
+
+      return updatedSources;
     });
-  }, [newExpenseAmount]); // probably best to rest all on main amount change
+  }, [newExpenseAmount, setNewExpenseSources]);
 
   const handleChoice = (event) => {
     const isChecked = event.target.checked;
-    const id = event.target.id;
+    const checkboxId = event.target.id;
+    console.log(checkboxId);
     if (isChecked) {
-      if (!isNaN(parseFloat(id))) {
-        const envelope = envelopes.find((item) => item.id === Number(id));
-        setNewExpenseSources(addSourcesInOrder(newExpenseSources, envelope));
-      } else if (id === "LTS") {
+      if (!isNaN(parseFloat(checkboxId))) {
+        const envelope = envelopes.find((item) => item.id === Number(checkboxId));
+        setNewExpenseSources(addSourcesInOrder(newExpenseSources, {
+          id: envelope.id,
+          type: "envelope",
+          name: envelope.name,
+          amount: "",
+          available: envelope.currentAmount,
+          order: envelope.order
+        }));
+      } else if (checkboxId === "LTS") {
         setNewExpenseSources(
           addSourcesInOrder(newExpenseSources, {
-            longTermSavings: savings.longTermSavings,
-          }),
+            id: -2,
+            type: "longTermSavings",
+            name: "Long term savings",
+            amount: "",
+            available: savings.longTermSavings,
+            order: -2
+          })
         );
-      } else if (id === "STS") {
+      } else if (checkboxId === "STS") {
         setNewExpenseSources(
           addSourcesInOrder(newExpenseSources, {
-            shortTermSavings: savings.shortTermSavings,
-          }),
+            id: -1,
+            type: "shortTermSavings",
+            name: "Short term savings",
+            amount: "",
+            available: savings.shortTermSavings,
+            order: -1
+          })
         );
       }
-    } else {
-      if (!isNaN(parseFloat(id)) && isFinite(id)) {
+    } else { // NEW
+      if (!isNaN(parseFloat(checkboxId))) {
         const envelope = newExpenseSources.find(
-          (item) => item.id === Number(id),
+          (item) => item.id === Number(checkboxId)
         );
+
+        // Remove the envelope from newExpenseSources
         setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.id !== envelope.id),
+          prevSources.filter((source) => source.id !== envelope.id)
         );
-        setSourceAmounts((prev) => {
-          const newState = { ...prev };
-          delete newState[id]; // Remove amount when source is deselected
-          return newState;
-        });
-      } else if (id === "LTS") {
-        setNewExpenseSources((prevSources) =>
-          prevSources.filter(
-            (source) => !Object.hasOwn(source, "longTermSavings"),
-          ),
-        );
-        setSourceAmounts((prev) => {
-          const newState = { ...prev };
-          delete newState["-2"]; // Remove amount when source is deselected
-          return newState;
-        });
-      } else if (id === "STS") {
+      } else if (checkboxId === "LTS") {
+        console.log(newExpenseSources);
+        
+        // Remove the long-term savings source
         setNewExpenseSources((prevSources) =>
           prevSources.filter(
-            (source) => !Object.hasOwn(source, "shortTermSavings"),
-          ),
+            (source) => source.type !== "longTermSavings"
+          )
         );
-        setSourceAmounts((prev) => {
-          const newState = { ...prev };
-          delete newState["-1"]; // Remove amount when source is deselected
-          return newState;
-        });
+      } else if (checkboxId === "STS") {
+        // Remove the short-term savings source
+        setNewExpenseSources((prevSources) =>
+          prevSources.filter(
+            (source) => source.type !== "shortTermSavings"
+          )
+        );
       }
     }
   };
@@ -113,7 +137,7 @@ const SourceCheckboxRaw = ({
         <div>
           <input
             type="checkbox"
-            key="-1"
+            key={-1}
             id="STS"
             name="Short term savings"
             onChange={handleChoice}
@@ -124,7 +148,7 @@ const SourceCheckboxRaw = ({
         <div>
           <input
             type="checkbox"
-            key="-2"
+            key={-2}
             id="LTS"
             name="Long term savings"
             onChange={handleChoice}
@@ -144,20 +168,11 @@ const SourceCheckboxRaw = ({
             <label htmlFor={envelope.id}>{envelope.name}</label>
           </div>
         ))}
+        {/* NEW */}
         {newExpenseSources.map((source) => {
-          //const key = source.id || JSON.stringify(source);
-          let key;
-          let name;
-          if (source.id) {
-            key = source.id;
-            name = source.name;
-          } else if (Object.keys(source)[0] === "shortTermSavings") {
-            key = -1;
-            name = "Short term savings";
-          } else {
-            key = -2;
-            name = "Long term savings";
-          }
+          let key = source.id;  // Use source.id directly
+          let name = source.name;
+
           return (
             <div key={key}>
               <label htmlFor={key}>Amount from {name}</label>
@@ -168,8 +183,8 @@ const SourceCheckboxRaw = ({
                 <input
                   className="form-item__input-with-currency__input"
                   type="text"
-                  value={sourceAmounts[key] || ""}
-                  onChange={(e) => handlesourceAmountsChange(e, key)}
+                  value={source.amount || ""}
+                  onChange={(e) => handleSourceAmountsChange(e, key)}
                   id={key}
                   name={key}
                 />

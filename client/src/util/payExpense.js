@@ -1,78 +1,62 @@
 import { updateEnvelope, updateSavings } from "./axios/updateFunctions";
 
-// Helper function to update short term savings
-const updateShortTermSavings = async (newShortTermSavings, longTermSavings) => {
-  return await updateSavings(newShortTermSavings, longTermSavings);
-};
-
-// Helper function to update long term savings
-const updateLongTermSavings = async (shortTermSavings, newLongTermSavings) => {
-  return await updateSavings(shortTermSavings, newLongTermSavings);
-};
-
-// Helper function to update an envelope
-const updateSourceEnvelope = async (source, sourceAmounts) => {
-  const id = source.id;
-  const newAmount = source.currentAmount - parseFloat(sourceAmounts[id]);
-  return await updateEnvelope(
-    source.id,
-    source.name,
-    source.budget,
-    newAmount,
-    source.description,
-    source.color,
-    source.order
-  );
-};
-
-// Main function to pay expense
 export const payExpense = async (
   newExpenseAmount,
   newExpenseSources,
-  sourceAmounts,
   envelopes,
   savings,
 ) => {
-  console.log(newExpenseAmount);
-  console.log(newExpenseSources);
-  console.log(sourceAmounts);
-  console.log(envelopes);
-  console.log(savings);
 
-  if (newExpenseSources.length !== Object.keys(sourceAmounts).length) {
-    throw new Error("Sources and amounts not coordinated!!");
+  let totalAmount = 0;
+  for (const source of newExpenseSources) {
+    totalAmount += Number(source.amount);
+  }
+  if (totalAmount !== Number(newExpenseAmount)) {
+    console.log(newExpenseAmount)
+    console.log(totalAmount);
+    throw new Error("Amounts from sources don't add up to total expense!");
   }
 
-  const promises = [];
   let newShortTermSavings = savings.shortTermSavings;
+  let newLongTermSavings = savings.longTermSavings;
+  const promises = [];
 
   for (let i = 0; i < newExpenseSources.length; i++) {
     const source = newExpenseSources[i];
 
-    // Handle short-term savings
-    if (source.shortTermSavings) {
-      const shortTermAmount = parseFloat(sourceAmounts["-1"]);
-      if (shortTermAmount > source.shortTermSavings) {
-        throw new Error("Can't pay expense from Short term savings!");
+    if (source.amount > source.available) {
+      throw new Error(`Not enough funds in ${source.name}!`);
+    } else {
+      if (source.type === "shortTermSavings") {
+        // Reduce the short-term savings amount
+        newShortTermSavings -= source.amount;
+      } else if (source.type === "longTermSavings") {
+        // Reduce the long-term savings amount
+        newLongTermSavings -= source.amount;
+      } else {
+        const envelope = envelopes.find((item) => item.id === source.id);
+        if (envelope) {
+          promises.push(updateEnvelope(
+            envelope.id,
+            envelope.name,
+            envelope.budget,
+            envelope.currentAmount - source.amount,
+            envelope.description,
+            envelope.color,
+            envelope.order
+          ));
+        } else {
+          console.warn(`Envelope with ID ${source.id} not found.`);
+        }
       }
-      newShortTermSavings = source.shortTermSavings - shortTermAmount;
-      promises.push(updateShortTermSavings(newShortTermSavings, savings.longTermSavings));
-    }
-    // Handle long-term savings
-    else if (source.longTermSavings) {
-      const longTermAmount = parseFloat(sourceAmounts["-2"]);
-      if (longTermAmount > source.longTermSavings) {
-        throw new Error("Can't pay expense from Long term savings!");
-      }
-      promises.push(updateLongTermSavings(newShortTermSavings, source.longTermSavings - longTermAmount));
-    }
-    // Handle envelopes
-    else {
-      promises.push(updateSourceEnvelope(source, sourceAmounts));
     }
   }
 
-  // Wait for all promises to complete and handle the result
+  // If any savings need updating, do so with a single request
+  if (newShortTermSavings !== savings.shortTermSavings || newLongTermSavings !== savings.longTermSavings) {
+    promises.push(updateSavings(newShortTermSavings, newLongTermSavings));
+  }
+
   try {
     const results = await Promise.all(promises);
 

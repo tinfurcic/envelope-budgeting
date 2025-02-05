@@ -12,15 +12,38 @@ const SourceSelectRaw = ({
 
   const handleSelectedSourceChange = (event) => {
     const id = event.target.value;
+    console.log(event.target);
     if (id === "") {
       setNewExpenseSources([]);
     } else if (!isNaN(parseFloat(id)) && isFinite(id)) {
       const envelope = envelopes.find((item) => item.id === Number(id));
-      setNewExpenseSources([envelope]);
+      setNewExpenseSources([{
+        id: envelope.id,
+        type: "envelope", 
+        name: envelope.name, 
+        amount: newExpenseAmount, 
+        available: envelope.currentAmount,
+        order: envelope.order
+      }])
     } else if (id === "LTS") {
-      setNewExpenseSources([{longTermSavings: savings.longTermSavings}]);
+      setNewExpenseSources([{
+        id: -2,
+        type: "longTermSavings", 
+        name: "Long term savings", 
+        amount: newExpenseAmount, 
+        available: savings.longTermSavings,
+        order: -2
+      }]);
+
     } else if (id === "STS") {
-      setNewExpenseSources([{shortTermSavings: savings.shortTermSavings}]);
+      setNewExpenseSources([{
+        id: -1,
+        type: "shortTermSavings", 
+        name: "Short term savings", 
+        amount: newExpenseAmount, 
+        available: savings.shortTermSavings,
+        order: -1
+      }]);
     } else {
       console.error("Option id type not recognized");
     }
@@ -68,7 +91,7 @@ const SourceSelectRaw = ({
               <option value="">No envelopes to select from.</option>
             ) : sourceCategory === "envelope" ? (
               <>
-                <option key="-1" value="">
+                <option key={-1} value="">
                   Select an envelope
                 </option>
                 {envelopes.map((envelope) => (
@@ -87,7 +110,7 @@ const SourceSelectRaw = ({
                 <>
                   <option value="no-selection">Select savings type</option>
                   <option
-                    value="STS"
+                    value="STS" //?
                     disabled={savings.shortTermSavings < newExpenseAmount}
                   >
                     Short term savings ({fakeCurrency}

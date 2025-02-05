@@ -16,11 +16,10 @@ const NewExpensePage = () => {
   const [newExpenseAmount, setNewExpenseAmount] = useState("");
   const [newExpenseDate, setNewExpenseDate] = useState("");
   const [newExpenseSources, setNewExpenseSources] = useState([]);
-  const [sourceAmounts, setSourceAmounts] = useState({});
   const [newExpenseDescription, setNewExpenseDescription] = useState("");
   const [isTodayChecked, setIsTodayChecked] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
-  const [sourceCategory, setSourceCategory] = useState(null); //type*s*
+  const [sourceCategory, setSourceCategory] = useState(null);
   const [allowMultipleSources, setAllowMultipleSources] = useState(false);
 
   const fakeCurrency = "€";
@@ -37,7 +36,7 @@ const NewExpensePage = () => {
           false, // isLockedIn
           setExpenses,
         ),
-        payExpense(newExpenseAmount, newExpenseSources, sourceAmounts, envelopes, savings),
+        payExpense(newExpenseAmount, newExpenseSources, envelopes, savings),
       ]);
 
       if (!createExpenseResult.success) {
@@ -57,6 +56,7 @@ const NewExpensePage = () => {
       setNewExpenseSources([]);
       setNewExpenseDescription("");
       setSourceCategory(null);
+      setAllowMultipleSources(false);
     } catch (error) {
       console.error(
         "Error during expense creation and payment:",
@@ -113,11 +113,21 @@ const NewExpensePage = () => {
   }, [newExpenseDate, date]);
 
   useEffect(() => {
+    let totalSum = 0;
+    let hasEmptyField = false;
+    for (const source of newExpenseSources) { // will also work if if newExpenseSources is empty
+      if (Number(source.amount) === 0) { // will happen if source.amount is "", "0", 0, "0.0", 0.0, "0.00" or 0.00
+        hasEmptyField = true;
+        break;
+      }
+      totalSum += Number(source.amount);
+    }
     setIsDisabled(
-      newExpenseAmount === "" ||
-        newExpenseAmount === "0" ||
-        newExpenseDate === "" ||
-        newExpenseSources.length === 0,
+      Number(newExpenseAmount) === 0 ||
+      newExpenseDate === "" ||
+      newExpenseSources.length === 0 ||
+      hasEmptyField ||
+      Number(totalSum) !== Number(newExpenseAmount)
     );
   }, [newExpenseAmount, newExpenseDate, newExpenseSources]);
 
@@ -210,8 +220,6 @@ const NewExpensePage = () => {
                 <SourceCheckboxRaw
                   newExpenseAmount={newExpenseAmount}
                   newExpenseSources={newExpenseSources}
-                  sourceAmounts={sourceAmounts}
-                  setSourceAmounts={setSourceAmounts}
                   setNewExpenseSources={setNewExpenseSources}
                   envelopes={envelopes}
                   savings={savings}
