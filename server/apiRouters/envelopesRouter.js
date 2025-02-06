@@ -68,7 +68,7 @@ envelopesRouter.post("/", async (req, res) => {
 
 envelopesRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, budget, currentAmount, description, color } = req.body;
+  const { name, budget, currentAmount, description, color, order } = req.body;
 
   try {
     const updatedEnvelope = await updateEnvelope(
@@ -79,6 +79,7 @@ envelopesRouter.patch("/:id", async (req, res) => {
       currentAmount,
       description,
       color,
+      order,
     );
     res.status(200).json(updatedEnvelope);
   } catch (error) {

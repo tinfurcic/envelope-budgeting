@@ -3,7 +3,6 @@ import { useOutletContext } from "react-router-dom";
 import Button from "./Button";
 
 const TodaysExpenses = () => {
-
   const { expenses, loadingData, date } = useOutletContext();
 
   const fakeCurrency = "€";
@@ -12,13 +11,9 @@ const TodaysExpenses = () => {
 
   useEffect(() => {
     if (expenses) {
-      setTodaysExpenses(expenses.filter((expense) => expense.date === date))
+      setTodaysExpenses(expenses.filter((expense) => expense.date === date));
     }
   }, [expenses, date]);
-
-  useEffect(() => {
-    console.log(todaysExpenses);
-  }, [todaysExpenses]);
 
   return (
     <div className="todays-expenses">
@@ -50,15 +45,16 @@ const TodaysExpenses = () => {
               </tr>
             </thead>
             <tbody className="todays-expenses__table-body">
-              {
-                todaysExpenses.map((expense, index) => (
-                  <tr key={index} /*className={`todays-expenses__row-${index}`}*/> 
-                    <td>{fakeCurrency}{expense.amount}</td>
-                    <td>{expense.source}</td>
-                    <td>{expense.description || 'N/A'}</td>
-                  </tr>
-                ))
-              }
+              {todaysExpenses.map((expense, index) => (
+                <tr key={index} /*className={`todays-expenses__row-${index}`}*/>
+                  <td>
+                    {fakeCurrency}
+                    {expense.amount}
+                  </td>
+                  <td>{expense.source}</td>
+                  <td>{expense.description || "N/A"}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}

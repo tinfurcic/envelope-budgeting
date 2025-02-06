@@ -1,5 +1,39 @@
 import { db } from "../firebase-admin.js";
 
+const computeSourceChanges = (oldSources, newSources) => {
+  const changes = [];
+  const sourceMap = new Map();
+
+  // Step 1: Store new source amounts in a map
+  newSources.forEach((source) =>
+    sourceMap.set(`${source.type}-${s.id}`, source.amount),
+  );
+
+  // Step 2: Process old sources and compute the difference
+  oldSources.forEach((oldSource) => {
+    const key = `${oldSource.type}-${oldSource.id}`;
+    const newAmount = sourceMap.get(key) || 0; // Default to 0 if the source is not in newSources
+    const diff = oldSource.amount - newAmount; // The difference between old and new amounts
+
+    // Add the change (whether positive or negative) to the changes array
+    changes.push({ source: oldSource, amountDiff: diff });
+
+    // Remove the source from the map to avoid double-processing
+    sourceMap.delete(key);
+  });
+
+  // Step 3: Handle sources that were added in the new sources but not in the old sources
+  sourceMap.forEach((amount, key) => {
+    const [type, id] = key.split("-");
+    changes.push({
+      source: { type, id: Number(id), amount },
+      amountDiff: -amount,
+    }); // Handle new sources as negative difference
+  });
+
+  return changes;
+};
+
 // Get all expenses for a specific user
 export const getAllExpenses = async (userId) => {
   try {
@@ -50,81 +84,240 @@ export const getExpenseById = async (userId, expenseId) => {
   }
 };
 
-// Create a new expense for a user
-// By adding `|| ""` after a property, I can make sending through request body optional
-// It's probably better to make user actions pass some values by default
+// New expense. Also handles spending. Much wow.
 export const createExpense = async (
   userId,
   amount,
   date,
-  source,
+  sources,
   description,
   isLockedIn,
 ) => {
+  console.log(sources);
+  const userRef = db.collection("users").doc(userId);
+  const envelopesRef = userRef.collection("envelopes");
+  const savingsRef = userRef.collection("savings");
+  const expenseMetadataRef = userRef.collection("expenses").doc("metadata");
+
   try {
-    const userRef = db.collection("users").doc(userId);
-    const expenseMetadataRef = userRef.collection("expenses").doc("metadata");
-    const expenseMetadataDoc = await expenseMetadataRef.get();
+    const transaction = await db.runTransaction(async (t) => {
+      const expenseMetadataDoc = await t.get(expenseMetadataRef);
+      if (!expenseMetadataDoc.exists) {
+        throw new Error("Metadata not found.");
+      }
 
-    if (!expenseMetadataDoc.exists) {
-      throw new Error("Metadata not found.");
-    }
+      const { nextExpenseId = 1 } = expenseMetadataDoc.data();
+      const expenseRef = userRef
+        .collection("expenses")
+        .doc(String(nextExpenseId));
 
-    const { nextExpenseId = 1 } = expenseMetadataDoc.data();
+      let newShortTermSavings = null;
+      let newLongTermSavings = null;
 
-    const expensesRef = userRef
-      .collection("expenses")
-      .doc(String(nextExpenseId));
+      // Validate the total amount from sources
+      const totalFromSources = sources.reduce(
+        (sum, source) => sum + Number(source.amount),
+        0,
+      );
+      if (totalFromSources !== amount) {
+        throw new Error("Amounts from sources don't add up to total expense!");
+      }
 
-    const newExpense = {
-      id: nextExpenseId,
-      amount: parseFloat(amount),
-      date, // might need some conversion here
-      source,
-      description,
-      isLockedIn,
-      createdAt: new Date().toISOString(),
-    };
+      // Collect data for sources before any updates (all reads here)
+      const envelopeDocs = [];
+      const savingsDocs = [];
 
-    const batch = db.batch();
-    batch.set(expensesRef, newExpense);
-    batch.update(expenseMetadataRef, { nextExpenseId: nextExpenseId + 1 });
+      for (const source of sources) {
+        if (source.type === "envelope") {
+          const envelopeRef = envelopesRef.doc(String(source.id));
+          const envelopeDoc = await t.get(envelopeRef);
+          if (!envelopeDoc.exists) {
+            throw new Error(`Envelope with ID ${source.id} not found.`);
+          }
+          envelopeDocs.push({
+            source,
+            envelopeData: envelopeDoc.data(),
+            envelopeRef,
+          });
+        } else if (
+          source.type === "shortTermSavings" ||
+          source.type === "longTermSavings"
+        ) {
+          const savingsDocRef = savingsRef.doc(source.type);
+          const savingsDoc = await t.get(savingsDocRef);
+          if (!savingsDoc.exists) {
+            throw new Error(`Savings document "${source.type}" not found.`);
+          }
+          savingsDocs.push({ source, savingsData: savingsDoc.data() });
+        }
+      }
 
-    await batch.commit();
+      // Process each source and calculate updates (all writes here)
+      for (const { source, envelopeData, envelopeRef } of envelopeDocs) {
+        if (Number(source.amount) > envelopeData.currentAmount) {
+          throw new Error(`Not enough funds in envelope "${source.name}".`);
+        }
+        t.update(envelopeRef, {
+          currentAmount: envelopeData.currentAmount - Number(source.amount),
+        });
+      }
 
-    return newExpense;
+      for (const { source, savingsData } of savingsDocs) {
+        if (Number(source.amount) > savingsData.value) {
+          throw new Error(`Not enough funds in "${source.name}".`);
+        }
+
+        // Deduct from savings (store new values to update after loop)
+        if (source.type === "shortTermSavings") {
+          newShortTermSavings = savingsData.value - Number(source.amount);
+        } else {
+          newLongTermSavings = savingsData.value - Number(source.amount);
+        }
+      }
+
+      // Apply savings updates if necessary
+      if (newShortTermSavings !== null) {
+        t.update(savingsRef.doc("shortTermSavings"), {
+          value: newShortTermSavings,
+        });
+      }
+      if (newLongTermSavings !== null) {
+        t.update(savingsRef.doc("longTermSavings"), {
+          value: newLongTermSavings,
+        });
+      }
+
+      // Create the new expense object
+      const newExpense = {
+        id: nextExpenseId,
+        amount: parseFloat(amount),
+        date,
+        sources,
+        description,
+        isLockedIn,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Set the new expense document
+      t.set(expenseRef, newExpense);
+      t.update(expenseMetadataRef, { nextExpenseId: nextExpenseId + 1 });
+
+      return { success: true, data: newExpense };
+    });
+
+    return transaction;
   } catch (error) {
     console.error("Error creating expense:", error);
     throw new Error("Failed to create expense.");
   }
 };
 
-// Update an expense for a user
+// Update expense. Also handles refunds and stuff. Crazy.
 export const updateExpense = async (
   userId,
   expenseId,
-  amount,
-  date,
-  source,
-  description,
-  isLockedIn,
+  newAmount,
+  newDate,
+  newSources,
+  newDescription,
 ) => {
+  const userRef = db.collection("users").doc(userId);
+  const envelopesRef = userRef.collection("envelopes");
+  const savingsRef = userRef.collection("savings");
+  const expenseRef = userRef.collection("expenses").doc(String(expenseId));
+
   try {
-    const updates = {};
-    if (amount !== undefined) updates.amount = parseFloat(amount);
-    if (date) updates.date = date;
-    if (source) updates.source = source;
-    if (description !== undefined) updates.description = description;
-    if (isLockedIn !== undefined) updates.isLockedIn = isLockedIn;
+    await db.runTransaction(async (t) => {
+      const expenseDoc = await t.get(expenseRef);
+      if (!expenseDoc.exists) {
+        throw new Error("Expense not found.");
+      }
+      const oldExpense = expenseDoc.data();
+      if (oldExpense.isLockedIn) {
+        throw new Error("Cannot update a locked-in expense.");
+      }
+      const oldSources = oldExpense.sources;
+      const changes = computeSourceChanges(oldSources, newSources);
 
-    const expenseRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("expenses")
-      .doc(expenseId);
-    await expenseRef.update(updates);
+      const totalFromNewSources = newSources.reduce(
+        (sum, source) => sum + Number(source.amount),
+        0,
+      );
+      if (totalFromNewSources !== newAmount) {
+        throw new Error("Amounts from sources don't add up to total expense!");
+      }
 
-    return { id: expenseId, ...updates };
+      const envelopeDocs = [];
+      const savingsDocs = [];
+
+      // reading envelopes
+      for (const { source } of changes) {
+        if (source.type === "envelope") {
+          const envelopeRef = envelopesRef.doc(String(source.id));
+          envelopeDocs.push(t.get(envelopeRef)); // Add the read to the batch
+        }
+      }
+
+      // reading savings
+      for (const { source } of changes) {
+        if (
+          source.type === "shortTermSavings" ||
+          source.type === "longTermSavings"
+        ) {
+          const savingsRefDoc = savingsRef.doc(source.type);
+          savingsDocs.push(t.get(savingsRefDoc)); // Add the read to the batch
+        }
+      }
+
+      // actually reading
+      const [envelopeDocsData, savingsDocsData] = await Promise.all([
+        Promise.all(envelopeDocs),
+        Promise.all(savingsDocs),
+      ]);
+
+      // writing
+      for (const { source, amountDiff } of changes) {
+        if (source.type === "envelope") {
+          const envelopeDoc = envelopeDocsData.find(
+            (doc) => doc.id === String(source.id),
+          );
+          if (!envelopeDoc.exists)
+            throw new Error(`Envelope ${source.name} not found.`);
+          const currentAmount = envelopeDoc.data().currentAmount;
+          if (currentAmount + amountDiff < 0) {
+            throw new Error(`Not enough funds in envelope ${source.name}.`);
+          }
+          t.update(envelopesRef.doc(String(source.id)), {
+            currentAmount: currentAmount + amountDiff,
+          });
+        } else if (
+          source.type === "shortTermSavings" ||
+          source.type === "longTermSavings"
+        ) {
+          const savingsDoc = savingsDocsData.find(
+            (doc) => doc.id === source.type,
+          );
+          if (!savingsDoc.exists)
+            throw new Error(`Savings ${source.name} not found.`);
+          const currentValue = savingsDoc.data().value;
+          if (currentValue + amountDiff < 0) {
+            throw new Error(`Not enough funds in ${source.name}.`);
+          }
+          t.update(savingsRef.doc(source.type), {
+            value: currentValue + amountDiff,
+          });
+        }
+      }
+
+      t.update(expenseRef, {
+        amount: newAmount,
+        date: newDate,
+        sources: newSources,
+        description: newDescription,
+      });
+    });
+
+    return { success: true };
   } catch (error) {
     console.error("Error updating expense:", error);
     throw new Error("Failed to update expense.");
@@ -133,15 +326,240 @@ export const updateExpense = async (
 
 // Delete an expense for a user
 export const deleteExpense = async (userId, expenseId) => {
+  const userRef = db.collection("users").doc(userId);
+  const envelopesRef = userRef.collection("envelopes");
+  const savingsRef = userRef.collection("savings");
+  const expenseRef = userRef.collection("expenses").doc(String(expenseId));
+
   try {
-    const expenseRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("expenses")
-      .doc(expenseId);
-    await expenseRef.delete();
+    const transaction = await db.runTransaction(async (t) => {
+      const expenseDoc = await t.get(expenseRef);
+      if (!expenseDoc.exists) {
+        throw new Error("Expense not found.");
+      }
+
+      const { sources } = expenseDoc.data();
+      let newShortTermSavings = null;
+      let newLongTermSavings = null;
+
+      const envelopeDocs = [];
+      const savingsDocs = [];
+
+      // reading
+      for (const source of sources) {
+        if (source.type === "envelope") {
+          const envelopeRef = envelopesRef.doc(String(source.id));
+          const envelopeDoc = await t.get(envelopeRef);
+          if (!envelopeDoc.exists) {
+            throw new Error(`Envelope with ID ${source.id} not found.`);
+          }
+          envelopeDocs.push({
+            source,
+            envelopeData: envelopeDoc.data(),
+            envelopeRef,
+          });
+        } else if (
+          source.type === "shortTermSavings" ||
+          source.type === "longTermSavings"
+        ) {
+          const savingsDocRef = savingsRef.doc(source.type);
+          const savingsDoc = await t.get(savingsDocRef);
+          if (!savingsDoc.exists) {
+            throw new Error(`Savings document "${source.type}" not found.`);
+          }
+          savingsDocs.push({ source, savingsData: savingsDoc.data() });
+        }
+      }
+
+      // writing
+      for (const { source, envelopeData, envelopeRef } of envelopeDocs) {
+        t.update(envelopeRef, {
+          currentAmount: envelopeData.currentAmount + Number(source.amount),
+        });
+      }
+
+      for (const { source, savingsData } of savingsDocs) {
+        if (source.type === "shortTermSavings") {
+          newShortTermSavings = savingsData.value + Number(source.amount);
+        } else {
+          newLongTermSavings = savingsData.value + Number(source.amount);
+        }
+      }
+
+      if (newShortTermSavings !== null) {
+        t.update(savingsRef.doc("shortTermSavings"), {
+          value: newShortTermSavings,
+        });
+      }
+      if (newLongTermSavings !== null) {
+        t.update(savingsRef.doc("longTermSavings"), {
+          value: newLongTermSavings,
+        });
+      }
+
+      // Deleting
+      t.delete(expenseRef);
+
+      return { success: true, message: "Expense deleted and funds refunded." };
+    });
+
+    return transaction;
   } catch (error) {
-    console.error("Error deleting expense (Admin SDK):", error);
+    console.error("Error deleting expense:", error);
     throw new Error("Failed to delete expense.");
   }
 };
+
+// delete everything without refunds (for development only)
+export const deleteAllExpenses = async (userId) => {
+  const userRef = db.collection("users").doc(userId);
+  const expensesRef = userRef.collection("expenses");
+  try {
+    const expenses = await expensesRef.get();
+    if (expenses.empty) {
+      return { success: true, message: "No expenses found." };
+    }
+    const batch = db.batch();
+    expenses.forEach((doc) => {
+      if (doc.id !== "metadata") {
+        batch.delete(doc.ref);
+      }
+    });
+    await batch.commit();
+    return { success: true, message: `${snapshot.size} expense(s) deleted.` };
+  } catch (error) {
+    console.error("Error deleting expenses:", error);
+    throw new Error("Failed to delete all expenses.");
+  }
+};
+
+/*
+// Straightforward alternative. Refunds all, then deducts all
+export const updateExpense = async ( 
+  userId,
+  expenseId,
+  newAmount,
+  newDate,
+  newSources,
+  newDescription,
+  newIsLockedIn
+) => {
+  const userRef = db.collection("users").doc(userId);
+  const expensesRef = userRef.collection("expenses");
+  const envelopesRef = userRef.collection("envelopes");
+  const savingsRef = userRef.collection("savings");
+  const expenseRef = expensesRef.doc(String(expenseId));
+
+  try {
+    const transaction = await db.runTransaction(async (t) => {
+      // Step 1: Read existing expense document
+      const expenseDoc = await t.get(expenseRef);
+      if (!expenseDoc.exists) {
+        throw new Error(`Expense with ID ${expenseId} not found.`);
+      }
+
+      const oldExpense = expenseDoc.data();
+      if (oldExpense.isLockedIn) {
+        throw new Error("Cannot update a locked-in expense.");
+      }
+
+      // Step 2: Read all affected envelopes/savings before writing
+      const allSourceRefs = new Map();
+
+      // Collect old sources
+      for (const source of oldExpense.sources) {
+        if (source.type === "envelope") {
+          allSourceRefs.set(`envelope-${source.id}`, envelopesRef.doc(String(source.id)));
+        } else {
+          allSourceRefs.set(source.type, savingsRef.doc(source.type));
+        }
+      }
+
+      // Collect new sources
+      for (const source of newSources) {
+        if (source.type === "envelope") {
+          allSourceRefs.set(`envelope-${source.id}`, envelopesRef.doc(String(source.id)));
+        } else {
+          allSourceRefs.set(source.type, savingsRef.doc(source.type));
+        }
+      }
+
+      // Read all unique sources
+      const sourceDocs = new Map();
+      for (const [key, ref] of allSourceRefs) {
+        const doc = await t.get(ref);
+        if (!doc.exists) {
+          throw new Error(`Source document ${key} not found.`);
+        }
+        sourceDocs.set(key, doc.data());
+      }
+
+      // Step 3: Refund old sources
+      const updatedAmounts = new Map();
+
+      for (const source of oldExpense.sources) {
+        const key = source.type === "envelope" ? `envelope-${source.id}` : source.type;
+        const sourceData = sourceDocs.get(key);
+
+        if (source.type === "envelope") {
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) + source.amount);
+        } else {
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.value) + source.amount);
+        }
+      }
+
+      // Step 4: Deduct from new sources
+      for (const source of newSources) {
+        const key = source.type === "envelope" ? `envelope-${source.id}` : source.type;
+        const sourceData = sourceDocs.get(key);
+
+        if (source.amount > (updatedAmounts.get(key) ?? sourceData.currentAmount ?? sourceData.value)) {
+          throw new Error(`Not enough funds in "${source.name}".`);
+        }
+
+        if (source.type === "envelope") {
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) - source.amount);
+        } else {
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.value) - source.amount);
+        }
+      }
+
+      // Step 5: Validate total amount
+      const totalFromNewSources = newSources.reduce((sum, src) => sum + Number(src.amount), 0);
+      if (totalFromNewSources !== newAmount) {
+        throw new Error("Amounts from sources don't add up to total expense!");
+      }
+
+      // Step 6: Perform writes
+      for (const [key, newAmount] of updatedAmounts) {
+        const ref = allSourceRefs.get(key);
+        if (key.startsWith("envelope-")) {
+          t.update(ref, { currentAmount: newAmount });
+        } else {
+          t.update(ref, { value: newAmount });
+        }
+      }
+
+      // Step 7: Update expense document
+      const updatedExpense = {
+        id: expenseId,
+        amount: parseFloat(newAmount),
+        date: newDate,
+        sources: newSources,
+        description: newDescription,
+        isLockedIn: newIsLockedIn,
+        updatedAt: new Date().toISOString(),
+      };
+
+      t.update(expenseRef, updatedExpense);
+
+      return { success: true, data: updatedExpense };
+    });
+
+    return transaction;
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    throw new Error("Failed to update expense.");
+  }
+};
+*/

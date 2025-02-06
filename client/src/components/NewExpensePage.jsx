@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { createExpense } from "../util/axios/createFunctions";
-import { payExpense } from "../util/payExpense";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
+import SourceSelectRaw from "./SourceSelectRaw";
 import backArrow from "../media/back-arrow.png";
+import SourceCheckboxRaw from "./SourceCheckboxRaw";
 
 const NewExpensePage = () => {
   const { setExpenses, envelopes, savings, loadingData, date } =
@@ -13,46 +14,47 @@ const NewExpensePage = () => {
 
   const [newExpenseAmount, setNewExpenseAmount] = useState("");
   const [newExpenseDate, setNewExpenseDate] = useState("");
-  const [newExpenseSource, setNewExpenseSource] = useState("");
+  const [newExpenseSources, setNewExpenseSources] = useState([]);
   const [newExpenseDescription, setNewExpenseDescription] = useState("");
   const [isTodayChecked, setIsTodayChecked] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
-  const [sourceType, setSourceType] = useState(null);
+  const [sourceCategory, setSourceCategory] = useState(null);
+  const [allowMultipleSources, setAllowMultipleSources] = useState(false);
 
   const fakeCurrency = "€";
 
   const handleCreateExpense = async (e) => {
     e.preventDefault();
     try {
-      const [createExpenseResult, payExpenseResult] = await Promise.all([
-        createExpense(
-          Number(newExpenseAmount),
-          newExpenseDate,
-          newExpenseSource,
-          newExpenseDescription,
-          false, // isLockedIn
-          setExpenses,
-        ),
-        payExpense(newExpenseAmount, newExpenseSource, envelopes, savings),
-      ]);
+      const correctTypeExpenseSources = newExpenseSources.map((source) => ({
+        ...source,
+        id: Number(source.id),
+        amount: Number(source.amount),
+        available: Number(source.available),
+        order: Number(source.order),
+      }));
+      const result = await createExpense(
+        Number(newExpenseAmount),
+        newExpenseDate,
+        correctTypeExpenseSources,
+        newExpenseDescription,
+        false, // isLockedIn
+        setExpenses,
+      );
 
-      if (!createExpenseResult.success) {
-        console.log(`Error creating expense: ${createExpenseResult.error}`);
+      if (!result.success) {
+        console.error(`Error creating expense: ${result.error}`);
         // fail message
         return;
+      } else {
+        console.log("Expense created and paid successfully!");
+        // success message
+        setNewExpenseAmount("");
+        setNewExpenseSources([]);
+        setNewExpenseDescription("");
+        setSourceCategory(null);
+        setAllowMultipleSources(false);
       }
-      if (!payExpenseResult.success) {
-        console.log(`Error paying expense: ${payExpenseResult.error}`);
-        // fail message
-        return;
-      }
-      // if both operations succeeded
-      console.log("Expense created and paid successfully!");
-      // success message
-      setNewExpenseAmount("");
-      setNewExpenseSource("");
-      setNewExpenseDescription("");
-      setSourceType(null);
     } catch (error) {
       console.error(
         "Error during expense creation and payment:",
@@ -72,9 +74,13 @@ const NewExpensePage = () => {
     }
   };
 
-  const handleCheckboxChange = (event) => {
+  const handleTodayCheckboxChange = (event) => {
     setIsTodayChecked(event.target.checked);
     setNewExpenseDate(event.target.checked ? date : "");
+  };
+
+  const handleSourcesCheckboxChange = (event) => {
+    setAllowMultipleSources(event.target.checked);
   };
 
   const handleDateChange = (event) => {
@@ -94,19 +100,36 @@ const NewExpensePage = () => {
   }, [date, isTodayChecked]);
 
   useEffect(() => {
+    setNewExpenseSources([]);
+    setSourceCategory(null);
+  }, [allowMultipleSources]);
+
+  useEffect(() => {
     if (newExpenseDate === date) {
       setIsTodayChecked(true);
     }
   }, [newExpenseDate, date]);
 
   useEffect(() => {
+    let totalSum = 0;
+    let hasEmptyField = false;
+    for (const source of newExpenseSources) {
+      // will also work if if newExpenseSources is empty
+      if (Number(source.amount) === 0) {
+        // will happen if source.amount is "", "0", 0, "0.0", 0.0, "0.00" or 0.00
+        hasEmptyField = true;
+        break;
+      }
+      totalSum += Number(source.amount);
+    }
     setIsDisabled(
-      newExpenseAmount === "" ||
-        newExpenseAmount === "0" ||
+      Number(newExpenseAmount) === 0 ||
         newExpenseDate === "" ||
-        newExpenseSource === "",
+        newExpenseSources.length === 0 ||
+        hasEmptyField ||
+        Number(totalSum) !== Number(newExpenseAmount),
     );
-  }, [newExpenseAmount, newExpenseDate, newExpenseSource]);
+  }, [newExpenseAmount, newExpenseDate, newExpenseSources]);
 
   return (
     <div className="new-expense-page">
@@ -124,7 +147,7 @@ const NewExpensePage = () => {
 
       <h1 className="new-expense-page__heading">New Expense</h1>
       <p className="new-expense-page__description">
-        Add a new expense and choose the source to pay from.
+        Add a new expense and choose the source(s) to pay from.
       </p>
 
       <form
@@ -170,7 +193,7 @@ const NewExpensePage = () => {
               id="today"
               name="today"
               checked={isTodayChecked}
-              onChange={handleCheckboxChange}
+              onChange={handleTodayCheckboxChange}
             />
             <label className="checkbox-label" htmlFor="today">
               Today
@@ -179,84 +202,40 @@ const NewExpensePage = () => {
         </div>
 
         <div className="form-item">
-          {/*
-            Deliberately not styling this section.
-            Will replace with custom components.
-            This will remain somewhere for accessibility purposes.
-          */}
-          <fieldset className="source-type-fieldset">
-            <legend className="source-type-fieldset__legend">Source</legend>
-            <input
-              className="form-item__input--radio"
-              type="radio"
-              value="envelope"
-              id="envelope"
-              name="source-type"
-              checked={sourceType === "envelope"}
-              onChange={() => {
-                setNewExpenseSource("");
-                setSourceType("envelope");
-              }}
-            />
-            <label htmlFor="envelope">Envelope</label>
-            <input
-              className="form-item__input--radio"
-              type="radio"
-              value="savings"
-              id="savings"
-              name="source-type"
-              checked={sourceType === "savings"}
-              onChange={() => {
-                setNewExpenseSource("savings");
-                setSourceType("savings");
-              }}
-            />
-            <label htmlFor="savings">Savings</label>
-          </fieldset>
-
-          {/* Render if "envelope" source is chosen */}
-          {sourceType === "envelope" && (
-            <div className="expense-envelope">
-              <label htmlFor="envelope-select"></label>
-              <select
-                className="expense-envelope__select"
-                name="envelope-select"
-                id="envelope-select"
-                onChange={(e) => setNewExpenseSource(e.target.value)}
-              >
-                {loadingData ? (
-                  <option
-                    className="expense-envelope__select__loading-message"
-                    value=""
-                  >
-                    Loading your envelopes...
-                  </option>
-                ) : envelopes.length === 0 ? (
-                  <option
-                    className="expense-envelope__select__no-options-message"
-                    value=""
-                  >
-                    No envelopes to select from.
-                  </option>
-                ) : (
-                  <>
-                    <option key="-1" value="">
-                      Select an envelope
-                    </option>
-                    {envelopes.map((envelope) => (
-                      <option
-                        key={envelope.id}
-                        value={envelope.id}
-                        disabled={envelope.currentAmount === 0}
-                      >
-                        {envelope.name} ({fakeCurrency}
-                        {envelope.currentAmount} left)
-                      </option>
-                    ))}
-                  </>
-                )}
-              </select>
-            </div>
+          <label className="form-item__label" htmlFor="sources">
+            Sources
+          </label>
+          {loadingData ? (
+            <p>Loading data...</p>
+          ) : (
+            <>
+              <input
+                type="checkbox"
+                id="sources"
+                checked={allowMultipleSources}
+                onChange={handleSourcesCheckboxChange}
+              />
+              <label>Choose multiple sources?</label>
+              {allowMultipleSources ? (
+                <SourceCheckboxRaw
+                  newExpenseAmount={newExpenseAmount}
+                  newExpenseSources={newExpenseSources}
+                  setNewExpenseSources={setNewExpenseSources}
+                  envelopes={envelopes}
+                  savings={savings}
+                />
+              ) : (
+                <SourceSelectRaw
+                  newExpenseAmount={newExpenseAmount}
+                  setNewExpenseSources={setNewExpenseSources}
+                  sourceCategory={sourceCategory}
+                  setSourceCategory={setSourceCategory}
+                  envelopes={envelopes}
+                  savings={savings}
+                  loadingData={loadingData}
+                />
+              )}
+            </>
           )}
         </div>
 

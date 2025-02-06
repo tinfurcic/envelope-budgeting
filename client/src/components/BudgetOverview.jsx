@@ -4,7 +4,6 @@ import ProgressBar from "./ProgressBar";
 import chartIcon from "../media/chart.png";
 
 const BudgetOverview = () => {
-
   const { totalBudget, totalCurrentAmount } = useOutletContext();
 
   const [percentage, setPercentage] = useState(
@@ -28,7 +27,8 @@ const BudgetOverview = () => {
           alt="comparison"
           className="progress-bar-comparison__icon"
         />
-        That's <span className="bold--green">13% more</span> than usually at this time of the month! (62%) [placeholders]
+        That's <span className="bold--green">13% more</span> than usually at
+        this time of the month! (62%) [placeholders]
         {/* render only if relevant data exists */}
       </p>
     </div>
