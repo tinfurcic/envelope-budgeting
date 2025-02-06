@@ -5,6 +5,7 @@ import {
   createExpense,
   updateExpense,
   deleteExpense,
+  deleteAllExpenses,
 } from "../expense.js";
 
 export const expensesRouter = express.Router();
@@ -47,11 +48,13 @@ expensesRouter.post("/", async (req, res) => {
   const { amount, date, sources, description, isLockedIn } = req.body;
   if (
     isNaN(amount) ||
+    amount <= 0 ||
     !date ||
     !sources ||
-    (isLockedIn !== true && isLockedIn !== false)
+    !Array.isArray(sources) ||
+    sources.length === 0 ||
+    typeof isLockedIn !== "boolean"
   ) {
-    // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
     return res.status(400).send({ error: "Invalid expense data" });
   }
 
@@ -60,7 +63,7 @@ expensesRouter.post("/", async (req, res) => {
       req.userId,
       amount,
       date,
-      sources, // "e:id" for envelopes, "STS" / "LTS" for short/long term savings?
+      sources,
       description,
       isLockedIn,
     );
@@ -101,6 +104,16 @@ expensesRouter.delete("/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting expense:", error.message);
     res.status(500).send({ error: "Internal server error" });
+  }
+});
+
+expensesRouter.delete("/", async (req, res) => {
+  try {
+    await deleteAllExpenses(req.userId);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting all expenses:", error.message);
+    res.status(500).send({ error: error.message || "Internal server error" });
   }
 });
 

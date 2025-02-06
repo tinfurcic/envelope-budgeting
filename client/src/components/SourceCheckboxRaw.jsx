@@ -13,7 +13,7 @@ const SourceCheckboxRaw = ({
   // sum of all entered amounts
   const totalEnteredAmount = newExpenseSources.reduce(
     (sum, source) => sum + (parseFloat(source.amount) || 0),
-    0
+    0,
   );
 
   const handleSourceAmountsChange = (event, key) => {
@@ -23,18 +23,26 @@ const SourceCheckboxRaw = ({
 
     if (regex.test(value)) {
       const numericValue = parseFloat(value) || 0;
-      const otherValuesSum = totalEnteredAmount - (parseFloat(newExpenseSources.find(source => source.id === key)?.amount) || 0);
+      const otherValuesSum =
+        totalEnteredAmount -
+        (parseFloat(
+          newExpenseSources.find((source) => source.id === key)?.amount,
+        ) || 0);
 
       if (numericValue + otherValuesSum > newExpenseAmount) {
-        value = Math.max(newExpenseAmount - otherValuesSum, 0).toFixed(2).toString();
+        value = Math.max(newExpenseAmount - otherValuesSum, 0)
+          .toFixed(2)
+          .toString();
       }
 
       setNewExpenseSources((prevSources) => {
         const updatedSources = prevSources.map((source) => {
           // Update the amount for the matching source
-          if (source.id === key || 
-              (key === -1 && source.type === "short-term-savings") || 
-              (key === -2 && source.type === "long-term-savings")) {
+          if (
+            source.id === key ||
+            (key === -1 && source.type === "short-term-savings") ||
+            (key === -2 && source.type === "long-term-savings")
+          ) {
             return {
               ...source,
               amount: value, // Update the amount directly in the source
@@ -54,7 +62,7 @@ const SourceCheckboxRaw = ({
       const updatedSources = prevSources.map((source) => {
         return {
           ...source,
-          amount: "",  // Reset the amount for each source
+          amount: "", // Reset the amount for each source
         };
       });
 
@@ -65,18 +73,21 @@ const SourceCheckboxRaw = ({
   const handleChoice = (event) => {
     const isChecked = event.target.checked;
     const checkboxId = event.target.id;
-    console.log(checkboxId);
     if (isChecked) {
       if (!isNaN(parseFloat(checkboxId))) {
-        const envelope = envelopes.find((item) => item.id === Number(checkboxId));
-        setNewExpenseSources(addSourcesInOrder(newExpenseSources, {
-          id: envelope.id,
-          type: "envelope",
-          name: envelope.name,
-          amount: "",
-          available: envelope.currentAmount,
-          order: envelope.order
-        }));
+        const envelope = envelopes.find(
+          (item) => item.id === Number(checkboxId),
+        );
+        setNewExpenseSources(
+          addSourcesInOrder(newExpenseSources, {
+            id: envelope.id,
+            type: "envelope",
+            name: envelope.name,
+            amount: "",
+            available: envelope.currentAmount,
+            order: envelope.order,
+          }),
+        );
       } else if (checkboxId === "LTS") {
         setNewExpenseSources(
           addSourcesInOrder(newExpenseSources, {
@@ -85,8 +96,8 @@ const SourceCheckboxRaw = ({
             name: "Long term savings",
             amount: "",
             available: savings.longTermSavings,
-            order: -2
-          })
+            order: -2,
+          }),
         );
       } else if (checkboxId === "STS") {
         setNewExpenseSources(
@@ -96,35 +107,29 @@ const SourceCheckboxRaw = ({
             name: "Short term savings",
             amount: "",
             available: savings.shortTermSavings,
-            order: -1
-          })
+            order: -1,
+          }),
         );
       }
-    } else { // NEW
+    } else {
       if (!isNaN(parseFloat(checkboxId))) {
         const envelope = newExpenseSources.find(
-          (item) => item.id === Number(checkboxId)
+          (item) => item.id === Number(checkboxId),
         );
 
         // Remove the envelope from newExpenseSources
         setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.id !== envelope.id)
+          prevSources.filter((source) => source.id !== envelope.id),
         );
       } else if (checkboxId === "LTS") {
-        console.log(newExpenseSources);
-        
         // Remove the long-term savings source
         setNewExpenseSources((prevSources) =>
-          prevSources.filter(
-            (source) => source.type !== "longTermSavings"
-          )
+          prevSources.filter((source) => source.type !== "longTermSavings"),
         );
       } else if (checkboxId === "STS") {
         // Remove the short-term savings source
         setNewExpenseSources((prevSources) =>
-          prevSources.filter(
-            (source) => source.type !== "shortTermSavings"
-          )
+          prevSources.filter((source) => source.type !== "shortTermSavings"),
         );
       }
     }
@@ -170,7 +175,7 @@ const SourceCheckboxRaw = ({
         ))}
         {/* NEW */}
         {newExpenseSources.map((source) => {
-          let key = source.id;  // Use source.id directly
+          let key = source.id; // Use source.id directly
           let name = source.name;
 
           return (

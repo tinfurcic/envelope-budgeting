@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { createExpense } from "../util/axios/createFunctions";
-import { payExpense } from "../util/payExpense";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import SourceSelectRaw from "./SourceSelectRaw";
@@ -27,36 +26,35 @@ const NewExpensePage = () => {
   const handleCreateExpense = async (e) => {
     e.preventDefault();
     try {
-      const [createExpenseResult, payExpenseResult] = await Promise.all([
-        createExpense(
-          Number(newExpenseAmount),
-          newExpenseDate,
-          newExpenseSources,
-          newExpenseDescription,
-          false, // isLockedIn
-          setExpenses,
-        ),
-        payExpense(newExpenseAmount, newExpenseSources, envelopes, savings),
-      ]);
+      const correctTypeExpenseSources = newExpenseSources.map((source) => ({
+        ...source,
+        id: Number(source.id),
+        amount: Number(source.amount),
+        available: Number(source.available),
+        order: Number(source.order),
+      }));
+      const result = await createExpense(
+        Number(newExpenseAmount),
+        newExpenseDate,
+        correctTypeExpenseSources,
+        newExpenseDescription,
+        false, // isLockedIn
+        setExpenses,
+      );
 
-      if (!createExpenseResult.success) {
-        console.log(`Error creating expense: ${createExpenseResult.error}`);
+      if (!result.success) {
+        console.error(`Error creating expense: ${result.error}`);
         // fail message
         return;
+      } else {
+        console.log("Expense created and paid successfully!");
+        // success message
+        setNewExpenseAmount("");
+        setNewExpenseSources([]);
+        setNewExpenseDescription("");
+        setSourceCategory(null);
+        setAllowMultipleSources(false);
       }
-      if (!payExpenseResult.success) {
-        console.log(`Error paying expense: ${payExpenseResult.error}`);
-        // fail message
-        return;
-      }
-      // if both operations succeeded
-      console.log("Expense created and paid successfully!");
-      // success message
-      setNewExpenseAmount("");
-      setNewExpenseSources([]);
-      setNewExpenseDescription("");
-      setSourceCategory(null);
-      setAllowMultipleSources(false);
     } catch (error) {
       console.error(
         "Error during expense creation and payment:",
@@ -115,8 +113,10 @@ const NewExpensePage = () => {
   useEffect(() => {
     let totalSum = 0;
     let hasEmptyField = false;
-    for (const source of newExpenseSources) { // will also work if if newExpenseSources is empty
-      if (Number(source.amount) === 0) { // will happen if source.amount is "", "0", 0, "0.0", 0.0, "0.00" or 0.00
+    for (const source of newExpenseSources) {
+      // will also work if if newExpenseSources is empty
+      if (Number(source.amount) === 0) {
+        // will happen if source.amount is "", "0", 0, "0.0", 0.0, "0.00" or 0.00
         hasEmptyField = true;
         break;
       }
@@ -124,10 +124,10 @@ const NewExpensePage = () => {
     }
     setIsDisabled(
       Number(newExpenseAmount) === 0 ||
-      newExpenseDate === "" ||
-      newExpenseSources.length === 0 ||
-      hasEmptyField ||
-      Number(totalSum) !== Number(newExpenseAmount)
+        newExpenseDate === "" ||
+        newExpenseSources.length === 0 ||
+        hasEmptyField ||
+        Number(totalSum) !== Number(newExpenseAmount),
     );
   }, [newExpenseAmount, newExpenseDate, newExpenseSources]);
 

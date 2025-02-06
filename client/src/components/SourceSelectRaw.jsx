@@ -12,38 +12,42 @@ const SourceSelectRaw = ({
 
   const handleSelectedSourceChange = (event) => {
     const id = event.target.value;
-    console.log(event.target);
     if (id === "") {
       setNewExpenseSources([]);
     } else if (!isNaN(parseFloat(id)) && isFinite(id)) {
       const envelope = envelopes.find((item) => item.id === Number(id));
-      setNewExpenseSources([{
-        id: envelope.id,
-        type: "envelope", 
-        name: envelope.name, 
-        amount: newExpenseAmount, 
-        available: envelope.currentAmount,
-        order: envelope.order
-      }])
+      setNewExpenseSources([
+        {
+          id: envelope.id,
+          type: "envelope",
+          name: envelope.name,
+          amount: newExpenseAmount,
+          available: envelope.currentAmount,
+          order: envelope.order,
+        },
+      ]);
     } else if (id === "LTS") {
-      setNewExpenseSources([{
-        id: -2,
-        type: "longTermSavings", 
-        name: "Long term savings", 
-        amount: newExpenseAmount, 
-        available: savings.longTermSavings,
-        order: -2
-      }]);
-
+      setNewExpenseSources([
+        {
+          id: -2,
+          type: "longTermSavings",
+          name: "Long term savings",
+          amount: newExpenseAmount,
+          available: savings.longTermSavings,
+          order: -2,
+        },
+      ]);
     } else if (id === "STS") {
-      setNewExpenseSources([{
-        id: -1,
-        type: "shortTermSavings", 
-        name: "Short term savings", 
-        amount: newExpenseAmount, 
-        available: savings.shortTermSavings,
-        order: -1
-      }]);
+      setNewExpenseSources([
+        {
+          id: -1,
+          type: "shortTermSavings",
+          name: "Short term savings",
+          amount: newExpenseAmount,
+          available: savings.shortTermSavings,
+          order: -1,
+        },
+      ]);
     } else {
       console.error("Option id type not recognized");
     }
