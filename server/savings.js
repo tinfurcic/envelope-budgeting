@@ -32,24 +32,20 @@ export const updateSavings = async (
 
     // Set both savings fields in the savings collection
     await Promise.all([
-      savingsRef
-        .doc("shortTermSavings")
-        .set(
-          {
-            value: parseFloat(shortTermSavings),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        ),
-      savingsRef
-        .doc("longTermSavings")
-        .set(
-          {
-            value: parseFloat(longTermSavings),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        ),
+      savingsRef.doc("shortTermSavings").set(
+        {
+          value: parseFloat(shortTermSavings),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      ),
+      savingsRef.doc("longTermSavings").set(
+        {
+          value: parseFloat(longTermSavings),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      ),
     ]);
 
     return { shortTermSavings, longTermSavings };

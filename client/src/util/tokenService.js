@@ -1,29 +1,24 @@
-import { getAuth } from "firebase/auth";
-
-let cachedToken = null;
-let tokenExpirationTime = null; // Store the token's expiration time
+import { getAuth, onIdTokenChanged } from "firebase/auth";
 
 export const getToken = async () => {
   const auth = getAuth();
-  const user = auth.currentUser;
-
-  if (!user) {
+  if (!auth.currentUser) {
     throw new Error("User is not signed in.");
   }
 
-  const currentTime = Date.now();
-
-  // If there's no cached token or the token is expired, refresh it
-  if (!cachedToken || currentTime > tokenExpirationTime) {
-    cachedToken = await user.getIdToken(true); // Force a refresh
-    const decodedToken = JSON.parse(atob(cachedToken.split(".")[1])); // Decode the payload
-    tokenExpirationTime = decodedToken.exp * 1000; // Convert to milliseconds
-  }
-
-  return cachedToken;
+  return auth.currentUser.getIdToken(); // Always gets a fresh token if needed
 };
 
-export const clearCachedToken = () => {
-  cachedToken = null; // Invalidate the cached token
-  tokenExpirationTime = null;
+export const listenForTokenRefresh = (callback) => {
+  const auth = getAuth();
+
+  // Return the unsubscribe function so we can clean up the listener
+  return onIdTokenChanged(auth, async (user) => {
+    if (user) {
+      const newToken = await user.getIdToken();
+      callback(newToken);
+    } else {
+      callback(null);
+    }
+  });
 };
