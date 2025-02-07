@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { fetchAllData } from "../util/fetchAllData";
 import { calcTotalBudget } from "../util/calcTotalBudget";
 import { calcTotalCurrentAmount } from "../util/calcTotalCurrentAmount";
 import { Outlet } from "react-router-dom";
 import "../sass/main.scss";
+import useEnvelopesListener from "../hooks/useEnvelopesListener";
+import useExpensesListener from "../hooks/useExpensesListener";
+import useGoalsListener from "../hooks/useGoalsListener";
+import useSavingsListener from "../hooks/useSavingsListener";
+import useIncomeListener from "../hooks/useIncomeListener";
+import useSettingsListener from "../hooks/useSettingsListener";
+
 import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
-  const [envelopes, setEnvelopes] = useState(null);
-  const [expenses, setExpenses] = useState(null);
-  const [goals, setGoals] = useState(null);
-  const [income, setIncome] = useState(null);
-  const [savings, setSavings] = useState(null);
-  const [settings, setSettings] = useState(null);
-
-  const [nextEnvelopeId, setNextEnvelopeId] = useState(null);
-  const [nextGoalId, setNextGoalId] = useState(null);
-  const [nextExpenseId, setNextExpenseId] = useState(null);
+  const { envelopes, nextEnvelopeId, loadingEnvelopes, syncingEnvelopes } =
+    useEnvelopesListener();
+  const { expenses, nextExpenseId, loadingExpenses, syncingExpenses } =
+    useExpensesListener();
+  const { goals, nextGoalId, loadingGoals, syncingGoals } = useGoalsListener();
+  const { savings, loadingSavings, syncingSavings } = useSavingsListener();
+  const { income, loadingIncome, syncingIncome } = useIncomeListener();
+  const { settings, loadingSettings, syncingSettings } = useSettingsListener();
 
   const [totalIncome, setTotalIncome] = useState(null);
   const [totalBudget, setTotalBudget] = useState(null);
   const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
 
-  const [loadingData, setLoadingData] = useState(true);
   const [date, setDate] = useState(getTodayDate());
   const [fullDate, setFullDate] = useState(new Date());
 
@@ -46,53 +49,33 @@ const App = () => {
 
   const appData = {
     envelopes,
-    setEnvelopes,
     nextEnvelopeId,
     expenses,
-    setExpenses,
     nextExpenseId,
     goals,
-    setGoals,
     nextGoalId,
     income,
-    setIncome,
     savings,
-    setSavings,
     settings,
-    setSettings,
     totalIncome,
     setTotalIncome,
     totalBudget,
     totalCurrentAmount,
-    loadingData,
+    loadingEnvelopes,
+    syncingEnvelopes,
+    loadingExpenses,
+    syncingExpenses,
+    loadingGoals,
+    syncingGoals,
+    loadingSavings,
+    syncingSavings,
+    loadingIncome,
+    syncingIncome,
+    loadingSettings,
+    syncingSettings,
     date,
     fullDate,
   };
-
-  // Fetch data on load
-  useEffect(() => {
-    const fetchDataOnLoad = async () => {
-      try {
-        const data = await fetchAllData();
-        setEnvelopes(data.envelopes);
-        setExpenses(data.expenses);
-        setGoals(data.goals);
-        setIncome(data.income);
-        setSavings(data.savings);
-        setSettings(data.settings);
-
-        setNextEnvelopeId(data.nextEnvelopeId);
-        setNextGoalId(data.nextGoalId);
-        setNextExpenseId(data.nextExpenseId);
-      } catch (error) {
-        console.error("Unable to load data properly:", error);
-      } finally {
-        setLoadingData(false); // Ensures loading state is updated even if there's an error
-      }
-    };
-
-    fetchDataOnLoad();
-  }, []);
 
   useEffect(() => {
     if (income !== null) {

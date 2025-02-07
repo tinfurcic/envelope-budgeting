@@ -48,6 +48,11 @@ const Envelope = () => {
       </p>
       <p>Budget: ${envelope.budget}</p>
       <p>Current Amount: ${envelope.currentAmount}</p>
+      <div>
+        {Object.entries(envelope).map(([key, value]) => (
+          <p key={key}>{`${key}: ${value}`}</p>
+        ))}
+      </div>
 
       <h2 className="envelope-overview__this-month-expenses">
         This month's expenses

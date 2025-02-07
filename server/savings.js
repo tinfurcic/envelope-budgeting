@@ -1,4 +1,5 @@
 import { db } from "../firebase-admin.js";
+import admin from "firebase-admin";
 
 // Get all savings for a user
 export const getSavings = async (userId) => {
@@ -33,10 +34,22 @@ export const updateSavings = async (
     await Promise.all([
       savingsRef
         .doc("shortTermSavings")
-        .set({ value: parseFloat(shortTermSavings) }, { merge: true }),
+        .set(
+          {
+            value: parseFloat(shortTermSavings),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        ),
       savingsRef
         .doc("longTermSavings")
-        .set({ value: parseFloat(longTermSavings) }, { merge: true }),
+        .set(
+          {
+            value: parseFloat(longTermSavings),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        ),
     ]);
 
     return { shortTermSavings, longTermSavings };

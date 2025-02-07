@@ -25,6 +25,29 @@ export const updateEnvelope = async (
   }
 };
 
+export const updateExpense = async (
+  id,
+  amount,
+  date,
+  sources,
+  description,
+  isLockedIn,
+) => {
+  try {
+    const res = await axiosInstance.patch(`/expenses/${Number(id)}`, {
+      amount,
+      date,
+      sources,
+      description,
+      isLockedIn,
+    });
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error updating expense:", error.message);
+    return { success: false, error: error.message };
+  }
+};
+
 export const updateGoal = async (
   id,
   goalAmount,

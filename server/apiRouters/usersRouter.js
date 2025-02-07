@@ -1,5 +1,6 @@
 import express from "express";
 import { db } from "../../firebase-admin.js";
+import admin from "firebase-admin";
 
 export const usersRouter = express.Router();
 
@@ -35,36 +36,49 @@ usersRouter.post("/", async (req, res) => {
       id: -1,
       nextEnvelopeId: 1,
       count: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("expenses").doc("metadata"), {
       initialized: true,
       id: -1,
       nextExpenseId: 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("goals").doc("metadata"), {
       initialized: true,
       id: -1,
       nextGoalId: 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     // Initialize income collection
-    batch.set(userRef.collection("income").doc("regularIncome"), { value: 0 });
-    batch.set(userRef.collection("income").doc("extraIncome"), { value: 0 });
+    batch.set(userRef.collection("income").doc("regularIncome"), {
+      value: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    batch.set(userRef.collection("income").doc("extraIncome"), {
+      value: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
     // Initialize savings collection
     batch.set(userRef.collection("savings").doc("shortTermSavings"), {
       value: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("savings").doc("longTermSavings"), {
       value: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     // Initialize settings collection
     batch.set(userRef.collection("settings").doc("currencyType"), {
       value: "USD",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("settings").doc("enableDebt"), {
       value: false,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     // Commit the batch
