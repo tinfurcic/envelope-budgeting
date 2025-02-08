@@ -1,28 +1,27 @@
 import { db } from "../firebase-admin.js";
+import admin from "firebase-admin";
 
 const computeSourceChanges = (oldSources, newSources) => {
   const changes = [];
   const sourceMap = new Map();
 
-  // Step 1: Store new source amounts in a map
   newSources.forEach((source) =>
-    sourceMap.set(`${source.type}-${s.id}`, source.amount),
+    sourceMap.set(`${source.type}-${source.id}`, source.amount),
   );
 
-  // Step 2: Process old sources and compute the difference
+  // Computing differences
   oldSources.forEach((oldSource) => {
     const key = `${oldSource.type}-${oldSource.id}`;
-    const newAmount = sourceMap.get(key) || 0; // Default to 0 if the source is not in newSources
+    const newAmount = sourceMap.get(key) || 0; // 0 if the source is not in newSources
     const diff = oldSource.amount - newAmount; // The difference between old and new amounts
 
-    // Add the change (whether positive or negative) to the changes array
     changes.push({ source: oldSource, amountDiff: diff });
 
     // Remove the source from the map to avoid double-processing
     sourceMap.delete(key);
   });
 
-  // Step 3: Handle sources that were added in the new sources but not in the old sources
+  // Handling sources that were added in the new sources but were not in the old sources
   sourceMap.forEach((amount, key) => {
     const [type, id] = key.split("-");
     changes.push({
@@ -195,12 +194,16 @@ export const createExpense = async (
         sources,
         description,
         isLockedIn,
-        createdAt: new Date().toISOString(),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 
       // Set the new expense document
       t.set(expenseRef, newExpense);
-      t.update(expenseMetadataRef, { nextExpenseId: nextExpenseId + 1 });
+      t.update(expenseMetadataRef, {
+        nextExpenseId: nextExpenseId + 1,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       return { success: true, data: newExpense };
     });
@@ -314,6 +317,7 @@ export const updateExpense = async (
         date: newDate,
         sources: newSources,
         description: newDescription,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     });
 
@@ -409,6 +413,41 @@ export const deleteExpense = async (userId, expenseId) => {
     throw new Error("Failed to delete expense.");
   }
 };
+
+// delete expenses that are already in history
+export async function deleteArchivedExpenses(userId, month) {
+  const expensesRef = db.collection("users").doc(userId).collection("expenses");
+
+  try {
+    const snapshot = await expensesRef.where("archived", "==", true).get();
+    const archivedExpenses = snapshot.docs.filter((doc) =>
+      doc.data().date.startsWith(month),
+    );
+
+    if (archivedExpenses.length === 0) {
+      return {
+        success: true,
+        message: "No archived expenses found to delete.",
+      };
+    }
+
+    const batch = db.batch(); // Create a batch
+    archivedExpenses.forEach((expense) => {
+      batch.delete(expensesRef.doc(expense.id)); // Queue the delete operation
+    });
+
+    // Commit the batch
+    await batch.commit();
+
+    return {
+      success: true,
+      message: `Deleted ${archivedExpenses.length} archived expenses for ${month}.`,
+    };
+  } catch (error) {
+    console.error(`Error deleting archived expenses for ${month}:`, error);
+    throw new Error(`Failed to delete archived expenses: ${error.message}`);
+  }
+}
 
 // delete everything without refunds (for development only)
 export const deleteAllExpenses = async (userId) => {
@@ -548,7 +587,7 @@ export const updateExpense = async (
         sources: newSources,
         description: newDescription,
         isLockedIn: newIsLockedIn,
-        updatedAt: new Date().toISOString(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 
       t.update(expenseRef, updatedExpense);

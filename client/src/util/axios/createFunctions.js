@@ -6,7 +6,6 @@ export const createEnvelope = async (
   currentAmount,
   description,
   color,
-  setEnvelopes,
 ) => {
   try {
     const res = await axiosInstance.post("/envelopes", {
@@ -16,7 +15,6 @@ export const createEnvelope = async (
       description,
       color,
     });
-    setEnvelopes((prevEnvelopes) => [...prevEnvelopes, res.data]);
     return { success: true, data: res.data };
   } catch (error) {
     console.error("Error creating envelope:", error);
@@ -30,7 +28,6 @@ export const createExpense = async (
   sources,
   description,
   isLockedIn,
-  setExpenses,
 ) => {
   try {
     const res = await axiosInstance.post("/expenses", {
@@ -40,7 +37,6 @@ export const createExpense = async (
       description,
       isLockedIn,
     });
-    setExpenses((prevExpenses) => [...prevExpenses, res.data]);
     return { success: true, data: res.data };
   } catch (error) {
     console.error("Error creating expense:", error);
@@ -53,7 +49,6 @@ export const createGoal = async (
   deadline,
   monthlyAmount,
   description,
-  setGoals,
 ) => {
   try {
     const res = await axiosInstance.post("/goals", {
@@ -62,10 +57,22 @@ export const createGoal = async (
       monthlyAmount,
       description,
     });
-    setGoals((prevGoals) => [...prevGoals, res.data]);
     return { success: true, data: res.data };
   } catch (error) {
     console.error("Error creating goal:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const archiveExpenses = async (month) => {
+  try {
+    const res = await axiosInstance.post(
+      `/expensesHistory/${month}/archive`,
+      {},
+    );
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error creating expense:", error);
     return { success: false, error: error.message };
   }
 };

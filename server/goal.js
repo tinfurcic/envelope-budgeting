@@ -1,4 +1,5 @@
 import { db } from "../firebase-admin.js";
+import admin from "firebase-admin";
 
 // Get all goals for a specific user
 export const getAllGoals = async (userId) => {
@@ -74,12 +75,16 @@ export const createGoal = async (
       deadline,
       monthlyAmount: parseFloat(monthlyAmount),
       description: description,
-      createdAt: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     const batch = db.batch();
     batch.set(goalsRef, newGoal);
-    batch.update(goalsMetadataRef, { nextGoalId: nextGoalId + 1 });
+    batch.update(goalsMetadataRef, {
+      nextGoalId: nextGoalId + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
     await batch.commit();
 
@@ -100,7 +105,7 @@ export const updateGoal = async (
   description,
 ) => {
   try {
-    const updates = {};
+    const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     if (goalAmount !== undefined) updates.goalAmount = parseFloat(goalAmount);
     if (deadline !== undefined) updates.deadline = deadline;
     if (monthlyAmount !== undefined)

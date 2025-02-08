@@ -84,7 +84,6 @@ const SourceCheckboxRaw = ({
             type: "envelope",
             name: envelope.name,
             amount: "",
-            available: envelope.currentAmount,
             order: envelope.order,
           }),
         );
@@ -95,7 +94,6 @@ const SourceCheckboxRaw = ({
             type: "longTermSavings",
             name: "Long term savings",
             amount: "",
-            available: savings.longTermSavings,
             order: -2,
           }),
         );
@@ -106,7 +104,6 @@ const SourceCheckboxRaw = ({
             type: "shortTermSavings",
             name: "Short term savings",
             amount: "",
-            available: savings.shortTermSavings,
             order: -1,
           }),
         );

@@ -23,7 +23,7 @@ settingsRouter.get("/", async (req, res) => {
     res.status(200).json(settings);
   } catch (error) {
     console.error("Error fetching settings:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -55,7 +55,7 @@ settingsRouter.patch("/", async (req, res) => {
     res.status(200).json(updatedSettings);
   } catch (error) {
     console.error("Error updating settings:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -88,7 +88,7 @@ settingsRouter.patch("/:settingType", async (req, res) => {
     res.status(200).json(updatedSetting);
   } catch (error) {
     console.error("Error updating setting:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 

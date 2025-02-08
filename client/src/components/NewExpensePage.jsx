@@ -8,7 +8,7 @@ import backArrow from "../media/back-arrow.png";
 import SourceCheckboxRaw from "./SourceCheckboxRaw";
 
 const NewExpensePage = () => {
-  const { setExpenses, envelopes, savings, loadingData, date } =
+  const { envelopes, savings, loadingExpenses, syncingExpenses, date } =
     useOutletContext();
   const navigate = useNavigate();
 
@@ -30,7 +30,6 @@ const NewExpensePage = () => {
         ...source,
         id: Number(source.id),
         amount: Number(source.amount),
-        available: Number(source.available),
         order: Number(source.order),
       }));
       const result = await createExpense(
@@ -39,7 +38,6 @@ const NewExpensePage = () => {
         correctTypeExpenseSources,
         newExpenseDescription,
         false, // isLockedIn
-        setExpenses,
       );
 
       if (!result.success) {
@@ -205,8 +203,10 @@ const NewExpensePage = () => {
           <label className="form-item__label" htmlFor="sources">
             Sources
           </label>
-          {loadingData ? (
+          {loadingExpenses ? (
             <p>Loading data...</p>
+          ) : syncingExpenses ? (
+            <p>Syncing data...</p>
           ) : (
             <>
               <input
@@ -232,7 +232,6 @@ const NewExpensePage = () => {
                   setSourceCategory={setSourceCategory}
                   envelopes={envelopes}
                   savings={savings}
-                  loadingData={loadingData}
                 />
               )}
             </>

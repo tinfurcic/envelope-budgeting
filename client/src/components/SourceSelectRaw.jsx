@@ -22,7 +22,6 @@ const SourceSelectRaw = ({
           type: "envelope",
           name: envelope.name,
           amount: newExpenseAmount,
-          available: envelope.currentAmount,
           order: envelope.order,
         },
       ]);
@@ -33,7 +32,6 @@ const SourceSelectRaw = ({
           type: "longTermSavings",
           name: "Long term savings",
           amount: newExpenseAmount,
-          available: savings.longTermSavings,
           order: -2,
         },
       ]);
@@ -44,7 +42,6 @@ const SourceSelectRaw = ({
           type: "shortTermSavings",
           name: "Short term savings",
           amount: newExpenseAmount,
-          available: savings.shortTermSavings,
           order: -1,
         },
       ]);

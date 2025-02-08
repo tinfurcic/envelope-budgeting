@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
 import { createEnvelope } from "../util/axios/createFunctions";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
 
 const CreateEnvelopePage = () => {
-  const { setEnvelopes } = useOutletContext();
   const navigate = useNavigate();
 
   const [newEnvelopeName, setNewEnvelopeName] = useState("");
@@ -27,7 +25,6 @@ const CreateEnvelopePage = () => {
       Number(newEnvelopeCurrentAmount),
       newEnvelopeDescription,
       newEnvelopeColor,
-      setEnvelopes,
     );
 
     if (!result.success) {
@@ -45,7 +42,6 @@ const CreateEnvelopePage = () => {
 
   const handleValueChange = (event, setValue) => {
     let value = event.target.value;
-    // Replace comma with dot before checking the value
     value = value.replace(/,/g, ".");
     const regex = /^(|0|0\.|0\.\d{1,2}|[1-9]\d*(\.|\.\d{1,2})?)$/;
     if (regex.test(value)) {

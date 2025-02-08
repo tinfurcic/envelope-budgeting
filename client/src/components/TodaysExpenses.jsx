@@ -3,7 +3,8 @@ import { useOutletContext } from "react-router-dom";
 import Button from "./Button";
 
 const TodaysExpenses = () => {
-  const { expenses, loadingData, date } = useOutletContext();
+  const { expenses, loadingExpenses, syncingExpenses, date } =
+    useOutletContext();
 
   const fakeCurrency = "€";
 
@@ -31,8 +32,10 @@ const TodaysExpenses = () => {
       </div>
 
       <div className="todays-expenses__expenses">
-        {loadingData || todaysExpenses === null ? (
+        {loadingExpenses || todaysExpenses === null ? (
           <p>Loading expenses...</p>
+        ) : syncingExpenses ? (
+          <p>Syncing expenses...</p>
         ) : todaysExpenses.length === 0 ? (
           <p>No expenses today.</p>
         ) : (

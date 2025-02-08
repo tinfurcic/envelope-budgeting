@@ -1,4 +1,5 @@
 import { db } from "../firebase-admin.js";
+import admin from "firebase-admin";
 
 // Get all envelopes for a specific user
 export const getAllEnvelopes = async (userId) => {
@@ -50,9 +51,6 @@ export const getEnvelopeById = async (userId, envelopeId) => {
   }
 };
 
-// Create a new envelope for a user
-// By adding `|| ""` after a property, I can make sending through request body optional
-// It's probably better to make user actions pass some values by default
 export const createEnvelope = async (
   userId,
   name,
@@ -84,7 +82,8 @@ export const createEnvelope = async (
       description,
       color,
       order: count + 1,
-      createdAt: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     const batch = db.batch();
@@ -92,6 +91,7 @@ export const createEnvelope = async (
     batch.update(envelopeMetadataRef, {
       nextEnvelopeId: nextEnvelopeId + 1,
       count: count + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     await batch.commit();
@@ -115,7 +115,7 @@ export const updateEnvelope = async (
   newOrder,
 ) => {
   try {
-    const updates = {};
+    const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     if (newName) updates.name = newName;
     if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
     if (newCurrentAmount !== undefined)
@@ -159,7 +159,10 @@ export const deleteEnvelope = async (userId, envelopeId) => {
 
     const batch = db.batch();
     batch.delete(envelopeRef);
-    batch.update(envelopeMetadataRef, { count: count - 1 });
+    batch.update(envelopeMetadataRef, {
+      count: count - 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
     await batch.commit();
   } catch (error) {
     console.error("Error deleting envelope (Admin SDK):", error);

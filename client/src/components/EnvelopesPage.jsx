@@ -6,7 +6,7 @@ import Button from "./Button";
 import expenseIcon from "../media/expense.png";
 
 const EnvelopesPage = () => {
-  const { envelopes, loadingData } = useOutletContext();
+  const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
   const navigate = useNavigate();
 
   return (
@@ -26,9 +26,13 @@ const EnvelopesPage = () => {
 
       {/* Add grid/slider view button*/}
       <div className="envelopes-page__envelopes">
-        {loadingData ? (
+        {loadingEnvelopes ? (
           <span className="envelopes-page__loading-message">
             Loading your envelopes...
+          </span>
+        ) : syncingEnvelopes ? (
+          <span className="envelopes-page__loading-message">
+            Syncing your envelopes...
           </span>
         ) : envelopes.length === 0 ? (
           <div className="envelopes-page__no-items">

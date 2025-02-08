@@ -1,18 +1,46 @@
 import axios from "axios";
-import { getToken } from "../tokenService";
+import { getToken } from "../tokenService.js";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:4001/api", // API base URL
+  baseURL: "http://localhost:4001/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// This interceptor attaches the token to every request
+// Request Interceptor: Attach token to every request
 axiosInstance.interceptors.request.use(async (config) => {
-  const token = await getToken();
-  config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const token = await getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.warn("No token available, proceeding without authentication.");
+  }
   return config;
 });
+
+// Response Interceptor: Handle Token Expiration
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If the request is unauthorized and hasn't been retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const newToken = await getToken();
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return axiosInstance(originalRequest); // Retry with the new token
+      } catch (err) {
+        console.error("Token refresh failed", err);
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default axiosInstance;
