@@ -6,7 +6,7 @@ export const fetchEnvelopes = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching envelopes:", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -16,7 +16,7 @@ export const fetchExpenses = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching expenses:", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -26,7 +26,7 @@ export const fetchGoals = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching goals:", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -36,7 +36,7 @@ export const fetchIncome = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching income:", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -46,7 +46,7 @@ export const fetchSavings = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching savings:", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -56,6 +56,26 @@ export const fetchSettings = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching settings:", error.message);
-    return null;
+    throw error;
   }
 };
+
+export async function getAllExpensesHistory() {
+  try {
+    const res = await axiosInstance.get("/expensesHistory");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching all expense history:", error.message);
+    throw error;
+  }
+}
+
+export async function getExpensesInMonth(month) {
+  try {
+    const res = await axiosInstance.get(`/expensesHistory/${month}`);
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching expenses for ${month}:`, error.message);
+    throw error;
+  }
+}

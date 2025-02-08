@@ -19,7 +19,7 @@ incomeRouter.get("/", async (req, res) => {
     res.status(200).json(income);
   } catch (error) {
     console.error("Error fetching income:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -52,7 +52,7 @@ incomeRouter.patch("/", async (req, res) => {
     res.status(200).json(updatedIncome);
   } catch (error) {
     console.error("Error updating income:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -76,7 +76,7 @@ incomeRouter.patch("/:incomeType", async (req, res) => {
     res.status(200).json(updatedIncome);
   } catch (error) {
     console.error("Error updating income:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 

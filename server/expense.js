@@ -414,6 +414,41 @@ export const deleteExpense = async (userId, expenseId) => {
   }
 };
 
+// delete expenses that are already in history
+export async function deleteArchivedExpenses(userId, month) {
+  const expensesRef = db.collection("users").doc(userId).collection("expenses");
+
+  try {
+    const snapshot = await expensesRef.where("archived", "==", true).get();
+    const archivedExpenses = snapshot.docs.filter((doc) =>
+      doc.data().date.startsWith(month),
+    );
+
+    if (archivedExpenses.length === 0) {
+      return {
+        success: true,
+        message: "No archived expenses found to delete.",
+      };
+    }
+
+    const batch = db.batch(); // Create a batch
+    archivedExpenses.forEach((expense) => {
+      batch.delete(expensesRef.doc(expense.id)); // Queue the delete operation
+    });
+
+    // Commit the batch
+    await batch.commit();
+
+    return {
+      success: true,
+      message: `Deleted ${archivedExpenses.length} archived expenses for ${month}.`,
+    };
+  } catch (error) {
+    console.error(`Error deleting archived expenses for ${month}:`, error);
+    throw new Error(`Failed to delete archived expenses: ${error.message}`);
+  }
+}
+
 // delete everything without refunds (for development only)
 export const deleteAllExpenses = async (userId) => {
   const userRef = db.collection("users").doc(userId);

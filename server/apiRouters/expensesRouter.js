@@ -6,6 +6,7 @@ import {
   updateExpense,
   deleteExpense,
   deleteAllExpenses,
+  deleteArchivedExpenses,
 } from "../expense.js";
 
 export const expensesRouter = express.Router();
@@ -25,7 +26,7 @@ expensesRouter.get("/", async (req, res) => {
     res.status(200).json(expenses);
   } catch (error) {
     console.error("Error fetching expenses:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -40,7 +41,7 @@ expensesRouter.get("/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching expense by ID:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -70,7 +71,7 @@ expensesRouter.post("/", async (req, res) => {
     res.status(201).json(newExpense);
   } catch (error) {
     console.error("Error creating expense:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -91,7 +92,7 @@ expensesRouter.patch("/:id", async (req, res) => {
     res.status(200).json(updatedExpense);
   } catch (error) {
     console.error("Error updating expense:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -103,7 +104,7 @@ expensesRouter.delete("/:id", async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting expense:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -114,6 +115,17 @@ expensesRouter.delete("/", async (req, res) => {
   } catch (error) {
     console.error("Error deleting all expenses:", error.message);
     res.status(500).send({ error: error.message || "Internal server error" });
+  }
+});
+
+expensesRouter.delete("/archived/:month", async (req, res) => {
+  try {
+    const { month } = req.params;
+    const result = await deleteArchivedExpenses(req.userId, month);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error deleting archived expenses:", error.message);
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 

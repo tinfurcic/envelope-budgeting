@@ -32,21 +32,15 @@ usersRouter.post("/", async (req, res) => {
 
     // Adding a metadata docs because collections without documents can't exist on firebase
     batch.set(userRef.collection("envelopes").doc("metadata"), {
-      initialized: true,
-      id: -1,
       nextEnvelopeId: 1,
       count: 0,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("expenses").doc("metadata"), {
-      initialized: true,
-      id: -1,
       nextExpenseId: 1,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("goals").doc("metadata"), {
-      initialized: true,
-      id: -1,
       nextGoalId: 1,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -68,6 +62,11 @@ usersRouter.post("/", async (req, res) => {
     });
     batch.set(userRef.collection("savings").doc("longTermSavings"), {
       value: 0,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Initialize expensesHistory collection
+    batch.set(userRef.collection("expensesHistory").doc("metadata"), {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

@@ -24,7 +24,7 @@ goalsRouter.get("/", async (req, res) => {
     res.status(200).json(goals);
   } catch (error) {
     console.error("Error fetching goals:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -39,7 +39,7 @@ goalsRouter.get("/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching goal by ID:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -61,7 +61,7 @@ goalsRouter.post("/", async (req, res) => {
     res.status(201).json(newGoal);
   } catch (error) {
     console.error("Error creating goal:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -81,7 +81,7 @@ goalsRouter.patch("/:id", async (req, res) => {
     res.status(200).json(updatedGoal);
   } catch (error) {
     console.error("Error updating goal:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -93,7 +93,7 @@ goalsRouter.delete("/:id", async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting goal:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 

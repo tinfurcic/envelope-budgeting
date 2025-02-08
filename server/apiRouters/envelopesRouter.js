@@ -24,7 +24,7 @@ envelopesRouter.get("/", async (req, res) => {
     res.status(200).json(envelopes);
   } catch (error) {
     console.error("Error fetching envelopes:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -39,7 +39,7 @@ envelopesRouter.get("/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching envelope by ID:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -62,7 +62,7 @@ envelopesRouter.post("/", async (req, res) => {
     res.status(201).json(newEnvelope);
   } catch (error) {
     console.error("Error creating envelope:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -84,7 +84,7 @@ envelopesRouter.patch("/:id", async (req, res) => {
     res.status(200).json(updatedEnvelope);
   } catch (error) {
     console.error("Error updating envelope:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -96,7 +96,7 @@ envelopesRouter.delete("/:id", async (req, res) => {
     res.status(204).send(); // No content
   } catch (error) {
     console.error("Error deleting envelope:", error.message);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });
 

@@ -63,3 +63,16 @@ export const createGoal = async (
     return { success: false, error: error.message };
   }
 };
+
+export const archiveExpenses = async (month) => {
+  try {
+    const res = await axiosInstance.post(
+      `/expensesHistory/${month}/archive`,
+      {},
+    );
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error creating expense:", error);
+    return { success: false, error: error.message };
+  }
+};

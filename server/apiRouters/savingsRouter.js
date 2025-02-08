@@ -19,7 +19,7 @@ savingsRouter.get("/", async (req, res) => {
     res.status(200).json(savings);
   } catch (error) {
     console.error("Error fetching savings:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -52,7 +52,7 @@ savingsRouter.patch("/", async (req, res) => {
     res.status(200).json(updatedSavings);
   } catch (error) {
     console.error("Error updating savings:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
@@ -80,7 +80,7 @@ savingsRouter.patch("/:savingsType", async (req, res) => {
     res.status(200).json(updatedSavings);
   } catch (error) {
     console.error("Error updating savings:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 
