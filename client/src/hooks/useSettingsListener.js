@@ -20,14 +20,15 @@ const useSettingsListener = () => {
 
       let isNewer = false;
 
-      const settingsData = snapshot.docs.map((doc) => {
+      const settingsData = {};
+      snapshot.docs.forEach((doc) => {
         const data = doc.data();
 
         if (data.updatedAt && (!lastUpdated || data.updatedAt > lastUpdated)) {
           isNewer = true;
         }
 
-        return { id: doc.id, ...data };
+        settingsData[doc.id] = { id: doc.id, ...data };
       });
 
       setSettings(settingsData);

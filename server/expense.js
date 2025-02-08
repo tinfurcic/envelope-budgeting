@@ -92,7 +92,6 @@ export const createExpense = async (
   description,
   isLockedIn,
 ) => {
-  console.log(sources);
   const userRef = db.collection("users").doc(userId);
   const envelopesRef = userRef.collection("envelopes");
   const savingsRef = userRef.collection("savings");

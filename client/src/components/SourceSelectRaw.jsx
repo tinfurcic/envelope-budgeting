@@ -112,17 +112,17 @@ const SourceSelectRaw = ({
                   <option value="no-selection">Select savings type</option>
                   <option
                     value="STS" //?
-                    disabled={savings.shortTermSavings < newExpenseAmount}
+                    disabled={savings.shortTermSavings.value < newExpenseAmount}
                   >
                     Short term savings ({fakeCurrency}
-                    {savings.shortTermSavings} left)
+                    {savings.shortTermSavings.value} left)
                   </option>
                   <option
                     value="LTS"
-                    disabled={savings.longTermSavings < newExpenseAmount}
+                    disabled={savings.longTermSavings.value < newExpenseAmount}
                   >
                     Long term savings ({fakeCurrency}
-                    {savings.longTermSavings} left)
+                    {savings.longTermSavings.value} left)
                   </option>
                 </>
               )

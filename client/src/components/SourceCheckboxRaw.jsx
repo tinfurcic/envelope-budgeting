@@ -10,6 +10,9 @@ const SourceCheckboxRaw = ({
 }) => {
   const fakeCurrency = "€";
 
+  //  build a potentialSources array: [{id: 1, currentAmount: 50, ...}, ..., {id: -1, value: 2000}]
+          // build a potentialSources array: [{id: 1, amount: 50, ...}, ..., {id: -1, amount: 2000}]
+
   // sum of all entered amounts
   const totalEnteredAmount = newExpenseSources.reduce(
     (sum, source) => sum + (parseFloat(source.amount) || 0),
@@ -143,7 +146,7 @@ const SourceCheckboxRaw = ({
             id="STS"
             name="Short term savings"
             onChange={handleChoice}
-            disabled={savings.shortTermSavings === 0}
+            disabled={savings.shortTermSavings.value === 0}
           />
           <label htmlFor="STS">Short term savings</label>
         </div>
@@ -154,7 +157,7 @@ const SourceCheckboxRaw = ({
             id="LTS"
             name="Long term savings"
             onChange={handleChoice}
-            disabled={savings.longTermSavings === 0}
+            disabled={savings.longTermSavings.value === 0}
           />
           <label htmlFor="LTS">Long term savings</label>
         </div>

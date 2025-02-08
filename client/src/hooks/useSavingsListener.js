@@ -5,7 +5,7 @@ import { useAuth } from "../components/AuthContext";
 
 const useSavingsListener = () => {
   const { user } = useAuth();
-  const [savings, setSavings] = useState([]);
+  const [savings, setSavings] = useState({});
   const [loadingSavings, setLoadingSavings] = useState(true);
   const [syncingSavings, setSyncingSavings] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -20,14 +20,15 @@ const useSavingsListener = () => {
 
       let isNewer = false;
 
-      const savingsData = snapshot.docs.map((doc) => {
+      const savingsData = {};
+      snapshot.docs.forEach((doc) => {
         const data = doc.data();
 
         if (data.updatedAt && (!lastUpdated || data.updatedAt > lastUpdated)) {
           isNewer = true;
         }
 
-        return { id: doc.id, ...data };
+        savingsData[doc.id] = { id: doc.id, ...data };
       });
 
       setSavings(savingsData);
