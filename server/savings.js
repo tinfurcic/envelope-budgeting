@@ -12,7 +12,7 @@ export const getSavings = async (userId) => {
 
     const savings = {};
     savingsSnapshot.forEach((doc) => {
-      savings[doc.id] = doc.data().value || 0;
+      savings[doc.id] = doc.data().currentAmount || 0;
     });
 
     return savings;
@@ -34,14 +34,14 @@ export const updateSavings = async (
     await Promise.all([
       savingsRef.doc("shortTermSavings").set(
         {
-          value: parseFloat(shortTermSavings),
+          currentAmount: parseFloat(shortTermSavings),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true },
       ),
       savingsRef.doc("longTermSavings").set(
         {
-          value: parseFloat(longTermSavings),
+          currentAmount: parseFloat(longTermSavings),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true },
@@ -57,16 +57,16 @@ export const updateSavings = async (
 
 // Update a specific savings type
 // Isn't used on the front end
-export const updateSavingsType = async (userId, savingsType, value) => {
+export const updateSavingsType = async (userId, savingsType, currentAmount) => {
   try {
     const savingsRef = db
       .collection("users")
       .doc(userId)
       .collection("savings")
       .doc(savingsType);
-    await savingsRef.set({ value: parseFloat(value) }, { merge: true });
+    await savingsRef.set({ currentAmount: parseFloat(currentAmount) }, { merge: true });
 
-    return { [savingsType]: value };
+    return { [savingsType]: currentAmount };
   } catch (error) {
     console.error("Error updating savings:", error.message);
     throw new Error("Failed to update savings.");

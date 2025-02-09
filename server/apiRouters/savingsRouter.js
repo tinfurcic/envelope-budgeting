@@ -60,14 +60,14 @@ savingsRouter.patch("/", async (req, res) => {
 // Isn't used on the front end
 savingsRouter.patch("/:savingsType", async (req, res) => {
   const { savingsType } = req.params;
-  const { value } = req.body;
+  const { currentAmount } = req.body;
 
   const allowedSavingsTypes = ["shortTermSavings", "longTermSavings"];
   if (!allowedSavingsTypes.includes(savingsType)) {
     return res.status(400).json({ error: "Invalid savingsType." });
   }
 
-  if (isNaN(value)) {
+  if (isNaN(currentAmount)) {
     return res.status(400).json({ error: "Invalid value. Must be a number." });
   }
 
@@ -75,7 +75,7 @@ savingsRouter.patch("/:savingsType", async (req, res) => {
     const updatedSavings = await updateSavingsType(
       req.userId,
       savingsType,
-      value,
+      currentAmount,
     );
     res.status(200).json(updatedSavings);
   } catch (error) {
