@@ -57,11 +57,15 @@ usersRouter.post("/", async (req, res) => {
 
     // Initialize savings collection
     batch.set(userRef.collection("savings").doc("shortTermSavings"), {
-      value: 0,
+      id: -1,
+      currentAmount: 0,
+      name: "Short Term Savings",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("savings").doc("longTermSavings"), {
-      value: 0,
+      id: -2,
+      currentAmount: 0,
+      name: "Long Term Savings",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

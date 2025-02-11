@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { addSourcesInOrder } from "../util/addSourcesInOrder";
 
 const SourceCheckboxRaw = ({
@@ -9,6 +9,12 @@ const SourceCheckboxRaw = ({
   savings,
 }) => {
   const fakeCurrency = "€";
+
+  const [potentialSources, setPotentialSources] = useState([]);
+
+  useEffect(() => {
+    setPotentialSources([...envelopes, ...Object.values(savings)]);
+  }, [envelopes, savings]);
 
   // sum of all entered amounts
   const totalEnteredAmount = newExpenseSources.reduce(
@@ -38,11 +44,7 @@ const SourceCheckboxRaw = ({
       setNewExpenseSources((prevSources) => {
         const updatedSources = prevSources.map((source) => {
           // Update the amount for the matching source
-          if (
-            source.id === key ||
-            (key === -1 && source.type === "short-term-savings") ||
-            (key === -2 && source.type === "long-term-savings")
-          ) {
+          if (source.id === key) {
             return {
               ...source,
               amount: value, // Update the amount directly in the source
@@ -56,13 +58,52 @@ const SourceCheckboxRaw = ({
     }
   };
 
+  const handleChoice = (event) => {
+    const isChecked = event.target.checked;
+    const checkboxId = event.target.id;
+    if (isChecked) {
+      const source = potentialSources.find(
+        (item) => item.id === Number(checkboxId),
+      );
+      let type, order, name;
+      if (source.id > 0) {
+        [type, order, name] = ["envelope", source.order, source.name];
+      } else if (source.id === -1) {
+        [type, order, name] = ["shortTermSavings", -1, "Short term savings"];
+      } else if (source.id === -2) {
+        [type, order, name] = ["longTermSavings", -2, "Long term savings"];
+      }
+      setNewExpenseSources(
+        addSourcesInOrder(newExpenseSources, {
+          id: source.id,
+          type,
+          name,
+          amount: "",
+          order,
+        }),
+      );
+    } else {
+      if (!isNaN(parseFloat(checkboxId))) {
+        const sourceToRemove = newExpenseSources.find(
+          (item) => item.id === Number(checkboxId),
+        );
+
+        setNewExpenseSources((prevSources) =>
+          prevSources.filter((source) => source.id !== sourceToRemove.id),
+        );
+      } else {
+        throw new Error("Unexpected checkbox id!");
+      }
+    }
+  };
+
+  // when newExpenseAmount changes, reset all amount fields
   useEffect(() => {
     setNewExpenseSources((prevSources) => {
-      // Reset the amount values in each source object
       const updatedSources = prevSources.map((source) => {
         return {
           ...source,
-          amount: "", // Reset the amount for each source
+          amount: "",
         };
       });
 
@@ -70,109 +111,57 @@ const SourceCheckboxRaw = ({
     });
   }, [newExpenseAmount, setNewExpenseSources]);
 
-  const handleChoice = (event) => {
-    const isChecked = event.target.checked;
-    const checkboxId = event.target.id;
-    if (isChecked) {
-      if (!isNaN(parseFloat(checkboxId))) {
-        const envelope = envelopes.find(
-          (item) => item.id === Number(checkboxId),
-        );
-        setNewExpenseSources(
-          addSourcesInOrder(newExpenseSources, {
-            id: envelope.id,
-            type: "envelope",
-            name: envelope.name,
-            amount: "",
-            order: envelope.order,
-          }),
-        );
-      } else if (checkboxId === "LTS") {
-        setNewExpenseSources(
-          addSourcesInOrder(newExpenseSources, {
-            id: -2,
-            type: "longTermSavings",
-            name: "Long term savings",
-            amount: "",
-            order: -2,
-          }),
-        );
-      } else if (checkboxId === "STS") {
-        setNewExpenseSources(
-          addSourcesInOrder(newExpenseSources, {
-            id: -1,
-            type: "shortTermSavings",
-            name: "Short term savings",
-            amount: "",
-            order: -1,
-          }),
-        );
-      }
-    } else {
-      if (!isNaN(parseFloat(checkboxId))) {
-        const envelope = newExpenseSources.find(
-          (item) => item.id === Number(checkboxId),
-        );
-
-        // Remove the envelope from newExpenseSources
-        setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.id !== envelope.id),
-        );
-      } else if (checkboxId === "LTS") {
-        // Remove the long-term savings source
-        setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.type !== "longTermSavings"),
-        );
-      } else if (checkboxId === "STS") {
-        // Remove the short-term savings source
-        setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.type !== "shortTermSavings"),
+  // Set maximum input value to match the amount in the source
+  useEffect(() => {
+    for (const expenseSource of newExpenseSources) {
+      const id = expenseSource.id;
+      const source = potentialSources.find((item) => item.id === Number(id));
+      if (source && expenseSource.amount > source.currentAmount) {
+        setNewExpenseSources((prev) =>
+          prev.map((expenseSource) =>
+            expenseSource.id === id
+              ? { ...expenseSource, amount: source.currentAmount }
+              : expenseSource,
+          ),
         );
       }
     }
-  };
+  }, [newExpenseSources, potentialSources, setNewExpenseSources]);
 
   return (
     <>
       <fieldset>
         <legend>Choose where to pay from:</legend>
-        <div>
-          <input
-            type="checkbox"
-            key={-1}
-            id="STS"
-            name="Short term savings"
-            onChange={handleChoice}
-            disabled={savings.shortTermSavings === 0}
-          />
-          <label htmlFor="STS">Short term savings</label>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            key={-2}
-            id="LTS"
-            name="Long term savings"
-            onChange={handleChoice}
-            disabled={savings.longTermSavings === 0}
-          />
-          <label htmlFor="LTS">Long term savings</label>
-        </div>
-        {envelopes.map((envelope) => (
-          <div key={envelope.id}>
+        {potentialSources.map((source) => (
+          <Fragment key={source.id}>
             <input
               type="checkbox"
-              id={envelope.id}
-              name={envelope.name}
+              id={source.id} // source.id
+              name={
+                source.id > 0
+                  ? source.name
+                  : source.id === -1
+                    ? "Short term savings"
+                    : source.id === -2
+                      ? "Long term savings"
+                      : "¿NONAME?"
+              }
               onChange={handleChoice}
-              disabled={envelope.currentAmount === 0}
+              disabled={source.currentAmount === 0}
             />
-            <label htmlFor={envelope.id}>{envelope.name}</label>
-          </div>
+            <label htmlFor={source.id}>
+              {source.id > 0
+                ? source.name
+                : source.id === -1
+                  ? "Short term savings"
+                  : source.id === -2
+                    ? "Long term savings"
+                    : "¿NONAME?"}
+            </label>
+          </Fragment>
         ))}
-        {/* NEW */}
         {newExpenseSources.map((source) => {
-          let key = source.id; // Use source.id directly
+          let key = source.id;
           let name = source.name;
 
           return (

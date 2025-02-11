@@ -20,14 +20,15 @@ const useIncomeListener = () => {
 
       let isNewer = false;
 
-      const incomeData = snapshot.docs.map((doc) => {
+      const incomeData = {};
+      snapshot.docs.forEach((doc) => {
         const data = doc.data();
 
         if (data.updatedAt && (!lastUpdated || data.updatedAt > lastUpdated)) {
           isNewer = true;
         }
 
-        return { id: doc.id, ...data };
+        incomeData[doc.id] = { id: doc.id, ...data };
       });
 
       setIncome(incomeData);

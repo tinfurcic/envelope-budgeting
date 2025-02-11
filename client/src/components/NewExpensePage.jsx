@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { createExpense } from "../util/axios/createFunctions";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
-import SourceSelectRaw from "./SourceSelectRaw";
+import PickSingleSource from "./PickSingleSource";
 import backArrow from "../media/back-arrow.png";
 import SourceCheckboxRaw from "./SourceCheckboxRaw";
 
@@ -64,7 +64,6 @@ const NewExpensePage = () => {
 
   const handleValueChange = (event, setValue) => {
     let value = event.target.value;
-    // Replace comma with dot before checking the value
     value = value.replace(/,/g, ".");
     const regex = /^(|0|0\.|0\.\d{1,2}|[1-9]\d*(\.|\.\d{1,2})?)$/;
     if (regex.test(value)) {
@@ -72,13 +71,39 @@ const NewExpensePage = () => {
     }
   };
 
+  // --- Everything related do multiple sources ---
+  const handleSourcesCheckboxChange = (event) => {
+    setAllowMultipleSources(event.target.checked);
+  };
+
+  useEffect(() => {
+    setNewExpenseSources([]);
+    setSourceCategory(null);
+  }, [allowMultipleSources]);
+
+  useEffect(() => {
+    let totalSum = 0;
+    let hasEmptyField = false;
+    for (const source of newExpenseSources) {
+      if (Number(source.amount) === 0) {
+        hasEmptyField = true;
+        break;
+      }
+      totalSum += Number(source.amount);
+    }
+    setIsDisabled(
+      Number(newExpenseAmount) === 0 ||
+        newExpenseDate === "" ||
+        newExpenseSources.length === 0 ||
+        hasEmptyField ||
+        Number(totalSum) !== Number(newExpenseAmount),
+    );
+  }, [newExpenseAmount, newExpenseDate, newExpenseSources]);
+
+  // --- Everything related to date ---
   const handleTodayCheckboxChange = (event) => {
     setIsTodayChecked(event.target.checked);
     setNewExpenseDate(event.target.checked ? date : "");
-  };
-
-  const handleSourcesCheckboxChange = (event) => {
-    setAllowMultipleSources(event.target.checked);
   };
 
   const handleDateChange = (event) => {
@@ -98,45 +123,18 @@ const NewExpensePage = () => {
   }, [date, isTodayChecked]);
 
   useEffect(() => {
-    setNewExpenseSources([]);
-    setSourceCategory(null);
-  }, [allowMultipleSources]);
-
-  useEffect(() => {
     if (newExpenseDate === date) {
       setIsTodayChecked(true);
     }
   }, [newExpenseDate, date]);
-
-  useEffect(() => {
-    let totalSum = 0;
-    let hasEmptyField = false;
-    for (const source of newExpenseSources) {
-      // will also work if if newExpenseSources is empty
-      if (Number(source.amount) === 0) {
-        // will happen if source.amount is "", "0", 0, "0.0", 0.0, "0.00" or 0.00
-        hasEmptyField = true;
-        break;
-      }
-      totalSum += Number(source.amount);
-    }
-    setIsDisabled(
-      Number(newExpenseAmount) === 0 ||
-        newExpenseDate === "" ||
-        newExpenseSources.length === 0 ||
-        hasEmptyField ||
-        Number(totalSum) !== Number(newExpenseAmount),
-    );
-  }, [newExpenseAmount, newExpenseDate, newExpenseSources]);
 
   return (
     <div className="new-expense-page">
       <div className="new-expense-page__nav-back">
         <Button
           type="button"
-          className="button"
+          className="button button--back"
           onClick={() => navigate("/envelopes")}
-          variant="back"
           isDisabled={false}
         >
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
@@ -200,22 +198,25 @@ const NewExpensePage = () => {
         </div>
 
         <div className="form-item">
-          <label className="form-item__label" htmlFor="sources">
-            Sources
-          </label>
           {loadingExpenses ? (
             <p>Loading data...</p>
           ) : syncingExpenses ? (
             <p>Syncing data...</p>
           ) : (
             <>
-              <input
-                type="checkbox"
-                id="sources"
-                checked={allowMultipleSources}
-                onChange={handleSourcesCheckboxChange}
-              />
-              <label>Choose multiple sources?</label>
+              <div className="source-mode">
+                <p>Source</p>
+                <div>
+                  <input
+                    type="checkbox"
+                    id="sources"
+                    checked={allowMultipleSources}
+                    onChange={handleSourcesCheckboxChange}
+                  />
+                  <label htmlFor="sources">Allow multiple sources</label>
+                </div>
+              </div>
+              
               {allowMultipleSources ? (
                 <SourceCheckboxRaw
                   newExpenseAmount={newExpenseAmount}
@@ -225,7 +226,7 @@ const NewExpensePage = () => {
                   savings={savings}
                 />
               ) : (
-                <SourceSelectRaw
+                <PickSingleSource
                   newExpenseAmount={newExpenseAmount}
                   setNewExpenseSources={setNewExpenseSources}
                   sourceCategory={sourceCategory}
@@ -255,9 +256,8 @@ const NewExpensePage = () => {
         <div className="form-item__submit-btn">
           <Button
             type="submit"
-            className="button"
+            className="button button--green"
             onClick={null}
-            variant="green"
             isDisabled={isDisabled}
           >
             Add Expense

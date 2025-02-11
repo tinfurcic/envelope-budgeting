@@ -16,9 +16,8 @@ const Logout = () => {
     <div className="logout">
       <Button
         type="button"
-        className="button"
+        className="button button--red"
         onClick={handleLogout}
-        variant="red"
         isDisabled={false}
       >
         Log out

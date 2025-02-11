@@ -47,10 +47,47 @@
     }
   }
 
+  &--category {
+    flex-grow: 1;
+
+    &:first-child {
+      border-radius: 1rem 0 0 1rem;
+    }
+
+    &:last-child {
+      border-radius: 0 1rem 1rem 0;
+    }
+
+    &.active{
+      background-color: global.$primary-blue;
+    }
+
+    &.inactive {
+      background-color: global.$secondary-blue;
+      opacity: 0.5;
+    }
+  }
+
+  &--source {
+    background-color: var(--envelope-color);
+    
+    &.active{
+      outline: 1px solid black;
+    }
+
+    &.inactive {
+      opacity: 0.5;
+    }
+
+    &--savings {
+      background-color: navy;
+      color: white;
+    }
+  }
+
   &--new-expense {
     width: 3rem;
     height: 3rem;
-    //background-color: global.$primary-yellow;
     background-color: global.$primary-blue;
 
     & img {
@@ -60,8 +97,15 @@
   }
 
   &:disabled {
+    pointer-events: none;
     opacity: 0.6;
-    cursor: default;
+  }
+
+  &.disabled {
+    pointer-events: none;
+
+    background-color: transparent;
+    color: gray;
   }
 
   &__gear-icon {

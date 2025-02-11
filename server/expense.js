@@ -92,7 +92,6 @@ export const createExpense = async (
   description,
   isLockedIn,
 ) => {
-  console.log(sources);
   const userRef = db.collection("users").doc(userId);
   const envelopesRef = userRef.collection("envelopes");
   const savingsRef = userRef.collection("savings");
@@ -162,27 +161,29 @@ export const createExpense = async (
       }
 
       for (const { source, savingsData } of savingsDocs) {
-        if (Number(source.amount) > savingsData.value) {
+        if (Number(source.amount) > savingsData.currentAmount) {
           throw new Error(`Not enough funds in "${source.name}".`);
         }
 
         // Deduct from savings (store new values to update after loop)
         if (source.type === "shortTermSavings") {
-          newShortTermSavings = savingsData.value - Number(source.amount);
+          newShortTermSavings =
+            savingsData.currentAmount - Number(source.amount);
         } else {
-          newLongTermSavings = savingsData.value - Number(source.amount);
+          newLongTermSavings =
+            savingsData.currentAmount - Number(source.amount);
         }
       }
 
       // Apply savings updates if necessary
       if (newShortTermSavings !== null) {
         t.update(savingsRef.doc("shortTermSavings"), {
-          value: newShortTermSavings,
+          currentAmount: newShortTermSavings,
         });
       }
       if (newLongTermSavings !== null) {
         t.update(savingsRef.doc("longTermSavings"), {
-          value: newLongTermSavings,
+          currentAmount: newLongTermSavings,
         });
       }
 
@@ -284,8 +285,9 @@ export const updateExpense = async (
           const envelopeDoc = envelopeDocsData.find(
             (doc) => doc.id === String(source.id),
           );
-          if (!envelopeDoc.exists)
+          if (!envelopeDoc.exists) {
             throw new Error(`Envelope ${source.name} not found.`);
+          }
           const currentAmount = envelopeDoc.data().currentAmount;
           if (currentAmount + amountDiff < 0) {
             throw new Error(`Not enough funds in envelope ${source.name}.`);
@@ -300,14 +302,15 @@ export const updateExpense = async (
           const savingsDoc = savingsDocsData.find(
             (doc) => doc.id === source.type,
           );
-          if (!savingsDoc.exists)
+          if (!savingsDoc.exists) {
             throw new Error(`Savings ${source.name} not found.`);
-          const currentValue = savingsDoc.data().value;
+          }
+          const currentValue = savingsDoc.data().currentAmount;
           if (currentValue + amountDiff < 0) {
             throw new Error(`Not enough funds in ${source.name}.`);
           }
           t.update(savingsRef.doc(source.type), {
-            value: currentValue + amountDiff,
+            currentAmount: currentValue + amountDiff,
           });
         }
       }
@@ -384,20 +387,22 @@ export const deleteExpense = async (userId, expenseId) => {
 
       for (const { source, savingsData } of savingsDocs) {
         if (source.type === "shortTermSavings") {
-          newShortTermSavings = savingsData.value + Number(source.amount);
+          newShortTermSavings =
+            savingsData.currentAmount + Number(source.amount);
         } else {
-          newLongTermSavings = savingsData.value + Number(source.amount);
+          newLongTermSavings =
+            savingsData.currentAmount + Number(source.amount);
         }
       }
 
       if (newShortTermSavings !== null) {
         t.update(savingsRef.doc("shortTermSavings"), {
-          value: newShortTermSavings,
+          currentAmount: newShortTermSavings,
         });
       }
       if (newLongTermSavings !== null) {
         t.update(savingsRef.doc("longTermSavings"), {
-          value: newLongTermSavings,
+          currentAmount: newLongTermSavings,
         });
       }
 
@@ -543,7 +548,7 @@ export const updateExpense = async (
         if (source.type === "envelope") {
           updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) + source.amount);
         } else {
-          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.value) + source.amount);
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) + source.amount);
         }
       }
 
@@ -552,14 +557,14 @@ export const updateExpense = async (
         const key = source.type === "envelope" ? `envelope-${source.id}` : source.type;
         const sourceData = sourceDocs.get(key);
 
-        if (source.amount > (updatedAmounts.get(key) ?? sourceData.currentAmount ?? sourceData.value)) {
+        if (source.amount > (updatedAmounts.get(key) ?? sourceData.currentAmount ?? sourceData.currentAmount)) {
           throw new Error(`Not enough funds in "${source.name}".`);
         }
 
         if (source.type === "envelope") {
           updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) - source.amount);
         } else {
-          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.value) - source.amount);
+          updatedAmounts.set(key, (updatedAmounts.get(key) || sourceData.currentAmount) - source.amount);
         }
       }
 
@@ -575,7 +580,7 @@ export const updateExpense = async (
         if (key.startsWith("envelope-")) {
           t.update(ref, { currentAmount: newAmount });
         } else {
-          t.update(ref, { value: newAmount });
+          t.update(ref, { currentAmount: newAmount });
         }
       }
 

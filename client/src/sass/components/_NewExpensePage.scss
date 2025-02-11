@@ -3,3 +3,18 @@
 .new-expense-page {
   @include mixins.form-page-styles;
 }
+
+.source-mode {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+
+  input {
+    margin-right: 0.25rem;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+}

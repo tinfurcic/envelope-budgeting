@@ -82,9 +82,8 @@ const CreateEnvelopePage = () => {
       <div className="create-envelope-page__nav-back">
         <Button
           type="button"
-          className="button"
+          className="button button--back"
           onClick={() => navigate("/envelopes")}
-          variant="back"
           isDisabled={false}
         >
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
@@ -189,9 +188,8 @@ const CreateEnvelopePage = () => {
         <div className="form-item__submit-btn">
           <Button
             type="submit"
-            className="button"
+            className="button button--green"
             onClick={null}
-            variant="green"
             isDisabled={isDisabled}
           >
             Create Envelope
