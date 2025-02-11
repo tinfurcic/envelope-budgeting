@@ -3,15 +3,16 @@ import React from "react";
 const Button = ({
   type,
   className,
+  extraStyle,
   onClick,
-  variant,
   isDisabled,
   children,
 }) => {
   return (
     <button
       type={type}
-      className={`${className} ${variant && `${className}--${variant}`}`}
+      className={className}
+      style={extraStyle}
       onClick={onClick}
       disabled={isDisabled}
     >

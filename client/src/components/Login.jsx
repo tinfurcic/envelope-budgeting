@@ -82,9 +82,8 @@ const Login = () => {
         <div className="login-page__form__submit-btn">
           <Button
             type="submit"
-            className="button"
+            className="button button--login"
             onClick={null}
-            variant="login"
             isDisabled={false}
           >
             {isNewUser ? "Sign up" : "Log in"}

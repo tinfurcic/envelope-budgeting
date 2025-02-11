@@ -6,7 +6,7 @@ const SourceCheckboxRaw = ({
   newExpenseSources,
   setNewExpenseSources,
   envelopes,
-  savings
+  savings,
 }) => {
   const fakeCurrency = "€";
 
@@ -15,7 +15,6 @@ const SourceCheckboxRaw = ({
   useEffect(() => {
     setPotentialSources([...envelopes, ...Object.values(savings)]);
   }, [envelopes, savings]);
-
 
   // sum of all entered amounts
   const totalEnteredAmount = newExpenseSources.reduce(
@@ -80,7 +79,7 @@ const SourceCheckboxRaw = ({
           type,
           name,
           amount: "",
-          order
+          order,
         }),
       );
     } else {
@@ -90,16 +89,16 @@ const SourceCheckboxRaw = ({
         );
 
         setNewExpenseSources((prevSources) =>
-          prevSources.filter((source) => source.id !== sourceToRemove.id)
+          prevSources.filter((source) => source.id !== sourceToRemove.id),
         );
       } else {
-        throw new Error("Unexpected checkbox id!")
+        throw new Error("Unexpected checkbox id!");
       }
     }
   };
 
   // when newExpenseAmount changes, reset all amount fields
-  useEffect(() => { 
+  useEffect(() => {
     setNewExpenseSources((prevSources) => {
       const updatedSources = prevSources.map((source) => {
         return {
@@ -118,14 +117,16 @@ const SourceCheckboxRaw = ({
       const id = expenseSource.id;
       const source = potentialSources.find((item) => item.id === Number(id));
       if (source && expenseSource.amount > source.currentAmount) {
-        setNewExpenseSources((prev) => 
+        setNewExpenseSources((prev) =>
           prev.map((expenseSource) =>
-            expenseSource.id === id ? { ...expenseSource, amount: source.currentAmount } : expenseSource
-          )
-        ); 
-      } 
+            expenseSource.id === id
+              ? { ...expenseSource, amount: source.currentAmount }
+              : expenseSource,
+          ),
+        );
+      }
     }
-  }, [newExpenseSources, potentialSources]);
+  }, [newExpenseSources, potentialSources, setNewExpenseSources]);
 
   return (
     <>
@@ -136,11 +137,27 @@ const SourceCheckboxRaw = ({
             <input
               type="checkbox"
               id={source.id} // source.id
-              name={source.id > 0 ? source.name : source.id === -1 ? "Short term savings" : source.id === -2 ? "Long term savings" : "¿NONAME?"} 
+              name={
+                source.id > 0
+                  ? source.name
+                  : source.id === -1
+                    ? "Short term savings"
+                    : source.id === -2
+                      ? "Long term savings"
+                      : "¿NONAME?"
+              }
               onChange={handleChoice}
               disabled={source.currentAmount === 0}
             />
-            <label htmlFor={source.id}>{source.id > 0 ? source.name : source.id === -1 ? "Short term savings" : source.id === -2 ? "Long term savings" : "¿NONAME?"}</label>
+            <label htmlFor={source.id}>
+              {source.id > 0
+                ? source.name
+                : source.id === -1
+                  ? "Short term savings"
+                  : source.id === -2
+                    ? "Long term savings"
+                    : "¿NONAME?"}
+            </label>
           </Fragment>
         ))}
         {newExpenseSources.map((source) => {

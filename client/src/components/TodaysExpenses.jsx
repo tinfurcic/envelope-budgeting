@@ -22,9 +22,8 @@ const TodaysExpenses = () => {
         <h2 className="todays-expenses__heading">Today's expenses</h2>
         <Button
           type="button"
-          className="button"
+          className="button button--blue"
           onClick={null}
-          variant="blue"
           isDisabled={false}
         >
           All expenses
@@ -48,16 +47,22 @@ const TodaysExpenses = () => {
               </tr>
             </thead>
             <tbody className="todays-expenses__table-body">
-              {todaysExpenses.map((expense/*, index*/) => (
-                <tr key={expense.id} /*className={`todays-expenses__row-${index}`}*/>
+              {todaysExpenses.map((expense /*, index*/) => (
+                <tr
+                  key={
+                    expense.id
+                  } /*className={`todays-expenses__row-${index}`}*/
+                >
                   <td className="todays-expenses__amount-cell">
                     {fakeCurrency}
                     {expense.amount}
                   </td>
                   <td className="todays-expenses__sources-cell">
-                    {expense.sources.map((source) => (source.name)).join(", ")}
+                    {expense.sources.map((source) => source.name).join(", ")}
                   </td>
-                  <td className="todays-expenses__description-cell">{expense.description || "N/A"}</td>
+                  <td className="todays-expenses__description-cell">
+                    {expense.description || "N/A"}
+                  </td>
                 </tr>
               ))}
             </tbody>

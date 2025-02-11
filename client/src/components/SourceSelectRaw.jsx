@@ -10,12 +10,12 @@ const SourceSelectRaw = ({
 }) => {
   const fakeCurrency = "€";
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedSourceId, setSelectedSourceId] = useState("");
   const [potentialSources, setPotentialSources] = useState([]);
 
   const handleSelectedSourceChange = (event) => {
     const id = event.target.value;
-    setSelectedOption(id);
+    setSelectedSourceId(id);
     if (id === "") {
       setNewExpenseSources([]);
     } else if (!isNaN(parseFloat(id)) && isFinite(id)) {
@@ -30,11 +30,11 @@ const SourceSelectRaw = ({
       }
       setNewExpenseSources([
         {
-          id: source.id, 
+          id: source.id,
           type,
-          name, 
+          name,
           amount: newExpenseAmount,
-          order
+          order,
         },
       ]);
     } else {
@@ -47,14 +47,14 @@ const SourceSelectRaw = ({
   }, [envelopes, savings]);
 
   useEffect(() => {
-    if (selectedOption !== "") {
-      const id = selectedOption;
+    if (selectedSourceId !== "") {
+      const id = selectedSourceId;
       const source = potentialSources.find((item) => item.id === Number(id));
       if (source.currentAmount < newExpenseAmount) {
-        setSelectedOption("");
+        setSelectedSourceId("");
       }
     }
-  }, [selectedOption, newExpenseAmount]);
+  }, [selectedSourceId, newExpenseAmount, potentialSources]);
 
   useEffect(() => {
     setNewExpenseSources((prev) => {
@@ -63,33 +63,32 @@ const SourceSelectRaw = ({
       }
       return prev;
     });
-  }, [newExpenseAmount]);
+  }, [newExpenseAmount, setNewExpenseSources]);
 
   return (
     <>
       <fieldset>
         <legend>Source</legend>
         {["envelope", "savings"].map((value) => (
-        <Fragment key={value}>
-          <input
-            type="radio"
-            value={value}
-            id={value}
-            name="source-category"
-            checked={sourceCategory === value}
-            onChange={() => {
-              setNewExpenseSources([]);
-              setSourceCategory(value);
-              setSelectedOption("");
-            }}
-          />
-          <label htmlFor={value}>
-            {value.charAt(0).toUpperCase() + value.slice(1)}
-          </label>
-        </Fragment>
-    ))}
+          <Fragment key={value}>
+            <label htmlFor={value}>
+              <input
+                type="radio"
+                value={value}
+                id={value}
+                name="source-category"
+                checked={sourceCategory === value}
+                onChange={() => {
+                  setNewExpenseSources([]);
+                  setSourceCategory(value);
+                  setSelectedSourceId("");
+                }}
+              />
+              {value.charAt(0).toUpperCase() + value.slice(1)}
+            </label>
+          </Fragment>
+        ))}
       </fieldset>
-
       {sourceCategory !== null && (
         <div>
           <label htmlFor="source-select__label"></label>
@@ -97,7 +96,7 @@ const SourceSelectRaw = ({
             name="envelope-select"
             id="envelope-select"
             onChange={handleSelectedSourceChange}
-            value={selectedOption}
+            value={selectedSourceId}
           >
             {envelopes.length === 0 && sourceCategory === "envelope" ? (
               <option value="">No envelopes to select from.</option>
@@ -110,7 +109,10 @@ const SourceSelectRaw = ({
                   <option
                     key={envelope.id}
                     value={envelope.id}
-                    disabled={envelope.currentAmount < newExpenseAmount || envelope.currentAmount === 0} // disabled if currentAmount is less than newExpenseAmount
+                    disabled={
+                      envelope.currentAmount < newExpenseAmount ||
+                      envelope.currentAmount === 0
+                    } // disabled if currentAmount is less than newExpenseAmount
                   >
                     {envelope.name} ({fakeCurrency}
                     {envelope.currentAmount} left)
@@ -123,14 +125,22 @@ const SourceSelectRaw = ({
                   <option value="">Select savings type</option>
                   <option
                     value={-1} //?
-                    disabled={savings.shortTermSavings.currentAmount < newExpenseAmount || savings.shortTermSavings.currentAmount === 0}
+                    disabled={
+                      savings.shortTermSavings.currentAmount <
+                        newExpenseAmount ||
+                      savings.shortTermSavings.currentAmount === 0
+                    }
                   >
                     Short term savings ({fakeCurrency}
                     {savings.shortTermSavings.currentAmount} left)
                   </option>
                   <option
                     value={-2}
-                    disabled={savings.longTermSavings.currentAmount < newExpenseAmount || savings.longTermSavings.currentAmount === 0}
+                    disabled={
+                      savings.longTermSavings.currentAmount <
+                        newExpenseAmount ||
+                      savings.longTermSavings.currentAmount === 0
+                    }
                   >
                     Long term savings ({fakeCurrency}
                     {savings.longTermSavings.currentAmount} left)

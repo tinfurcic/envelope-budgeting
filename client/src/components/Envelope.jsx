@@ -21,9 +21,8 @@ const Envelope = () => {
       <div className="envelope-overview__nav-back">
         <Button
           type="button"
-          className="button"
+          className="button button--back"
           onClick={() => navigate("/envelopes")}
-          variant="back"
           isDisabled={false}
         >
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
@@ -34,9 +33,8 @@ const Envelope = () => {
         <div className="envelope-overview__heading__edit-icon">
           <Button
             type="button"
-            className="button"
+            className="button button--edit"
             onClick={null}
-            variant="edit"
             isDisabled={false}
           >
             <img src={editIcon} alt="Edit Icon" />

@@ -15,9 +15,8 @@ const EnvelopesPage = () => {
         <h2 className="envelopes-page__heading">My Envelopes</h2>
         <Button
           type="button"
-          className="button"
+          className="button button--blue"
           onClick={() => navigate("/create")}
-          variant="blue"
           isDisabled={false}
         >
           New Envelope
@@ -51,9 +50,8 @@ const EnvelopesPage = () => {
       <div className="new-expense-button">
         <Button
           type="button"
-          className="button"
+          className="button button--new-expense"
           onClick={() => navigate("/expense")}
-          variant="new-expense"
           isDisabled={false}
         >
           <img src={expenseIcon} alt="New expense" />

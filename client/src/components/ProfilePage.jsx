@@ -31,9 +31,8 @@ const ProfilePage = () => {
             <div className="funds__category__edit-icon">
               <Button
                 type="button"
-                className="button"
+                className="button button--edit"
                 onClick={null}
-                variant="edit"
                 isDisabled={false}
               >
                 <img src={editIcon} alt="Edit Icon" />
@@ -62,9 +61,8 @@ const ProfilePage = () => {
             <div className="funds__category__edit-icon">
               <Button
                 type="button"
-                className="button"
+                className="button button--edit"
                 onClick={null}
-                variant="edit"
                 isDisabled={false}
               >
                 <img src={editIcon} alt="Edit Icon" />

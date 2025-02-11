@@ -64,7 +64,10 @@ export const updateSavingsType = async (userId, savingsType, currentAmount) => {
       .doc(userId)
       .collection("savings")
       .doc(savingsType);
-    await savingsRef.set({ currentAmount: parseFloat(currentAmount) }, { merge: true });
+    await savingsRef.set(
+      { currentAmount: parseFloat(currentAmount) },
+      { merge: true },
+    );
 
     return { [savingsType]: currentAmount };
   } catch (error) {

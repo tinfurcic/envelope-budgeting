@@ -9,9 +9,8 @@ const GoalsPage = () => {
         <h1 className="goals-page__heading">My Goals</h1>
         <Button
           type="button"
-          className="button"
+          className="button button--blue"
           onClick={null}
-          variant="blue"
           isDisabled={false}
         >
           New Goal

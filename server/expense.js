@@ -167,9 +167,11 @@ export const createExpense = async (
 
         // Deduct from savings (store new values to update after loop)
         if (source.type === "shortTermSavings") {
-          newShortTermSavings = savingsData.currentAmount - Number(source.amount);
+          newShortTermSavings =
+            savingsData.currentAmount - Number(source.amount);
         } else {
-          newLongTermSavings = savingsData.currentAmount - Number(source.amount);
+          newLongTermSavings =
+            savingsData.currentAmount - Number(source.amount);
         }
       }
 
@@ -385,9 +387,11 @@ export const deleteExpense = async (userId, expenseId) => {
 
       for (const { source, savingsData } of savingsDocs) {
         if (source.type === "shortTermSavings") {
-          newShortTermSavings = savingsData.currentAmount + Number(source.amount);
+          newShortTermSavings =
+            savingsData.currentAmount + Number(source.amount);
         } else {
-          newLongTermSavings = savingsData.currentAmount + Number(source.amount);
+          newLongTermSavings =
+            savingsData.currentAmount + Number(source.amount);
         }
       }
 
