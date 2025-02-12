@@ -1,18 +1,10 @@
-.hidden-select {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
 .source-button-group {
+  // mixin?
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
-  gap: 20px;
+  justify-content: space-around;
+  row-gap: 1rem;
+  column-gap: 0.25rem;
   margin-top: 1rem;
 }

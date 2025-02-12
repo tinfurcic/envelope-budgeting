@@ -160,6 +160,10 @@ const SourceCheckboxRaw = ({
             </label>
           </Fragment>
         ))}
+      </fieldset>
+
+      <fieldset>
+        <legend>Enter Amounts</legend>
         {newExpenseSources.map((source) => {
           let key = source.id;
           let name = source.name;

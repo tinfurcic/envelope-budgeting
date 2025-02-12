@@ -60,12 +60,14 @@ usersRouter.post("/", async (req, res) => {
       id: -1,
       currentAmount: 0,
       name: "Short Term Savings",
+      color: "#000080",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("savings").doc("longTermSavings"), {
       id: -2,
       currentAmount: 0,
       name: "Long Term Savings",
+      color: "#000080",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

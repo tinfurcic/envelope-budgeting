@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import PickSingleSource from "./PickSingleSource";
 import backArrow from "../media/back-arrow.png";
-import SourceCheckboxRaw from "./SourceCheckboxRaw";
+import PickMultipleSources from "./PickMultipleSources";
 
 const NewExpensePage = () => {
   const { envelopes, savings, loadingExpenses, syncingExpenses, date } =
@@ -153,7 +153,7 @@ const NewExpensePage = () => {
       >
         <div className="form-item">
           <label className="form-item__label" htmlFor="amount">
-            Amount
+            {`${allowMultipleSources ? "Total amount" : "Amount"}`}
           </label>
           <div className="form-item__input-with-currency">
             <span className="form-item__input-with-currency__currency">
@@ -205,7 +205,7 @@ const NewExpensePage = () => {
           ) : (
             <>
               <div className="source-mode">
-                <p>Source</p>
+                <p>{allowMultipleSources ? "Sources" : "Source"}</p>
                 <div>
                   <input
                     type="checkbox"
@@ -216,9 +216,9 @@ const NewExpensePage = () => {
                   <label htmlFor="sources">Allow multiple sources</label>
                 </div>
               </div>
-              
+
               {allowMultipleSources ? (
-                <SourceCheckboxRaw
+                <PickMultipleSources
                   newExpenseAmount={newExpenseAmount}
                   newExpenseSources={newExpenseSources}
                   setNewExpenseSources={setNewExpenseSources}

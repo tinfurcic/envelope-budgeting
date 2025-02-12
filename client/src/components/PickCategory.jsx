@@ -2,18 +2,17 @@ import React, { Fragment, useState } from "react";
 import Button from "./Button";
 
 const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
-
   const [activeCategory, setActiveCategory] = useState("");
 
   const handleClick = (category) => {
     handleCategoryChange(category);
     setActiveCategory(category);
-  }
+  };
 
   return (
     <>
       {/* Hidden raw radio buttons for accessibility */}
-      <fieldset className="hidden-radio">
+      <fieldset className="hidden-from-sight">
         <legend>Source</legend>
         {["envelope", "savings"].map((category) => (
           <Fragment key={category}>
@@ -33,7 +32,11 @@ const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
       </fieldset>
 
       {/* Styled buttons replacing radio buttons visually */}
-      <div className="category-button-group" role="group" aria-label="Select Category">
+      <div
+        className="category-button-group"
+        role="group"
+        aria-label="Select Category"
+      >
         {["envelope", "savings"].map((category) => (
           <Button
             key={category}
@@ -44,7 +47,7 @@ const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
           </Button>
-          ))}
+        ))}
       </div>
     </>
   );
