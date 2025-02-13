@@ -115,6 +115,80 @@ export const updateEnvelope = async (
   newOrder,
 ) => {
   try {
+    const userRef = db.collection("users").doc(userId);
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+    const envelopesRef = userRef.collection("envelopes");
+
+    const envelopeMetadataDoc = await envelopeMetadataRef.get();
+    if (!envelopeMetadataDoc.exists) {
+      throw new Error("Metadata not found.");
+    }
+
+    const { count } = envelopeMetadataDoc.data();
+
+    // Fetch the envelope to get its current `order`
+    const envelopeDoc = await envelopesRef.doc(envelopeId).get();
+    if (!envelopeDoc.exists) {
+      throw new Error("Envelope not found.");
+    }
+
+    const envelopeData = envelopeDoc.data();
+    const currentOrder = envelopeData.order;
+
+    // Validate newOrder (using count from metadata)
+    if (newOrder < 1 || newOrder > count || !Number.isInteger(newOrder)) {
+      throw new Error(
+        `Invalid order number. It must be a positive integer between 1 and ${count}.`,
+      );
+    }
+
+    // If the order hasn't changed, just update the envelope
+    if (newOrder === currentOrder) {
+      const updates = {
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      if (newName) updates.name = newName;
+      if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
+      if (newCurrentAmount !== undefined)
+        updates.currentAmount = parseFloat(newCurrentAmount);
+      if (newDescription !== undefined) updates.description = newDescription;
+      if (newColor !== undefined) updates.color = newColor;
+
+      await envelopesRef.doc(envelopeId).update(updates);
+      return { id: envelopeId, ...updates };
+    }
+
+    const batch = db.batch();
+
+    if (newOrder < currentOrder) {
+      // Move the envelope to an earlier position
+      const envelopesToUpdate = await envelopesRef
+        .where("order", ">=", newOrder)
+        .where("order", "<", currentOrder)
+        .get();
+
+      envelopesToUpdate.forEach((doc) => {
+        const docRef = doc.ref;
+        batch.update(docRef, { order: doc.data().order + 1 }); // Increment the order for envelopes moving down
+      });
+    } else if (newOrder > currentOrder) {
+      // Move the envelope to a later position
+      const envelopesToUpdate = await envelopesRef
+        .where("order", ">", currentOrder)
+        .where("order", "<=", newOrder)
+        .get();
+
+      envelopesToUpdate.forEach((doc) => {
+        const docRef = doc.ref;
+        batch.update(docRef, { order: doc.data().order - 1 }); // Decrement the order for envelopes moving up
+      });
+    }
+
+    // Update the target envelope's order to the new order
+    const envelopeRef = envelopesRef.doc(envelopeId);
+    batch.update(envelopeRef, { order: newOrder });
+
+    // Other updates
     const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     if (newName) updates.name = newName;
     if (newBudget !== undefined) updates.budget = parseFloat(newBudget);
@@ -122,18 +196,13 @@ export const updateEnvelope = async (
       updates.currentAmount = parseFloat(newCurrentAmount);
     if (newDescription !== undefined) updates.description = newDescription;
     if (newColor !== undefined) updates.color = newColor;
-    if (newOrder !== undefined) updates.order = newOrder;
 
-    const envelopeRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("envelopes")
-      .doc(envelopeId);
-    await envelopeRef.update(updates);
+    batch.update(envelopeRef, updates);
+    await batch.commit();
 
-    return { id: envelopeId, ...updates };
+    return { id: envelopeId, ...updates, order: newOrder };
   } catch (error) {
-    console.error("Error updating envelope (Admin SDK):", error);
+    console.error("Error updating envelope:", error);
     throw new Error("Failed to update the envelope.");
   }
 };
@@ -151,13 +220,33 @@ export const deleteEnvelope = async (userId, envelopeId) => {
 
     const { count } = envelopeMetadataDoc.data();
 
-    const envelopeRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("envelopes")
-      .doc(envelopeId);
+    const envelopeRef = userRef.collection("envelopes").doc(envelopeId);
+
+    // Fetch the envelope to get its `order` value
+    const envelopeDoc = await envelopeRef.get();
+    const envelopeData = envelopeDoc.data();
+
+    if (!envelopeData) {
+      throw new Error("Envelope not found.");
+    }
+
+    const envelopeOrder = envelopeData.order;
+
+    // Get all envelopes with `order` greater than the deleted envelope
+    const envelopesRef = userRef.collection("envelopes");
+    const envelopesSnapshot = await envelopesRef
+      .where("order", ">", envelopeOrder)
+      .get();
 
     const batch = db.batch();
+
+    // Update `order` for envelopes that need to shift
+    envelopesSnapshot.docs.forEach((doc) => {
+      const envelopeToUpdateRef = doc.ref;
+      const updatedOrder = doc.data().order - 1; // Shift order down by 1
+      batch.update(envelopeToUpdateRef, { order: updatedOrder });
+    });
+
     batch.delete(envelopeRef);
     batch.update(envelopeMetadataRef, {
       count: count - 1,

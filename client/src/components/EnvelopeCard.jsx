@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const EnvelopeCard = ({ envelope }) => {
   const containerRef = useRef(null);
   const navigate = useNavigate();
-  const { name, budget, currentAmount, id } = envelope;
+  const { name, budget, currentAmount, color, id } = envelope;
 
   const currency = "€"; // this should be a global setting, somewhere
 
@@ -30,6 +30,7 @@ const EnvelopeCard = ({ envelope }) => {
       className="envelope-card"
       ref={containerRef}
       onClick={() => navigate(`/envelopes/${id}`)}
+      style={{ backgroundColor: color }}
     >
       <span className="envelope-card__name">{name}</span>
       <div className="envelope-card__amount-left">

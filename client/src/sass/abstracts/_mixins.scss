@@ -93,5 +93,22 @@
         }
       }
     }
+
+    &__colors {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    &__color-box {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: none;
+      cursor: pointer;
+
+      &.active {
+        outline: 1px solid black;
+      }
+    }
   }
 }

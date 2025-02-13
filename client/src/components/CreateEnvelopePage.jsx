@@ -3,6 +3,7 @@ import { createEnvelope } from "../util/axios/createFunctions";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
+import Colors from "./Colors";
 
 const CreateEnvelopePage = () => {
   const navigate = useNavigate();
@@ -170,6 +171,13 @@ const CreateEnvelopePage = () => {
             </div>
           </div>
         )}
+
+        <div className="form-item">
+          <Colors
+            newEnvelopeColor={newEnvelopeColor}
+            setNewEnvelopeColor={setNewEnvelopeColor}
+          />
+        </div>
 
         <div className="form-item">
           <label className="form-item__label" htmlFor="description">
