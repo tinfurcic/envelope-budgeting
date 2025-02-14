@@ -1,13 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
 import expenseIcon from "../media/expense.png";
+import { debounce } from "../util/debounce";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
   const navigate = useNavigate();
+  
+  const [isButtonOverlapping, setIsButtonOverlapping] = useState(false);
+
+  useEffect(() => {
+    const envelopesPage = document.querySelector(".envelopes-page");
+    const button = document.querySelector(".new-expense-button");
+    const envelopeCards = document.querySelectorAll(".envelope-card");
+
+    const checkOverlap = () => {
+      const buttonRect = button.getBoundingClientRect();
+
+      let overlapDetected = false;
+      envelopeCards.forEach((card) => {
+        const cardRect = card.getBoundingClientRect();
+
+        if (
+          buttonRect.top < cardRect.bottom &&
+          buttonRect.bottom > cardRect.top &&
+          buttonRect.left < cardRect.right &&
+          buttonRect.right > cardRect.left
+        ) {
+          overlapDetected = true;
+        }
+      });
+
+      setIsButtonOverlapping(overlapDetected);
+    };
+
+    const debouncedCheckOverlap = debounce(checkOverlap, 500);
+
+    envelopesPage.addEventListener("scroll", debouncedCheckOverlap);
+    window.addEventListener("resize", debouncedCheckOverlap);
+
+    // Initial check
+    debouncedCheckOverlap();
+
+    return () => {
+      envelopesPage.removeEventListener("scroll", debouncedCheckOverlap);
+      window.removeEventListener("resize", debouncedCheckOverlap);
+    };
+  }, [envelopes]);
 
   return (
     <div className="envelopes-page">
@@ -23,7 +65,7 @@ const EnvelopesPage = () => {
         </Button>
       </div>
 
-      {/* Add grid/slider view button*/}
+      {/* Add grid/slider view button */}
       <div className="envelopes-page__envelopes">
         {loadingEnvelopes ? (
           <span className="envelopes-page__loading-message">
@@ -47,7 +89,8 @@ const EnvelopesPage = () => {
           </div>
         )}
       </div>
-      <div className="new-expense-button">
+
+      <div className={`new-expense-button ${isButtonOverlapping ? 'overlapping' : ''}`}>
         <Button
           type="button"
           className="button button--new-expense"
