@@ -32,19 +32,18 @@
 .new-expense-button {
   position: absolute;
   right: 1rem;
-  bottom: 5.125rem;
-  z-index: 20;
-
-}
-
-.new-expense-button {
-  position: absolute;
-  right: 1rem;
-  bottom: 5.125rem;
   z-index: 20;
   transition: opacity 0.3s ease;
 
   &.overlapping {
     opacity: 0.5;
+  }
+
+  &.large-margin {
+    bottom: 5.125rem;
+  }
+
+  &.small-margin {
+    bottom: 1rem;
   }
 }

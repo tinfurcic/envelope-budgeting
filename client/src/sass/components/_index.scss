@@ -6,12 +6,18 @@
 @forward "BudgetOverview";
 @forward "ProgressBar";
 @forward "TodaysExpenses";
+@forward "ExpensesTable";
 
 @forward "EnvelopesPage";
 @forward "EnvelopeCard";
 @forward "Envelope";
 @forward "CreateEnvelopePage";
+
 @forward "NewExpensePage";
+@forward "PickSingleSource";
+@forward "PickSourceInCategory";
+@forward "PickCategory";
+@forward "PickMultipleSources";
 
 @forward "GoalsPage";
 @forward "Goal";
@@ -22,8 +28,3 @@
 @forward "Login";
 
 @forward "Button";
-
-@forward "PickSingleSource";
-@forward "PickSourceInCategory";
-@forward "PickCategory";
-@forward "PickMultipleSources";

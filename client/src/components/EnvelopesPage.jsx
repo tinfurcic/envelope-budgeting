@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { debounce } from "../util/debounce";
+import useScreenSize from "../hooks/useScreenSize";
+import expenseIcon from "../media/expense.png";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
-import expenseIcon from "../media/expense.png";
-import { debounce } from "../util/debounce";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
+  const { isSmall } = useScreenSize();
   const navigate = useNavigate();
-  
+
   const [isButtonOverlapping, setIsButtonOverlapping] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ const EnvelopesPage = () => {
   return (
     <div className="envelopes-page">
       <div className="envelopes-page__header">
-        <h2 className="envelopes-page__heading">My Envelopes</h2>
+        <h1 className="envelopes-page__heading">My Envelopes</h1>
         <Button
           type="button"
           className="button button--blue"
@@ -90,10 +92,12 @@ const EnvelopesPage = () => {
         )}
       </div>
 
-      <div className={`new-expense-button ${isButtonOverlapping ? 'overlapping' : ''}`}>
+      <div
+        className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
+      >
         <Button
           type="button"
-          className="button button--new-expense"
+          className={`button button--new-expense`}
           onClick={() => navigate("/expense")}
           isDisabled={false}
         >

@@ -1,16 +1,52 @@
 .envelope-overview {
-  &__nav-back {
-    padding-top: 1rem;
-    padding-bottom: 0.625rem;
+  &__header {
+    background-color: var(--envelope-color);
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
   }
 
-  &__heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  &__name {
+    margin: 0;
+    padding: 0.5rem 0 0 1rem;
 
-    &__edit-icon {
-      margin-left: auto;
-    }
+    font-size: 3rem;
+    font-weight: 400;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__subheading {
+    margin: 0.5rem 0;
+  }
+
+  &__description {
+    margin: 0;
+    padding: 0 0 0.5rem 1rem;
+  }
+
+  &__back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+
+    font-size: 1.5rem;
+    height: 2rem;
+    width: 2rem;
+
+    border: 2px solid black;
+    border-radius: 5px;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: 2;
   }
 }

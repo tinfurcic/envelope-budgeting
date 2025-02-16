@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Button from "./Button";
-import backArrow from "../media/back-arrow.png";
-import editIcon from "../media/edit-icon.png";
+import ProgressBar from "./ProgressBar";
+import ExpensesTable from "./ExpensesTable";
 
 const Envelope = () => {
   const { id } = useParams();
-  const { envelopes } = useOutletContext();
+  const { envelopes, expenses, loadingExpenses, syncingExpenses } =
+    useOutletContext();
   const navigate = useNavigate();
 
   const envelope = envelopes.find((env) => env.id.toString() === id);
+
+  const [latestExpenses, setLatestExpenses] = useState(null);
+
+  useEffect(() => {
+    if (expenses) {
+      setLatestExpenses(
+        expenses.filter((expense) =>
+          expense.sources.some((source) => source.id === envelope.id),
+        ),
+      );
+    }
+  }, [expenses, envelope]);
 
   if (!envelope) {
     return <span>Envelope not found.</span>;
@@ -18,43 +30,49 @@ const Envelope = () => {
 
   return (
     <div className="envelope-overview">
-      <div className="envelope-overview__nav-back">
-        <Button
+      <header
+        className="envelope-overview__header"
+        style={{ "--envelope-color": envelope.color }}
+      >
+        <button
           type="button"
-          className="button button--back"
+          className="envelope-overview__back-button"
           onClick={() => navigate("/envelopes")}
-          isDisabled={false}
         >
-          <img src={backArrow} alt="Back" width="20" /> to My Envelopes
-        </Button>
-      </div>
-      <h1 className="envelope-overview__heading">
-        {envelope.name}
-        <div className="envelope-overview__heading__edit-icon">
-          <Button
-            type="button"
-            className="button button--edit"
-            onClick={null}
-            isDisabled={false}
-          >
-            <img src={editIcon} alt="Edit Icon" />
-          </Button>
+          X
+        </button>
+        <h1 className="envelope-overview__name">{envelope.name}</h1>
+        <p className="envelope-overview__description">
+          {envelope.description || "No description"}
+        </p>
+      </header>
+      <main>
+        <div className="envelope-overview__overview">
+          <h2 className="envelope-overview__subheading">Budget overview</h2>
+          <ProgressBar
+            budget={envelope.budget}
+            amount={envelope.currentAmount}
+          />
         </div>
-      </h1>
-      <p className="envelope-overview__description">
-        Envelope description here
-      </p>
-      <p>Budget: ${envelope.budget}</p>
-      <p>Current Amount: ${envelope.currentAmount}</p>
-      <div>
-        {Object.entries(envelope).map(([key, value]) => (
-          <p key={key}>{`${key}: ${value}`}</p>
-        ))}
-      </div>
+        <div className="envelope-overview__latest-expenses">
+          <h2 className="envelope-overview__subheading">Latest expenses</h2>
+          {loadingExpenses || latestExpenses === null ? (
+            <p>Loading expenses...</p>
+          ) : syncingExpenses ? (
+            <p>Syncing expenses...</p>
+          ) : latestExpenses.length === 0 ? (
+            <p>No expenses this month.</p>
+          ) : (
+            <ExpensesTable
+              dateWindow="latest"
+              expenses={latestExpenses}
+              envelope={envelope}
+            />
+          )}
+        </div>
 
-      <h2 className="envelope-overview__this-month-expenses">
-        This month's expenses
-      </h2>
+        <h2 className="envelope-overview__subheading">This month's expenses</h2>
+      </main>
     </div>
   );
 };
