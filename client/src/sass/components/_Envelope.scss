@@ -1,3 +1,6 @@
+@use "../base/global";
+@use "../base/typography";
+
 .envelope-overview {
   &__header {
     background-color: var(--envelope-color);
@@ -7,18 +10,44 @@
     margin-left: -50vw;
     margin-right: -50vw;
     width: 100vw;
+    min-height: 7.5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    row-gap: 1rem;
   }
 
   &__name {
-    margin: 0;
-    padding: 0.5rem 0 0 1rem;
+    margin: 0 4rem 0 1rem;
+    padding: 0.5rem 0 0 0;
 
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 400;
+    line-height: 1.5; 
+    letter-spacing: typography.$letter-spacing-normal; // should be globally consistent
 
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    cursor: default;
+  }
+
+  &__name-input {
+    margin: 0 4rem 0 1rem;
+    padding: 0.5rem 0 0 0;
+    border: none;
+    border-bottom: 2px solid black;
+    font-size: 2.5rem;
+    line-height: 1.5;
+    letter-spacing: typography.$letter-spacing-normal; // should be globally consistent
+    background-color: transparent;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__subheading {
@@ -26,8 +55,27 @@
   }
 
   &__description {
-    margin: 0;
-    padding: 0 0 0.5rem 1rem;
+    margin: 0 4rem 0 0;
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+
+  &__description-input {
+    margin: 0 4rem 0.5rem 1rem;
+    padding: 0.125rem;
+    background-color: transparent;
+    border: none;
+    border: 1px dashed black;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__color-input {
+    padding: 0.5rem;
+    background-color: global.$background-color;
+    margin-bottom: 1rem;
   }
 
   &__back-button {
@@ -43,7 +91,29 @@
     height: 2rem;
     width: 2rem;
 
-    border: 2px solid black;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow:
+    rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  &__header-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+
+    font-size: 1.5rem;
+    height: 2rem;
+    width: 2rem;
+
     border-radius: 5px;
     background-color: transparent;
     cursor: pointer;

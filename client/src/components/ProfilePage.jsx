@@ -33,7 +33,6 @@ const ProfilePage = () => {
                 type="button"
                 className="button button--edit"
                 onClick={null}
-                isDisabled={false}
               >
                 <img src={editIcon} alt="Edit Icon" />
               </Button>
@@ -63,7 +62,6 @@ const ProfilePage = () => {
                 type="button"
                 className="button button--edit"
                 onClick={null}
-                isDisabled={false}
               >
                 <img src={editIcon} alt="Edit Icon" />
               </Button>

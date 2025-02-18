@@ -23,7 +23,6 @@ const TodaysExpenses = () => {
           type="button"
           className="button button--blue"
           onClick={null}
-          isDisabled={false}
         >
           All expenses
         </Button>

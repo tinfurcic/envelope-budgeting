@@ -34,6 +34,7 @@ usersRouter.post("/", async (req, res) => {
     batch.set(userRef.collection("envelopes").doc("metadata"), {
       nextEnvelopeId: 1,
       count: 0,
+      budgetSum: 0,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("expenses").doc("metadata"), {

@@ -11,7 +11,6 @@ const GoalsPage = () => {
           type="button"
           className="button button--blue"
           onClick={null}
-          isDisabled={false}
         >
           New Goal
         </Button>

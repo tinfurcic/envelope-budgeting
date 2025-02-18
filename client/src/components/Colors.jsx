@@ -1,27 +1,38 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getMatchingColors } from "../util/getMatchingColors";
 
-const Colors = ({ newEnvelopeColor, setNewEnvelopeColor }) => {
+const Colors = ({ newEnvelopeColor, setNewEnvelopeColor, currentColor = "#FFFFFF" }) => {
   const colors = useMemo(() => getMatchingColors("#e5a0a0"), []);
+
+  const [currentColorIndex, setCurrentColorIndex] = useState(null);
+
+  useEffect(() => {
+    if (colors) {
+      setCurrentColorIndex(colors.indexOf(currentColor));
+    }
+  }, [colors, currentColor, setCurrentColorIndex]);
 
   const handleClick = (color) => {
     setNewEnvelopeColor(color);
   };
 
   useEffect(() => {
-    if (colors[0]) {
-      setNewEnvelopeColor(colors[0]);
+    if (colors) {
+      if (currentColorIndex === -1) {
+        setNewEnvelopeColor(colors[0]);
+      } else {
+        setNewEnvelopeColor(colors[currentColorIndex]);
+      }
     }
-  }, [setNewEnvelopeColor, colors]);
+  }, [colors, currentColorIndex, setNewEnvelopeColor]);
 
   return (
     <>
-      <p>Color</p>
-      <div className="form-item__colors">
+      <div className="colors">
         {colors.map((color) => (
           <button
             type="button"
-            className={`form-item__color-box ${newEnvelopeColor === color ? "active" : ""}`}
+            className={`color-box ${newEnvelopeColor === color ? "active" : ""}`}
             style={{ backgroundColor: color }}
             key={color}
             onClick={() => handleClick(color)}

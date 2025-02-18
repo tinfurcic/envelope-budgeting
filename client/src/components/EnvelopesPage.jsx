@@ -61,7 +61,6 @@ const EnvelopesPage = () => {
           type="button"
           className="button button--blue"
           onClick={() => navigate("/create")}
-          isDisabled={false}
         >
           New Envelope
         </Button>
@@ -99,7 +98,6 @@ const EnvelopesPage = () => {
           type="button"
           className={`button button--new-expense`}
           onClick={() => navigate("/expense")}
-          isDisabled={false}
         >
           <img src={expenseIcon} alt="New expense" />
         </Button>

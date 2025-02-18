@@ -135,7 +135,6 @@ const NewExpensePage = () => {
           type="button"
           className="button button--back"
           onClick={() => navigate("/envelopes")}
-          isDisabled={false}
         >
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
         </Button>
@@ -152,15 +151,15 @@ const NewExpensePage = () => {
         autoComplete="off"
       >
         <div className="form-item">
-          <label className="form-item__label" htmlFor="amount">
+          <label className="form-label" htmlFor="amount">
             {`${allowMultipleSources ? "Total amount" : "Amount"}`}
           </label>
-          <div className="form-item__input-with-currency">
-            <span className="form-item__input-with-currency__currency">
+          <div className="input-with-currency">
+            <span className="input-with-currency__currency">
               {fakeCurrency}
             </span>
             <input
-              className="form-item__input-with-currency__input"
+              className="form-input input-with-currency__input"
               type="text"
               value={newExpenseAmount}
               onChange={(e) => handleValueChange(e, setNewExpenseAmount)}
@@ -171,12 +170,12 @@ const NewExpensePage = () => {
         </div>
 
         <div className="form-item">
-          <label className="form-item__label" htmlFor="date">
+          <label className="form-label" htmlFor="date">
             Date
           </label>
           <div className="form-item__date">
             <input
-              className="form-item__date__input"
+              className="form-item__date__input form-input"
               type="date"
               value={newExpenseDate}
               onChange={handleDateChange}
@@ -199,19 +198,20 @@ const NewExpensePage = () => {
 
         <div className="form-item">
           {loadingExpenses ? (
-            <p>Loading data...</p>
+            <p className="form-p">Loading data...</p>
           ) : syncingExpenses ? (
-            <p>Syncing data...</p>
+            <p className="form-p">Syncing data...</p>
           ) : (
             <>
               <div className="source-mode">
-                <p>{allowMultipleSources ? "Sources" : "Source"}</p>
+                <p className="form-p">{allowMultipleSources ? "Sources" : "Source"}</p>
                 <div>
                   <input
                     type="checkbox"
                     id="sources"
                     checked={allowMultipleSources}
                     onChange={handleSourcesCheckboxChange}
+                    className="source-input"
                   />
                   <label htmlFor="sources">Allow multiple sources</label>
                 </div>
@@ -240,11 +240,11 @@ const NewExpensePage = () => {
         </div>
 
         <div className="form-item">
-          <label className="form-item__label" htmlFor="description">
+          <label className="form-label" htmlFor="description">
             Description (optional)
           </label>
           <input
-            className="form-item__input"
+            className="form-input"
             type="text"
             value={newExpenseDescription}
             onChange={(e) => setNewExpenseDescription(e.target.value)}

@@ -229,15 +229,15 @@ const PickMultipleSources = ({
           </div>
           {newExpenseSources.map((source) => (
             <div key={source.id}>
-              <label htmlFor={`amount-${source.id}`}>
+              <label htmlFor={`amount-${source.id}`} className="form-label">
                 Amount from {source.name}
               </label>
-              <div className="form-item__input-with-currency">
-                <span className="form-item__input-with-currency__currency">
+              <div className="input-with-currency">
+                <span className="input-with-currency__currency">
                   {fakeCurrency}
                 </span>
                 <input
-                  className="form-item__input-with-currency__input"
+                  className="form-input input-with-currency__input"
                   type="text"
                   value={source.amount || ""}
                   onChange={(e) => handleSourceAmountsChange(e, source.id)}
