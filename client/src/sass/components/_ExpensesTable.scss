@@ -1,0 +1,36 @@
+.expenses-table {
+  border-collapse: collapse;
+  width: 100%;
+
+  &__header,
+  &__cell {
+    border-left: 2px solid #333;
+    padding: 0.25rem;
+    text-align: center;
+  }
+
+  &__header {
+    border-bottom: 2px solid #333;
+  }
+
+  &__cell {
+    border-bottom: 1px solid #333;
+  }
+
+  /* Remove the outer borders */
+  &__header:first-child,
+  &__cell:first-child {
+    border-left: none;
+  }
+  &__row:first-child .header,
+  &__row:first-child .cell {
+    border-top: none;
+  }
+  &__row:last-child .cell {
+    border-bottom: none;
+  }
+
+  &__head {
+    font-size: 1.125rem;
+  }
+}

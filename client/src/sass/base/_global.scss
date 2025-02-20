@@ -10,7 +10,6 @@ $primary-yellow: #bcbc10;
 $pale-light-yellow: #f6f6d5;
 $border-color: hsl(180, 14%, 70%);
 
-
 * {
   box-sizing: border-box;
 }
@@ -28,10 +27,34 @@ body {
   background-color: $background-color;
 }
 
+h1,
+h2 {
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 1.375rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
 .no-margin {
   margin: 0;
 }
 
 .no-margin-top {
   margin-top: 0;
+}
+
+.hidden-from-sight {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }

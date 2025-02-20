@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { useAuth } from "../components/AuthContext";
 
 const useEnvelopesListener = () => {
   const { user } = useAuth();
   const [envelopes, setEnvelopes] = useState([]);
   const [nextEnvelopeId, setNextEnvelopeId] = useState(null);
+  const [budgetSum, setBudgetSum] = useState(null);
   const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
   const [syncingEnvelopes, setSyncingEnvelopes] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -15,21 +16,24 @@ const useEnvelopesListener = () => {
     if (!user) return;
 
     const envelopesRef = collection(db, "users", user.uid, "envelopes");
+    const envelopesQuery = query(envelopesRef);
 
-    const unsubscribe = onSnapshot(envelopesRef, (snapshot) => {
+    const unsubscribe = onSnapshot(envelopesQuery, (snapshot) => {
       setSyncingEnvelopes(true);
 
       let isNewer = false;
       let newNextEnvelopeId = null;
+      let newBudgetSum = null;
+      let envelopesList = [];
 
-      const envelopeData = snapshot.docs
-        .map((doc) => {
-          const data = doc.data();
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
 
-          if (doc.id === "metadata") {
-            newNextEnvelopeId = data.nextEnvelopeId ?? null;
-            return null; // Skip including metadata in envelopes state
-          }
+        if (doc.id === "metadata") {
+          newNextEnvelopeId = data.nextEnvelopeId ?? null;
+          newBudgetSum = data.budgetSum ?? null;
+        } else {
+          envelopesList.push({ id: doc.id, ...data });
 
           if (
             data.updatedAt &&
@@ -37,14 +41,16 @@ const useEnvelopesListener = () => {
           ) {
             isNewer = true;
           }
+        }
+      });
 
-          return { id: doc.id, ...data };
-        })
-        .filter(Boolean); // Remove null values (metadata)
+      envelopesList.sort((a, b) => a.order - b.order);
 
-      setEnvelopes(envelopeData);
+      setEnvelopes(envelopesList);
       setNextEnvelopeId(newNextEnvelopeId);
+      setBudgetSum(newBudgetSum);
       setLoadingEnvelopes(false);
+
       if (isNewer) {
         setLastUpdated(Date.now());
       } else {
@@ -55,60 +61,13 @@ const useEnvelopesListener = () => {
     return () => unsubscribe();
   }, [user, lastUpdated]);
 
-  return { envelopes, nextEnvelopeId, loadingEnvelopes, syncingEnvelopes };
+  return {
+    envelopes,
+    nextEnvelopeId,
+    budgetSum,
+    loadingEnvelopes,
+    syncingEnvelopes,
+  };
 };
 
 export default useEnvelopesListener;
-
-/*
-import { useEffect, useState } from "react";
-import { db } from "../firebase-config";
-import { collection, onSnapshot } from "firebase/firestore";
-import { useAuth } from "../components/AuthContext";
-
-const useEnvelopesListener = () => {
-  const { user } = useAuth();
-  const [envelopes, setEnvelopes] = useState([]);
-  const [loadingEnvelopes, setLoadingEnvelopes] = useState(true);
-  const [syncingEnvelopes, setSyncingEnvelopes] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null); // ✅ Track last update
-
-  useEffect(() => {
-    if (!user) return;
-
-    const envelopesRef = collection(db, "users", user.uid, "envelopes");
-
-    const unsubscribe = onSnapshot(envelopesRef, (snapshot) => {
-      let isNewer = false;
-
-      const envelopeData = snapshot.docs
-        .filter(doc => doc.id !== 'metadata')
-        .map(doc => {
-          const data = doc.data();
-          if (data.updatedAt && (!lastUpdated || data.updatedAt > lastUpdated)) {
-            isNewer = true;
-          }
-          return { id: doc.id, ...data };
-        });
-
-      if (isNewer) {
-        setSyncingEnvelopes(true);
-        setLastUpdated(Date.now());
-      }
-      
-      setEnvelopes(envelopeData);
-      setLoadingEnvelopes(false);
-
-      if (!isNewer) {
-        setSyncingEnvelopes(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [user, lastUpdated]); // Depend on lastUpdated
-
-  return { envelopes, loadingEnvelopes, syncingEnvelopes };
-};
-
-export default useEnvelopesListener;
-*/

@@ -70,6 +70,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           id="email"
           name="email"
+          className="form-input"
         />
         <label htmlFor="password">Password:</label>
         <input
@@ -78,14 +79,10 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           id="password"
           name="password"
+          className="form-input"
         />
         <div className="login-page__form__submit-btn">
-          <Button
-            type="submit"
-            className="button button--login"
-            onClick={null}
-            isDisabled={false}
-          >
+          <Button type="submit" className="button button--login" onClick={null}>
             {isNewUser ? "Sign up" : "Log in"}
           </Button>
         </div>

@@ -5,7 +5,7 @@ const Button = ({
   className,
   extraStyle,
   onClick,
-  isDisabled,
+  isDisabled = false,
   children,
 }) => {
   return (

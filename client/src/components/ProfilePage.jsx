@@ -2,7 +2,7 @@ import React from "react";
 import { useOutletContext } from "react-router-dom";
 import CurrencyDropdown from "./CurrencyDropdown";
 import Button from "./Button";
-import editIcon from "../media/edit-icon.png";
+import SvgEditIcon from "./SvgEditIcon";
 import Logout from "./Logout";
 
 const ProfilePage = () => {
@@ -33,9 +33,8 @@ const ProfilePage = () => {
                 type="button"
                 className="button button--edit"
                 onClick={null}
-                isDisabled={false}
               >
-                <img src={editIcon} alt="Edit Icon" />
+                <SvgEditIcon strokeColor="black" fillColor="black" />
               </Button>
             </div>
           </h3>
@@ -63,9 +62,8 @@ const ProfilePage = () => {
                 type="button"
                 className="button button--edit"
                 onClick={null}
-                isDisabled={false}
               >
-                <img src={editIcon} alt="Edit Icon" />
+                <SvgEditIcon strokeColor="black" fillColor="black" />
               </Button>
             </div>
           </h3>

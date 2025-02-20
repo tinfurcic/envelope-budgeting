@@ -18,7 +18,6 @@ const Logout = () => {
         type="button"
         className="button button--red"
         onClick={handleLogout}
-        isDisabled={false}
       >
         Log out
       </Button>

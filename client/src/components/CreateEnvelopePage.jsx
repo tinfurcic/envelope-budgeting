@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { createEnvelope } from "../util/axios/createFunctions";
-import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
+import Colors from "./Colors";
 
 const CreateEnvelopePage = () => {
   const navigate = useNavigate();
+
+  const { income, savings, budgetSum } = useOutletContext();
 
   const [newEnvelopeName, setNewEnvelopeName] = useState("");
   const [newEnvelopeBudget, setNewEnvelopeBudget] = useState("");
@@ -63,10 +66,54 @@ const CreateEnvelopePage = () => {
   }, [isChecked, newEnvelopeBudget]);
 
   useEffect(() => {
-    if (parseFloat(newEnvelopeBudget) <= parseFloat(newEnvelopeCurrentAmount)) {
-      setNewEnvelopeCurrentAmount(newEnvelopeBudget);
+    if (Number(newEnvelopeBudget) < Number(newEnvelopeCurrentAmount)) {
+      setNewEnvelopeCurrentAmount(
+        Number(newEnvelopeBudget).toFixed(2).toString(),
+      );
     }
   }, [newEnvelopeBudget, newEnvelopeCurrentAmount]);
+
+  useEffect(() => {
+    if (
+      savings &&
+      savings.shortTermSavings &&
+      savings.longTermSavings &&
+      savings.shortTermSavings.currentAmount &&
+      savings.longTermSavings.currentAmount
+    ) {
+      if (
+        Number(newEnvelopeCurrentAmount) >
+        savings.shortTermSavings.currentAmount
+      ) {
+        console.log("This action will draw funds from your long-term savings!");
+        if (
+          Number(newEnvelopeCurrentAmount) >
+          savings.longTermSavings.currentAmount +
+            savings.longTermSavings.currentAmount
+        ) {
+          setIsChecked(false);
+          setNewEnvelopeCurrentAmount(
+            savings.shortTermSavings.currentAmount +
+              savings.longTermSavings.currentAmount,
+          );
+        }
+      }
+    }
+  }, [savings, newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount]);
+
+  useEffect(() => {
+    if (
+      income &&
+      income.regularIncome &&
+      income.regularIncome.value &&
+      budgetSum
+    ) {
+      const availableBudget = income.regularIncome.value - budgetSum;
+      if (parseFloat(newEnvelopeBudget) > availableBudget) {
+        setNewEnvelopeBudget(availableBudget.toFixed(2).toString());
+      }
+    }
+  }, [income, newEnvelopeBudget, budgetSum]);
 
   useEffect(() => {
     setIsDisabled(
@@ -84,7 +131,6 @@ const CreateEnvelopePage = () => {
           type="button"
           className="button button--back"
           onClick={() => navigate("/envelopes")}
-          isDisabled={false}
         >
           <img src={backArrow} alt="Back" width="20" /> to My Envelopes
         </Button>
@@ -101,11 +147,11 @@ const CreateEnvelopePage = () => {
         autoComplete="off"
       >
         <div className="form-item">
-          <label className="form-item__label" htmlFor="name">
+          <label className="form-label" htmlFor="name">
             Name
           </label>
           <input
-            className="form-item__input"
+            className="form-input"
             type="text"
             value={newEnvelopeName}
             onChange={(e) => setNewEnvelopeName(e.target.value)}
@@ -116,15 +162,17 @@ const CreateEnvelopePage = () => {
         </div>
 
         <div className="form-item">
-          <label className="form-item__label" htmlFor="budget">
+          <label className="form-label" htmlFor="budget">
             Budget
           </label>
-          <div className="form-item__input-with-currency">
-            <span className="form-item__input-with-currency__currency">
+          <div className="input-with-currency">
+            {" "}
+            {/* also form-input? */}
+            <span className="input-with-currency__currency">
               {fakeCurrency}
             </span>
             <input
-              className="form-item__input-with-currency__input"
+              className="form-input input-with-currency__input"
               type="text"
               value={newEnvelopeBudget}
               onChange={(e) => handleValueChange(e, setNewEnvelopeBudget)}
@@ -134,7 +182,7 @@ const CreateEnvelopePage = () => {
           </div>
           <div className="checkbox-group">
             <input
-              className="checkbox-group__input"
+              className="checkbox-input"
               type="checkbox"
               id="amount"
               name="amount"
@@ -150,15 +198,17 @@ const CreateEnvelopePage = () => {
 
         {!isChecked && (
           <div className="form-item">
-            <label className="form-item__label" htmlFor="current-amount">
+            <label className="form-label" htmlFor="current-amount">
               Amount to assign
             </label>
-            <div className="form-item__input-with-currency">
-              <span className="form-item__input-with-currency__currency">
+            <div className="input-with-currency">
+              {" "}
+              {/* form-input? */}
+              <span className="input-with-currency__currency">
                 {fakeCurrency}
               </span>
               <input
-                className="form-item__input-with-currency__input"
+                className="input-with-currency__input form-input"
                 type="text"
                 value={newEnvelopeCurrentAmount}
                 onChange={(e) =>
@@ -172,11 +222,19 @@ const CreateEnvelopePage = () => {
         )}
 
         <div className="form-item">
-          <label className="form-item__label" htmlFor="description">
+          <p className="form-p">Color</p>
+          <Colors
+            newEnvelopeColor={newEnvelopeColor}
+            setNewEnvelopeColor={setNewEnvelopeColor}
+          />
+        </div>
+
+        <div className="form-item">
+          <label className="form-label" htmlFor="description">
             Description (optional)
           </label>
           <input
-            className="form-item__input"
+            className="form-input"
             type="text"
             value={newEnvelopeDescription}
             onChange={(e) => setNewEnvelopeDescription(e.target.value)}

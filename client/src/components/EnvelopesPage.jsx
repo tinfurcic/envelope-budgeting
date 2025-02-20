@@ -1,29 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { debounce } from "../util/debounce";
+import useScreenSize from "../hooks/useScreenSize";
+import expenseIcon from "../media/expense.png";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
-import expenseIcon from "../media/expense.png";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
+  const { isSmall } = useScreenSize();
   const navigate = useNavigate();
+
+  const [isButtonOverlapping, setIsButtonOverlapping] = useState(false);
+
+  useEffect(() => {
+    const envelopesPage = document.querySelector(".envelopes-page");
+    const button = document.querySelector(".new-expense-button");
+    const envelopeCards = document.querySelectorAll(".envelope-card");
+
+    const checkOverlap = () => {
+      const buttonRect = button.getBoundingClientRect();
+
+      let overlapDetected = false;
+      envelopeCards.forEach((card) => {
+        const cardRect = card.getBoundingClientRect();
+
+        if (
+          buttonRect.top < cardRect.bottom &&
+          buttonRect.bottom > cardRect.top &&
+          buttonRect.left < cardRect.right &&
+          buttonRect.right > cardRect.left
+        ) {
+          overlapDetected = true;
+        }
+      });
+
+      setIsButtonOverlapping(overlapDetected);
+    };
+
+    const debouncedCheckOverlap = debounce(checkOverlap, 500);
+
+    envelopesPage.addEventListener("scroll", debouncedCheckOverlap);
+    window.addEventListener("resize", debouncedCheckOverlap);
+
+    // Initial check
+    debouncedCheckOverlap();
+
+    return () => {
+      envelopesPage.removeEventListener("scroll", debouncedCheckOverlap);
+      window.removeEventListener("resize", debouncedCheckOverlap);
+    };
+  }, [envelopes]);
 
   return (
     <div className="envelopes-page">
       <div className="envelopes-page__header">
-        <h2 className="envelopes-page__heading">My Envelopes</h2>
+        <h1 className="envelopes-page__heading">My Envelopes</h1>
         <Button
           type="button"
           className="button button--blue"
           onClick={() => navigate("/create")}
-          isDisabled={false}
         >
           New Envelope
         </Button>
       </div>
 
-      {/* Add grid/slider view button*/}
+      {/* Add grid/slider view button */}
       <div className="envelopes-page__envelopes">
         {loadingEnvelopes ? (
           <span className="envelopes-page__loading-message">
@@ -47,12 +90,14 @@ const EnvelopesPage = () => {
           </div>
         )}
       </div>
-      <div className="new-expense-button">
+
+      <div
+        className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
+      >
         <Button
           type="button"
-          className="button button--new-expense"
+          className={`button button--new-expense`}
           onClick={() => navigate("/expense")}
-          isDisabled={false}
         >
           <img src={expenseIcon} alt="New expense" />
         </Button>

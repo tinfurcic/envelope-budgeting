@@ -87,7 +87,6 @@ const PickSingleSource = ({
         fakeCurrency={fakeCurrency}
         newExpenseAmount={newExpenseAmount}
         selectedSourceId={selectedSourceId}
-        setSelectedSourceId={setSelectedSourceId}
         handleSelectedSourceChange={handleSelectedSourceChange}
       />
     </>

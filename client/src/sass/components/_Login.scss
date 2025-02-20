@@ -24,6 +24,21 @@
     max-width: 500px;
     margin: 0 auto;
 
+    & .form-input {
+      width: 100%;
+      flex-grow: 1; // doesn't hurt?
+
+      border: none;
+      border-radius: 5px;
+      font-size: 1.125rem;
+
+      &[type="text"]:focus,
+      &[type="date"]:focus,
+      &[type="password"]:focus {
+        outline: 2px solid #10bcbc;
+      }
+    }
+
     &__submit-btn {
       margin-top: 0.5rem;
       display: flex;

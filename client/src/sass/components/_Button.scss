@@ -36,15 +36,12 @@
   }
 
   &--edit {
-    padding: 0.125rem;
+    padding: 0.15rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 5px;
     border: 1px solid black;
     background-color: transparent;
-
-    & img {
-      display: block;
-      width: 1em;
-    }
   }
 
   &--category {
@@ -58,7 +55,7 @@
       border-radius: 0 1rem 1rem 0;
     }
 
-    &.active{
+    &.active {
       background-color: global.$primary-blue;
     }
 
@@ -70,8 +67,18 @@
 
   &--source {
     background-color: var(--envelope-color);
-    
-    &.active{
+    color: var(--envelope-text-color);
+    padding: 0.5rem 1rem;
+    margin: 0;
+    gap: 0;
+    //height: 5rem;
+
+    display: flex;
+    flex-direction: column;
+    //min-width: 6.5rem;
+    //max-width: 10rem;
+
+    &.active {
       outline: 1px solid black;
     }
 
@@ -79,9 +86,23 @@
       opacity: 0.5;
     }
 
-    &--savings {
-      background-color: navy;
-      color: white;
+    &__name {
+      height: 61.8%;
+      font-size: 1.25rem;
+      padding: 0;
+      margin: 0;
+
+      display: flex;
+      align-items: flex-end;
+    }
+
+    &__amount {
+      height: 38.2%;
+      padding: 0;
+      margin: 0;
+
+      display: flex;
+      align-items: center;
     }
   }
 
