@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getMatchingColors } from "../util/getMatchingColors";
 
-const Colors = ({ newEnvelopeColor, setNewEnvelopeColor, currentColor = "#FFFFFF" }) => {
+const Colors = ({
+  newEnvelopeColor,
+  setNewEnvelopeColor,
+  currentColor = "#FFFFFF",
+}) => {
   const colors = useMemo(() => getMatchingColors("#e5a0a0"), []);
 
   const [currentColorIndex, setCurrentColorIndex] = useState(null);

@@ -61,7 +61,13 @@ const useEnvelopesListener = () => {
     return () => unsubscribe();
   }, [user, lastUpdated]);
 
-  return { envelopes, nextEnvelopeId, budgetSum, loadingEnvelopes, syncingEnvelopes };
+  return {
+    envelopes,
+    nextEnvelopeId,
+    budgetSum,
+    loadingEnvelopes,
+    syncingEnvelopes,
+  };
 };
 
 export default useEnvelopesListener;

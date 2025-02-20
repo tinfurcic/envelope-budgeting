@@ -19,11 +19,7 @@ const TodaysExpenses = () => {
     <div className="todays-expenses">
       <div className="todays-expenses__header">
         <h2 className="todays-expenses__heading">Today's expenses</h2>
-        <Button
-          type="button"
-          className="button button--blue"
-          onClick={null}
-        >
+        <Button type="button" className="button button--blue" onClick={null}>
           All expenses
         </Button>
       </div>

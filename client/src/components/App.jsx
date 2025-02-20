@@ -10,8 +10,13 @@ import useSettingsListener from "../hooks/useSettingsListener";
 import ResponsiveLayout from "./layout/ResponsiveLayout";
 
 const App = () => {
-  const { envelopes, nextEnvelopeId, budgetSum, loadingEnvelopes, syncingEnvelopes } =
-    useEnvelopesListener();
+  const {
+    envelopes,
+    nextEnvelopeId,
+    budgetSum,
+    loadingEnvelopes,
+    syncingEnvelopes,
+  } = useEnvelopesListener();
   const { expenses, nextExpenseId, loadingExpenses, syncingExpenses } =
     useExpensesListener();
   const { goals, nextGoalId, loadingGoals, syncingGoals } = useGoalsListener();

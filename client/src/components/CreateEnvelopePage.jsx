@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { createEnvelope } from "../util/axios/createFunctions";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { createEnvelope } from "../util/axios/createFunctions";
 import Button from "./Button";
 import backArrow from "../media/back-arrow.png";
 import Colors from "./Colors";
@@ -8,7 +8,7 @@ import Colors from "./Colors";
 const CreateEnvelopePage = () => {
   const navigate = useNavigate();
 
-  const { income, budgetSum } = useOutletContext();
+  const { income, savings, budgetSum } = useOutletContext();
 
   const [newEnvelopeName, setNewEnvelopeName] = useState("");
   const [newEnvelopeBudget, setNewEnvelopeBudget] = useState("");
@@ -67,14 +67,49 @@ const CreateEnvelopePage = () => {
 
   useEffect(() => {
     if (Number(newEnvelopeBudget) < Number(newEnvelopeCurrentAmount)) {
-      setNewEnvelopeCurrentAmount(Number(newEnvelopeBudget).toFixed(2).toString());
+      setNewEnvelopeCurrentAmount(
+        Number(newEnvelopeBudget).toFixed(2).toString(),
+      );
     }
   }, [newEnvelopeBudget, newEnvelopeCurrentAmount]);
 
   useEffect(() => {
-    if (income && income.regularIncome && income.regularIncome.value && budgetSum) {
+    if (
+      savings &&
+      savings.shortTermSavings &&
+      savings.longTermSavings &&
+      savings.shortTermSavings.currentAmount &&
+      savings.longTermSavings.currentAmount
+    ) {
+      if (
+        Number(newEnvelopeCurrentAmount) >
+        savings.shortTermSavings.currentAmount
+      ) {
+        console.log("This action will draw funds from your long-term savings!");
+        if (
+          Number(newEnvelopeCurrentAmount) >
+          savings.longTermSavings.currentAmount +
+            savings.longTermSavings.currentAmount
+        ) {
+          setIsChecked(false);
+          setNewEnvelopeCurrentAmount(
+            savings.shortTermSavings.currentAmount +
+              savings.longTermSavings.currentAmount,
+          );
+        }
+      }
+    }
+  }, [savings, newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount]);
+
+  useEffect(() => {
+    if (
+      income &&
+      income.regularIncome &&
+      income.regularIncome.value &&
+      budgetSum
+    ) {
       const availableBudget = income.regularIncome.value - budgetSum;
-      if (parseFloat(newEnvelopeBudget) >= availableBudget) {
+      if (parseFloat(newEnvelopeBudget) > availableBudget) {
         setNewEnvelopeBudget(availableBudget.toFixed(2).toString());
       }
     }
@@ -130,7 +165,9 @@ const CreateEnvelopePage = () => {
           <label className="form-label" htmlFor="budget">
             Budget
           </label>
-          <div className="input-with-currency"> {/* form-input? */}
+          <div className="input-with-currency">
+            {" "}
+            {/* also form-input? */}
             <span className="input-with-currency__currency">
               {fakeCurrency}
             </span>
@@ -164,7 +201,9 @@ const CreateEnvelopePage = () => {
             <label className="form-label" htmlFor="current-amount">
               Amount to assign
             </label>
-            <div className="input-with-currency"> {/* form-input? */}
+            <div className="input-with-currency">
+              {" "}
+              {/* form-input? */}
               <span className="input-with-currency__currency">
                 {fakeCurrency}
               </span>

@@ -204,7 +204,9 @@ const NewExpensePage = () => {
           ) : (
             <>
               <div className="source-mode">
-                <p className="form-p">{allowMultipleSources ? "Sources" : "Source"}</p>
+                <p className="form-p">
+                  {allowMultipleSources ? "Sources" : "Source"}
+                </p>
                 <div>
                   <input
                     type="checkbox"

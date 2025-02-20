@@ -64,11 +64,16 @@ export const createEnvelope = async (
     const envelopeCollectionRef = userRef.collection("envelopes");
     const envelopeMetadataRef = envelopeCollectionRef.doc("metadata");
     const incomeRef = userRef.collection("income").doc("regularIncome");
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+    const longTermRef = userRef.collection("savings").doc("longTermSavings");
 
-    const [envelopeMetadataDoc, incomeDoc] = await Promise.all([
-      envelopeMetadataRef.get(),
-      incomeRef.get(),
-    ]);
+    const [envelopeMetadataDoc, incomeDoc, shortTermDoc, longTermDoc] =
+      await Promise.all([
+        envelopeMetadataRef.get(),
+        incomeRef.get(),
+        shortTermRef.get(),
+        longTermRef.get(),
+      ]);
 
     if (!envelopeMetadataDoc.exists) {
       throw new Error("Metadata not found.");
@@ -76,14 +81,47 @@ export const createEnvelope = async (
     if (!incomeDoc.exists) {
       throw new Error("Regular income document not found.");
     }
+    if (!shortTermDoc.exists || !longTermDoc.exists) {
+      throw new Error("Savings documents not found.");
+    }
 
-    const { nextEnvelopeId = 1, count, budgetSum = 0 } = envelopeMetadataDoc.data();
+    const {
+      nextEnvelopeId = 1,
+      count,
+      budgetSum = 0,
+    } = envelopeMetadataDoc.data();
     const regularIncome = incomeDoc.data().value;
     const newBudget = parseFloat(budget);
+    const amountNeeded = parseFloat(currentAmount);
 
     // Check if new total budget exceeds regular income
     if (budgetSum + newBudget > regularIncome) {
-      throw new Error("Total envelope budgets exceed available regular income.");
+      throw new Error(
+        "Total envelope budgets exceed available regular income.",
+      );
+    }
+
+    // Check and deduct funds from savings
+    let shortTermSavings = shortTermDoc.data().currentAmount;
+    let longTermSavings = longTermDoc.data().currentAmount;
+
+    if (amountNeeded > shortTermSavings + longTermSavings) {
+      throw new Error(
+        "Not enough funds in savings to cover the initial amount.",
+      );
+    }
+
+    let remainingAmount = amountNeeded;
+
+    if (remainingAmount <= shortTermSavings) {
+      // Deduct entirely from short-term savings
+      shortTermSavings -= remainingAmount;
+      remainingAmount = 0;
+    } else {
+      // Use up short-term savings first, then take from long-term
+      remainingAmount -= shortTermSavings;
+      shortTermSavings = 0;
+      longTermSavings -= remainingAmount;
     }
 
     const envelopeRef = envelopeCollectionRef.doc(String(nextEnvelopeId));
@@ -91,7 +129,7 @@ export const createEnvelope = async (
       id: nextEnvelopeId,
       name,
       budget: newBudget,
-      currentAmount: parseFloat(currentAmount),
+      currentAmount: amountNeeded,
       description,
       color,
       order: count + 1,
@@ -108,6 +146,10 @@ export const createEnvelope = async (
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // Update savings with the new amounts
+    batch.update(shortTermRef, { currentAmount: shortTermSavings });
+    batch.update(longTermRef, { currentAmount: longTermSavings });
+
     await batch.commit();
 
     return newEnvelope;
@@ -116,8 +158,6 @@ export const createEnvelope = async (
     throw new Error(error.message || "Failed to create the envelope.");
   }
 };
-
-
 
 // Update an envelope for a user
 export const updateEnvelope = async (
@@ -135,11 +175,21 @@ export const updateEnvelope = async (
     const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
     const envelopesRef = userRef.collection("envelopes");
     const incomeRef = userRef.collection("income").doc("regularIncome");
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+    const longTermRef = userRef.collection("savings").doc("longTermSavings");
 
-    const [envelopeMetadataDoc, incomeDoc, envelopeDoc] = await Promise.all([
+    const [
+      envelopeMetadataDoc,
+      incomeDoc,
+      envelopeDoc,
+      shortTermDoc,
+      longTermDoc,
+    ] = await Promise.all([
       envelopeMetadataRef.get(),
       incomeRef.get(),
       envelopesRef.doc(envelopeId).get(),
+      shortTermRef.get(),
+      longTermRef.get(),
     ]);
 
     if (!envelopeMetadataDoc.exists) {
@@ -151,18 +201,30 @@ export const updateEnvelope = async (
     if (!envelopeDoc.exists) {
       throw new Error("Envelope not found.");
     }
+    if (!shortTermDoc.exists || !longTermDoc.exists) {
+      throw new Error("Savings documents not found.");
+    }
 
     const { count, budgetSum = 0 } = envelopeMetadataDoc.data();
     const regularIncome = incomeDoc.data().value;
     const envelopeData = envelopeDoc.data();
     const currentOrder = envelopeData.order;
     const currentBudget = envelopeData.budget;
-    const updatedBudget = newBudget !== undefined ? parseFloat(newBudget) : currentBudget;
-    
+    const currentAmount = envelopeData.currentAmount;
+
+    const updatedBudget =
+      newBudget !== undefined ? parseFloat(newBudget) : currentBudget;
+    const updatedAmount =
+      newCurrentAmount !== undefined
+        ? parseFloat(newCurrentAmount)
+        : currentAmount;
+
     // Calculate new total budget
     const newTotalBudget = budgetSum - currentBudget + updatedBudget;
     if (newTotalBudget > regularIncome) {
-      throw new Error("Total envelope budgets exceed available regular income.");
+      throw new Error(
+        "Total envelope budgets exceed available regular income.",
+      );
     }
 
     // Validate newOrder (using count from metadata)
@@ -170,6 +232,29 @@ export const updateEnvelope = async (
       throw new Error(
         `Invalid order number. It must be a positive integer between 1 and ${count}.`,
       );
+    }
+
+    // Savings handling
+    let shortTermSavings = shortTermDoc.data().currentAmount;
+    let longTermSavings = longTermDoc.data().currentAmount;
+    let remainingAmount = updatedAmount - currentAmount;
+
+    if (remainingAmount > 0) {
+      // Need to withdraw from savings
+      if (remainingAmount > shortTermSavings + longTermSavings) {
+        throw new Error("Not enough funds in savings to cover the increase.");
+      }
+
+      if (remainingAmount <= shortTermSavings) {
+        shortTermSavings -= remainingAmount;
+      } else {
+        remainingAmount -= shortTermSavings;
+        shortTermSavings = 0;
+        longTermSavings -= remainingAmount;
+      }
+    } else if (remainingAmount < 0) {
+      // Need to refund to short-term savings
+      shortTermSavings += Math.abs(remainingAmount);
     }
 
     const batch = db.batch();
@@ -203,13 +288,17 @@ export const updateEnvelope = async (
     const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     if (newName) updates.name = newName;
     if (newBudget !== undefined) updates.budget = updatedBudget;
-    if (newCurrentAmount !== undefined) updates.currentAmount = parseFloat(newCurrentAmount);
+    if (newCurrentAmount !== undefined) updates.currentAmount = updatedAmount;
     if (newDescription !== undefined) updates.description = newDescription;
     if (newColor !== undefined) updates.color = newColor;
 
     batch.update(envelopesRef.doc(envelopeId), updates);
     batch.update(envelopeMetadataRef, { budgetSum: newTotalBudget });
-    
+
+    // Update savings
+    batch.update(shortTermRef, { currentAmount: shortTermSavings });
+    batch.update(longTermRef, { currentAmount: longTermSavings });
+
     await batch.commit();
 
     return { id: envelopeId, ...updates, order: newOrder };
@@ -225,10 +314,12 @@ export const deleteEnvelope = async (userId, envelopeId) => {
     const userRef = db.collection("users").doc(userId);
     const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
     const envelopeRef = userRef.collection("envelopes").doc(envelopeId);
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
 
-    const [envelopeMetadataDoc, envelopeDoc] = await Promise.all([
+    const [envelopeMetadataDoc, envelopeDoc, shortTermDoc] = await Promise.all([
       envelopeMetadataRef.get(),
-      envelopeRef.get()
+      envelopeRef.get(),
+      shortTermRef.get(),
     ]);
 
     if (!envelopeMetadataDoc.exists) {
@@ -237,14 +328,22 @@ export const deleteEnvelope = async (userId, envelopeId) => {
     if (!envelopeDoc.exists) {
       throw new Error("Envelope not found.");
     }
+    if (!shortTermDoc.exists) {
+      throw new Error("Short-term savings document not found.");
+    }
 
     const { count, budgetSum = 0 } = envelopeMetadataDoc.data();
     const envelopeData = envelopeDoc.data();
     const envelopeOrder = envelopeData.order;
     const envelopeBudget = envelopeData.budget;
+    const envelopeCurrentAmount = envelopeData.currentAmount;
 
     // Calculate new total budget
     const newTotalBudget = budgetSum - envelopeBudget;
+
+    // Refund to shortTermSavings
+    const shortTermSavings = shortTermDoc.data().currentAmount || 0;
+    const updatedShortTermSavings = shortTermSavings + envelopeCurrentAmount;
 
     // Get all envelopes with `order` greater than the deleted envelope
     const envelopesRef = userRef.collection("envelopes");
@@ -267,6 +366,7 @@ export const deleteEnvelope = async (userId, envelopeId) => {
       budgetSum: newTotalBudget,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+    batch.update(shortTermRef, { currentAmount: updatedShortTermSavings });
 
     await batch.commit();
   } catch (error) {
@@ -274,4 +374,3 @@ export const deleteEnvelope = async (userId, envelopeId) => {
     throw new Error("Failed to delete the envelope.");
   }
 };
-

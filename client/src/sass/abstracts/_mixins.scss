@@ -41,11 +41,11 @@
     & .form-input {
       width: 100%;
       flex-grow: 1; // doesn't hurt?
-    
+
       border: none;
       border-radius: 5px;
       font-size: 1.125rem;
-    
+
       &[type="text"]:focus,
       &[type="date"]:focus,
       &[type="password"]:focus {
