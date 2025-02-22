@@ -44,8 +44,8 @@ goalsRouter.get("/:id", async (req, res) => {
 });
 
 goalsRouter.post("/", async (req, res) => {
-  const { goalAmount, deadline, monthlyAmount, description } = req.body;
-  if (!goalAmount || !deadline || !monthlyAmount) {
+  const { name, goalAmount, deadline, accumulated, description } = req.body;
+  if (!name || !goalAmount || !deadline) {
     // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
     return res.status(400).send({ error: "Invalid goal data" });
   }
@@ -53,9 +53,10 @@ goalsRouter.post("/", async (req, res) => {
   try {
     const newGoal = await createGoal(
       req.userId,
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
+      accumulated,
       description,
     );
     res.status(201).json(newGoal);
@@ -67,15 +68,16 @@ goalsRouter.post("/", async (req, res) => {
 
 goalsRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { goalAmount, deadline, monthlyAmount, description } = req.body;
+  const { name, goalAmount, deadline, accumulated, description } = req.body;
 
   try {
     const updatedGoal = await updateGoal(
       req.userId,
       id,
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
+      accumulated,
       description,
     );
     res.status(200).json(updatedGoal);

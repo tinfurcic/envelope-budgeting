@@ -50,16 +50,18 @@ export const updateExpense = async (
 
 export const updateGoal = async (
   id,
+  name,
   goalAmount,
   deadline,
-  monthlyAmount,
+  accumulated,
   description,
 ) => {
   try {
     const res = await axiosInstance.patch(`/goals/${id}`, {
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
+      accumulated,
       description,
     });
     return { success: true, data: res.data };

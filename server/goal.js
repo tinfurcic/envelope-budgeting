@@ -51,9 +51,10 @@ export const getGoalById = async (userId, goalId) => {
 // It's probably better to make user actions pass some values by default
 export const createGoal = async (
   userId,
+  name,
   goalAmount,
   deadline,
-  monthlyAmount,
+  accumulated,
   description,
 ) => {
   try {
@@ -71,9 +72,10 @@ export const createGoal = async (
 
     const newGoal = {
       id: nextGoalId,
+      name,
       goalAmount: parseFloat(goalAmount),
       deadline,
-      monthlyAmount: parseFloat(monthlyAmount),
+      accumulated: parseFloat(accumulated),
       description: description,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -98,18 +100,20 @@ export const createGoal = async (
 // Update a goal for a user
 export const updateGoal = async (
   userId,
+  name,
   goalId,
   goalAmount,
   deadline,
-  monthlyAmount,
+  accumulated,
   description,
 ) => {
   try {
     const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+    if (name !== undefined) updates.name = name;
     if (goalAmount !== undefined) updates.goalAmount = parseFloat(goalAmount);
     if (deadline !== undefined) updates.deadline = deadline;
-    if (monthlyAmount !== undefined)
-      updates.monthlyAmount = parseFloat(monthlyAmount);
+    if (accumulated !== undefined)
+      updates.accumulated = parseFloat(accumulated);
     if (description !== undefined) updates.description = description;
 
     const goalRef = db

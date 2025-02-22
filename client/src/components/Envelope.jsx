@@ -34,8 +34,25 @@ const Envelope = () => {
   const [editableBudget, setEditableBudget] = useState("");
   const [budgetDifference, setBudgetDifference] = useState(0);
   const [amountDifference, setAmountDifference] = useState(0);
-  const [isSavingInfoDisabled, setIsSavingInfoDisabled] = useState(true);
-  const [isSavingNumbersDisabled, setIsSavingNumbersDisabled] = useState(true);
+
+  let isSavingInfoDisabled = true;
+  let isSavingNumbersDisabled = true;
+  if (
+    envelope &&
+    envelope.name !== undefined &&
+    envelope.description !== undefined &&
+    envelope.color &&
+    envelope.budget !== undefined &&
+    envelope.currentAmount !== undefined
+  ) {
+    isSavingInfoDisabled =
+      editableName === envelope.name &&
+      editableDescription === envelope.description &&
+      editableColor === envelope.color;
+    isSavingNumbersDisabled =
+      Number(editableBudget) === envelope.budget &&
+      Number(editableAmount) === envelope.currentAmount;
+  }
 
   const fakeCurrency = "€";
   const backgroundColor = useCSSVariable("--background-color");
@@ -100,7 +117,6 @@ const Envelope = () => {
     }
     setIsEditingNumbers(!isEditingNumbers);
   };
-  //end section
 
   // --- onChange and save handlers section ---
   const handleNameChange = (e) => {
@@ -151,51 +167,6 @@ const Envelope = () => {
       toggleEditNumbersMode();
     }
   };
-  //end section
-
-  // --- Enabling/showing // disabling/hiding save changes button section ---
-  useEffect(() => {
-    if (
-      envelope &&
-      envelope.name &&
-      envelope.description !== undefined &&
-      envelope.color
-    ) {
-      if (
-        editableName !== envelope.name ||
-        editableDescription !== envelope.description ||
-        editableColor !== envelope.color
-      ) {
-        setIsSavingInfoDisabled(false);
-      } else {
-        setIsSavingInfoDisabled(true);
-      }
-    }
-  }, [
-    envelope,
-    editableName,
-    editableDescription,
-    editableColor,
-    setIsSavingInfoDisabled,
-  ]);
-
-  useEffect(() => {
-    if (
-      envelope &&
-      envelope.budget !== undefined &&
-      envelope.currentAmount !== undefined
-    ) {
-      if (
-        Number(editableBudget) !== envelope.budget ||
-        Number(editableAmount) !== envelope.currentAmount
-      ) {
-        setIsSavingNumbersDisabled(false);
-      } else {
-        setIsSavingNumbersDisabled(true);
-      }
-    }
-  }, [envelope, editableBudget, editableAmount, setIsSavingNumbersDisabled]);
-  //end section
 
   // --- Number inputs handling section ---
   const handleValueChange = (event, setValue) => {
@@ -259,7 +230,6 @@ const Envelope = () => {
       }
     }
   }, [income, editableBudget, budgetSum]);
-  //end section
 
   // Load latest expenses
   useEffect(() => {
@@ -296,6 +266,7 @@ const Envelope = () => {
                 className="envelope__name-input"
                 value={editableName}
                 onChange={handleNameChange}
+                maxLength="30"
               />
             ) : (
               <h1 className="envelope__name">{editableName}</h1>
@@ -315,13 +286,13 @@ const Envelope = () => {
           </div>
 
           <div className="envelope__header-bar">
-            <button
+            <Button
               type="button"
-              className="envelope__back-button"
+              className="button button--back"
               onClick={() => navigate("/envelopes")}
             >
               X
-            </button>
+            </Button>
 
             {!isEditingNumbers && (
               <Button
@@ -337,7 +308,7 @@ const Envelope = () => {
               </Button>
             )}
 
-            {isEditingInfo && !isSavingInfoDisabled && (
+            {!isSavingInfoDisabled && isEditingInfo && (
               <Button
                 type="button"
                 className="button button--edit"

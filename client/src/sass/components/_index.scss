@@ -13,7 +13,7 @@
 @forward "Envelope";
 @forward "CreateEnvelopePage";
 
-@forward "NewExpensePage";
+@forward "CreateExpensePage";
 @forward "PickSingleSource";
 @forward "PickSourceInCategory";
 @forward "PickCategory";
@@ -21,6 +21,8 @@
 
 @forward "GoalsPage";
 @forward "Goal";
+@forward "GoalCard";
+@forward "CreateGoalPage";
 
 @forward "ProfilePage";
 @forward "CurrencyDropdown";

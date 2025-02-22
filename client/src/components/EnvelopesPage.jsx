@@ -60,7 +60,7 @@ const EnvelopesPage = () => {
         <Button
           type="button"
           className="button button--blue"
-          onClick={() => navigate("/create")}
+          onClick={() => navigate("/create-envelope")}
         >
           New Envelope
         </Button>

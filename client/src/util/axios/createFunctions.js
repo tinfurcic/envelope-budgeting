@@ -45,16 +45,18 @@ export const createExpense = async (
 };
 
 export const createGoal = async (
+  name,
   goalAmount,
   deadline,
-  monthlyAmount,
+  accumulated,
   description,
 ) => {
   try {
     const res = await axiosInstance.post("/goals", {
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
+      accumulated,
       description,
     });
     return { success: true, data: res.data };
