@@ -11,23 +11,28 @@ const CreateGoalPage = () => {
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [isDisabled, setIsDisabled] = useState(true);
   const [minDate, setMinDate] = useState("");
+  const [maxDate, setMaxDate] = useState("");
 
   const { date } = useOutletContext();
   const navigate = useNavigate();
   const fakeCurrency = "€";
 
   useEffect(() => {
-    const dateObject = new Date(date);
-    dateObject.setMonth(dateObject.getMonth() + 2);
+    const formatDate = (dateObj) => {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
 
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObject.getDate()).padStart(2, "0");
+    const minDateObject = new Date(date);
+    const maxDateObject = new Date(date);
 
-    const formattedMinDate = `${year}-${month}-${day}`;
-    setMinDate(formattedMinDate);
+    minDateObject.setMonth(minDateObject.getMonth() + 2);
+    maxDateObject.setMonth(maxDateObject.getMonth() + 24);
 
-    console.log("minDate changed");
+    setMinDate(formatDate(minDateObject));
+    setMaxDate(formatDate(maxDateObject));
   }, [date]);
 
   const handleCreateGoal = async (e) => {
@@ -45,6 +50,7 @@ const CreateGoalPage = () => {
       console.error(result.error);
     } else {
       // display success message
+      console.log("Goal successfully created!");
       setNewGoalName("");
       setNewGoalAmount("");
       setNewGoalDeadline("");
@@ -62,12 +68,8 @@ const CreateGoalPage = () => {
   };
 
   useEffect(() => {
-    setIsDisabled(
-      newGoalName === "" ||
-        Number(newGoalAmount) === 0 ||
-        newGoalDeadline === "",
-    );
-  }, [newGoalName, newGoalAmount, newGoalDeadline, setIsDisabled]);
+    setIsDisabled(newGoalName === "" || Number(newGoalAmount) === 0);
+  }, [newGoalName, newGoalAmount, setIsDisabled]);
 
   return (
     <div className="create-goal-page">
@@ -97,7 +99,7 @@ const CreateGoalPage = () => {
         >
           <div className="form-item">
             <label className="form-label" htmlFor="name">
-              Goal name
+              Name
             </label>
             <input
               className="form-input"
@@ -131,7 +133,7 @@ const CreateGoalPage = () => {
 
           <div className="form-item">
             <label className="form-label" htmlFor="date">
-              Goal deadline
+              Deadline (recommended)
             </label>
             <div className="form-item__date">
               <input
@@ -142,6 +144,7 @@ const CreateGoalPage = () => {
                 id="date"
                 name="date"
                 min={minDate}
+                max={maxDate}
               />
             </div>
           </div>

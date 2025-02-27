@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "../util/debounce";
 import useScreenSize from "../hooks/useScreenSize";
+import useOverlapping from "../hooks/useOverlapping";
 import expenseIcon from "../media/expense.png";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
@@ -12,46 +12,13 @@ const EnvelopesPage = () => {
   const { isSmall } = useScreenSize();
   const navigate = useNavigate();
 
-  const [isButtonOverlapping, setIsButtonOverlapping] = useState(false);
-
-  useEffect(() => {
-    const envelopesPage = document.querySelector(".envelopes-page");
-    const button = document.querySelector(".new-expense-button");
-    const envelopeCards = document.querySelectorAll(".envelope-card");
-
-    const checkOverlap = () => {
-      const buttonRect = button.getBoundingClientRect();
-
-      let overlapDetected = false;
-      envelopeCards.forEach((card) => {
-        const cardRect = card.getBoundingClientRect();
-
-        if (
-          buttonRect.top < cardRect.bottom &&
-          buttonRect.bottom > cardRect.top &&
-          buttonRect.left < cardRect.right &&
-          buttonRect.right > cardRect.left
-        ) {
-          overlapDetected = true;
-        }
-      });
-
-      setIsButtonOverlapping(overlapDetected);
-    };
-
-    const debouncedCheckOverlap = debounce(checkOverlap, 500);
-
-    envelopesPage.addEventListener("scroll", debouncedCheckOverlap);
-    window.addEventListener("resize", debouncedCheckOverlap);
-
-    // Initial check
-    debouncedCheckOverlap();
-
-    return () => {
-      envelopesPage.removeEventListener("scroll", debouncedCheckOverlap);
-      window.removeEventListener("resize", debouncedCheckOverlap);
-    };
-  }, [envelopes]);
+  const isButtonOverlapping = useOverlapping(
+    ".envelopes-page",
+    ".new-expense-button",
+    [".envelope-card"],
+    500,
+    [envelopes],
+  );
 
   return (
     <div className="envelopes-page">

@@ -8,5 +8,14 @@
   &__goals {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    padding-bottom: 0.5rem;
+  }
+
+  &__cards-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    row-gap: 1rem;
   }
 }

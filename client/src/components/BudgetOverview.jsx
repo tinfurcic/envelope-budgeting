@@ -6,7 +6,7 @@ import ProgressBar from "./ProgressBar";
 import chartIcon from "../media/chart.png";
 
 const BudgetOverview = () => {
-  const { envelopes } = useOutletContext();
+  const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
 
   const [totalBudget, setTotalBudget] = useState(null);
   const [totalCurrentAmount, setTotalCurrentAmount] = useState(null);
@@ -19,7 +19,12 @@ const BudgetOverview = () => {
   return (
     <div className="budget-overview">
       <h2 className="budget-overview__heading">Budget overview</h2>
-      <ProgressBar budget={totalBudget} amount={totalCurrentAmount} />
+      <ProgressBar
+        budget={totalBudget}
+        amount={totalCurrentAmount}
+        loading={loadingEnvelopes}
+        syncing={syncingEnvelopes}
+      />
       <p className="legend-item">
         <span className="legend-square"></span> Money left in my envelopes
       </p>

@@ -9,10 +9,14 @@ const PickSingleSource = ({
   setSourceCategory,
   envelopes,
   savings,
+  activeCategoryFromLocation,
+  sourceIdFromLocation,
 }) => {
   const fakeCurrency = "€";
 
-  const [selectedSourceId, setSelectedSourceId] = useState("");
+  const [selectedSourceId, setSelectedSourceId] = useState(
+    sourceIdFromLocation ?? "",
+  );
   const [potentialSources, setPotentialSources] = useState([]);
 
   const handleSelectedSourceChange = (event) => {
@@ -49,10 +53,10 @@ const PickSingleSource = ({
   }, [envelopes, savings]);
 
   useEffect(() => {
-    if (selectedSourceId !== "") {
+    if (potentialSources && selectedSourceId !== "") {
       const id = selectedSourceId;
       const source = potentialSources.find((item) => item.id === Number(id));
-      if (source.currentAmount < newExpenseAmount) {
+      if (source?.currentAmount < newExpenseAmount) {
         setSelectedSourceId("");
       }
     }
@@ -78,6 +82,7 @@ const PickSingleSource = ({
       <PickCategory
         sourceCategory={sourceCategory}
         handleCategoryChange={handleCategoryChange}
+        activeCategoryFromLocation={activeCategoryFromLocation}
       />
 
       <PickSourceInCategory

@@ -23,7 +23,7 @@ $padding: 0.25rem;
   background-repeat: no-repeat;
 
   &:hover {
-    border: 2px solid #10bcbc;
+    filter: brightness(1.1);
   }
 
   &__name {

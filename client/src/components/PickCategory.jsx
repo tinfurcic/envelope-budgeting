@@ -1,8 +1,14 @@
 import React, { Fragment, useState } from "react";
 import Button from "./Button";
 
-const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
-  const [activeCategory, setActiveCategory] = useState("");
+const PickCategory = ({
+  sourceCategory,
+  handleCategoryChange,
+  activeCategoryFromLocation,
+}) => {
+  const [activeCategory, setActiveCategory] = useState(
+    activeCategoryFromLocation ?? "",
+  );
 
   const handleClick = (category) => {
     handleCategoryChange(category);

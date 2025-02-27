@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const ProgressBar = ({ budget, amount }) => {
+const ProgressBar = ({ budget, amount, thin = false, loading, syncing }) => {
   const componentRef = useRef(null);
   const [percentage, setPercentage] = useState(
     Math.round((amount * 100) / budget),
@@ -19,17 +19,21 @@ const ProgressBar = ({ budget, amount }) => {
   }, [percentage]);
 
   return (
-    <div className="progress-bar-container">
+    <div
+      className={`progress-bar-container progress-bar-container--${thin ? "thin" : ""}`}
+    >
       <div
         ref={componentRef}
         className="progress-bar-container__progress-bar"
       ></div>
       <span className="progress-bar-container__percentage">
-        {budget === null || amount === null
-          ? "Loading..."
-          : budget !== 0
-            ? `${fakeCurrency}${amount} / ${fakeCurrency}${budget}`
-            : "Your assigned budget is 0"}
+        {loading
+          ? "Loading data..."
+          : syncing
+            ? "Syncing data..."
+            : budget !== 0
+              ? `${fakeCurrency}${amount} / ${fakeCurrency}${budget}`
+              : "Your assigned budget is 0"}
       </span>
     </div>
   );

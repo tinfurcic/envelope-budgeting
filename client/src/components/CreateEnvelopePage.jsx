@@ -34,6 +34,7 @@ const CreateEnvelopePage = () => {
       console.error(result.error);
     } else {
       // display success message
+      console.log("Envelope successfully created!");
       setNewEnvelopeName("");
       setNewEnvelopeBudget("");
       setNewEnvelopeCurrentAmount("");
@@ -74,11 +75,8 @@ const CreateEnvelopePage = () => {
 
   useEffect(() => {
     if (
-      savings &&
-      savings.shortTermSavings &&
-      savings.longTermSavings &&
-      savings.shortTermSavings.currentAmount &&
-      savings.longTermSavings.currentAmount
+      savings?.shortTermSavings?.currentAmount &&
+      savings?.longTermSavings?.currentAmount
     ) {
       if (
         Number(newEnvelopeCurrentAmount) >

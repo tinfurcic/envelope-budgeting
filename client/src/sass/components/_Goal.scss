@@ -1,6 +1,15 @@
+@use "../abstracts/mixins";
+@use "../base/global";
+
 .goal {
-  &__heading {
-    font-size: 1.25rem;
-    font-weight: 500;
+  @include mixins.page-header-styles;
+  @include mixins.page-main-section-styles;
+
+  &__header {
+    background-color: global.$goal-color;
+  }
+
+  &__name-input {
+    background-color: global.$goal-color;
   }
 }

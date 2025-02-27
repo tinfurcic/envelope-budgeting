@@ -1,10 +1,11 @@
-import React from "react";
-import Goal from "./Goal";
+import React, { useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import GoalCard from "./GoalCard";
 import Button from "./Button";
-import { useNavigate } from "react-router-dom";
 
 const GoalsPage = () => {
   const navigate = useNavigate();
+  const { goals, loadingGoals, syncingGoals } = useOutletContext();
 
   return (
     <div className="goals-page">
@@ -18,14 +19,29 @@ const GoalsPage = () => {
           New Goal
         </Button>
       </div>
-      <p className="goals-page__description">
-        Set Goals to increase your Long Term Savings
-      </p>
+
       <div className="goals-page__goals">
-        {/* map fetched goals here */}
-        <div className="goal">
-          <Goal />
-        </div>
+        {loadingGoals ? (
+          <span className="goals-page__loading-message">
+            Loading your goals...
+          </span>
+        ) : syncingGoals ? (
+          <span className="goals-page__loading-message">
+            Syncing your goals...
+          </span>
+        ) : goals.length === 0 ? (
+          <div className="goals-page__no-items">
+            <span className="goals-page__no-items-message">
+              You don't have any goals yet. Create one!
+            </span>
+          </div>
+        ) : (
+          <div className="goals-page__cards-container">
+            {goals.map((goal) => (
+              <GoalCard key={goal.id} goal={goal} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

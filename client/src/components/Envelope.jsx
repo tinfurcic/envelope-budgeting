@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { updateEnvelope } from "../util/axios/updateFunctions";
+import expenseIcon from "../media/expense.png";
 import useCSSVariable from "../hooks/useCSSVariable";
+import useOverlapping from "../hooks/useOverlapping";
+import useScreenSize from "../hooks/useScreenSize";
 import SvgEditIcon from "./SvgEditIcon";
+import SvgCheckIcon from "./SvgCheckIcon";
+import SvgEnvelopeCash from "./SvgEnvelopeCash";
 import ProgressBar from "./ProgressBar";
 import ExpensesTable from "./ExpensesTable";
 import Button from "./Button";
 import Colors from "./Colors";
-import SvgCheckIcon from "./SvgCheckIcon";
 
 const Envelope = () => {
   const { id } = useParams();
   const {
     envelopes,
+    loadingEnvelopes,
+    syncingEnvelopes,
     expenses,
     loadingExpenses,
     syncingExpenses,
@@ -21,6 +27,16 @@ const Envelope = () => {
     budgetSum,
   } = useOutletContext();
   const navigate = useNavigate();
+
+  const { isSmall } = useScreenSize();
+
+  const isButtonOverlapping = useOverlapping(
+    ".envelope",
+    ".new-expense-button",
+    [".envelope__latest-expenses"],
+    500,
+    [envelopes],
+  );
 
   const envelope = envelopes.find((env) => env.id.toString() === id);
 
@@ -94,6 +110,7 @@ const Envelope = () => {
     }
     setIsEditingInfo(!isEditingInfo);
   };
+
   const toggleEditNumbersMode = () => {
     if (
       envelope &&
@@ -229,7 +246,7 @@ const Envelope = () => {
         setEditableBudget(maxBudget.toFixed(2).toString());
       }
     }
-  }, [income, editableBudget, budgetSum]);
+  }, [envelope, income, editableBudget, budgetSum]);
 
   // Load latest expenses
   useEffect(() => {
@@ -241,16 +258,6 @@ const Envelope = () => {
       );
     }
   }, [expenses, envelope]);
-
-  if (!envelope) {
-    return (
-      <>
-        <p>Envelope not found.</p>
-        <p>Ah.</p>
-        <p>If only this was a proper error page with some navigation...</p>
-      </>
-    );
-  }
 
   return (
     <div className="envelope">
@@ -269,7 +276,15 @@ const Envelope = () => {
                 maxLength="30"
               />
             ) : (
-              <h1 className="envelope__name">{editableName}</h1>
+              <h1
+                className={`envelope__name ${loadingEnvelopes || syncingEnvelopes ? "envelope__name--small" : ""}`}
+              >
+                {loadingEnvelopes
+                  ? "Loading name..."
+                  : syncingEnvelopes
+                    ? "Syncing name"
+                    : editableName}
+              </h1>
             )}
 
             {isEditingInfo ? (
@@ -280,7 +295,11 @@ const Envelope = () => {
               />
             ) : (
               <p className="envelope__description">
-                {editableDescription || "No description"}
+                {loadingEnvelopes
+                  ? "Loading description..."
+                  : syncingEnvelopes
+                    ? "Syncing description"
+                    : editableDescription || "No description"}
               </p>
             )}
           </div>
@@ -355,24 +374,25 @@ const Envelope = () => {
                     isEditingNumbers ? { backgroundColor: "black" } : {}
                   }
                 >
-                  <SvgEditIcon
+                  <SvgEnvelopeCash
                     fillColor={isEditingNumbers ? backgroundColor : "black"}
-                    strokeColor={isEditingNumbers ? backgroundColor : "black"}
                   />
                 </Button>
               )}
             </div>
           </div>
           <ProgressBar
-            budget={envelope.budget}
-            amount={envelope.currentAmount}
+            budget={envelope?.budget ?? 1}
+            amount={envelope?.currentAmount ?? 0}
+            loading={loadingEnvelopes}
+            syncing={syncingEnvelopes}
           />
           {isEditingNumbers && (
             <div
-              className="edit-envelope-funds"
+              className="envelope__edit-funds"
               style={{ backgroundColor: editableColor }}
             >
-              <div className="edit-envelope-funds__item">
+              <div className="envelope__edit-funds__item">
                 <div className="label-difference-container">
                   <label className="label" htmlFor="budget">
                     New Budget
@@ -401,7 +421,7 @@ const Envelope = () => {
                 </div>
               </div>
 
-              <div className="edit-envelope-funds__item">
+              <div className="envelope__edit-funds__item">
                 <div className="label-difference-container">
                   <label className="label" htmlFor="amount">
                     New Amount
@@ -450,6 +470,33 @@ const Envelope = () => {
         </div>
 
         <h2 className="envelope__subheading">This month's expenses</h2>
+
+        <div
+          className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
+        >
+          <Button
+            type="button"
+            className={`button button--new-expense`}
+            onClick={() =>
+              navigate("/expense", {
+                state: {
+                  category: "envelope",
+                  sourceData: {
+                    id: envelope.id,
+                    type: "envelope",
+                    name: envelope.name,
+                    amount: 0,
+                    order: envelope.order,
+                  },
+                  activeCategory: "envelope",
+                  sourceId: envelope.id,
+                },
+              })
+            }
+          >
+            <img src={expenseIcon} alt="New expense" />
+          </Button>
+        </div>
       </main>
     </div>
   );

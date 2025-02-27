@@ -21,25 +21,29 @@ const useGoalsListener = () => {
 
       let isNewer = false;
       let newNextGoalId = null;
+      let goalsList = [];
 
-      const goalsData = snapshot.docs.map((doc) => {
+      snapshot.docs.forEach((doc) => {
         const data = doc.data();
 
         if (doc.id === "metadata") {
           newNextGoalId = data.nextGoalId ?? null;
-          return null;
-        }
+        } else {
+          goalsList.push({ id: doc.id, ...data });
 
-        if (data.updatedAt && (!lastUpdated || data.updatedAt > lastUpdated)) {
-          isNewer = true;
+          if (
+            data.updatedAt &&
+            (!lastUpdated || data.updatedAt > lastUpdated)
+          ) {
+            isNewer = true;
+          }
         }
-
-        return { id: doc.id, ...data };
       });
 
-      setGoals(goalsData);
+      setGoals(goalsList);
       setNextGoalId(newNextGoalId);
       setLoadingGoals(false);
+
       if (isNewer) {
         setLastUpdated(Date.now());
       } else {

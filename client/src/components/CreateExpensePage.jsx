@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useOutletContext, useNavigate, useLocation } from "react-router-dom";
 import { createExpense } from "../util/axios/createFunctions";
-import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import PickSingleSource from "./PickSingleSource";
 import PickMultipleSources from "./PickMultipleSources";
@@ -10,14 +9,25 @@ const CreateExpensePage = () => {
   const { envelopes, savings, loadingExpenses, syncingExpenses, date } =
     useOutletContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const categoryFromLocation = location.state?.category || null;
+  const expenseSourceFromLocation = location.state?.sourceData
+    ? [location.state?.sourceData]
+    : [];
+  const activeCategoryFromLocation = location.state?.activeCategory;
+  const sourceIdFromLocation = location.state?.sourceId;
+
+  const isFirstRender = useRef(true);
 
   const [newExpenseAmount, setNewExpenseAmount] = useState("");
   const [newExpenseDate, setNewExpenseDate] = useState("");
-  const [newExpenseSources, setNewExpenseSources] = useState([]);
+  const [newExpenseSources, setNewExpenseSources] = useState(
+    expenseSourceFromLocation,
+  );
   const [newExpenseDescription, setNewExpenseDescription] = useState("");
   const [isTodayChecked, setIsTodayChecked] = useState(true);
   const [isDisabled, setIsDisabled] = useState(true);
-  const [sourceCategory, setSourceCategory] = useState(null);
+  const [sourceCategory, setSourceCategory] = useState(categoryFromLocation);
   const [allowMultipleSources, setAllowMultipleSources] = useState(false);
 
   const fakeCurrency = "€";
@@ -76,9 +86,20 @@ const CreateExpensePage = () => {
   };
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     setNewExpenseSources([]);
     setSourceCategory(null);
   }, [allowMultipleSources]);
+
+  useEffect(() => {
+    return () => {
+      isFirstRender.current = true; // I need this because of Strict Mode
+    };
+  }, []);
 
   useEffect(() => {
     let totalSum = 0;
@@ -134,7 +155,11 @@ const CreateExpensePage = () => {
           <Button
             type="button"
             className="button button--back"
-            onClick={() => navigate("/envelopes")}
+            onClick={() =>
+              navigate(
+                `/envelopes${sourceIdFromLocation ? `/${sourceIdFromLocation}` : ""}`,
+              )
+            }
           >
             X
           </Button>
@@ -236,6 +261,8 @@ const CreateExpensePage = () => {
                     setSourceCategory={setSourceCategory}
                     envelopes={envelopes}
                     savings={savings}
+                    activeCategoryFromLocation={activeCategoryFromLocation}
+                    sourceIdFromLocation={sourceIdFromLocation}
                   />
                 )}
               </>

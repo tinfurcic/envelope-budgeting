@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../components/AuthContext";
 
 const useEnvelopesListener = () => {
@@ -16,9 +16,8 @@ const useEnvelopesListener = () => {
     if (!user) return;
 
     const envelopesRef = collection(db, "users", user.uid, "envelopes");
-    const envelopesQuery = query(envelopesRef);
 
-    const unsubscribe = onSnapshot(envelopesQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(envelopesRef, (snapshot) => {
       setSyncingEnvelopes(true);
 
       let isNewer = false;
