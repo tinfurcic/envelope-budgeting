@@ -7,7 +7,6 @@ import ProgressBar from "./ProgressBar";
 const GoalCard = ({ goal }) => {
   const navigate = useNavigate();
   const { date } = useOutletContext();
-  const fakeCurrency = "€";
 
   return (
     <div className="goal-card" onClick={() => navigate(`/goals/${goal.id}`)}>

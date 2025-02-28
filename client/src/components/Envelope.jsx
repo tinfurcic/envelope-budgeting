@@ -196,24 +196,21 @@ const Envelope = () => {
   };
 
   useEffect(() => {
-    if (envelope && envelope.budget) {
+    if (envelope?.budget) {
       setBudgetDifference(editableBudget - envelope.budget);
     }
   }, [envelope, editableBudget, setBudgetDifference]);
 
   useEffect(() => {
-    if (envelope && envelope.currentAmount) {
+    if (envelope?.currentAmount) {
       setAmountDifference(editableAmount - envelope.currentAmount);
     }
   }, [envelope, editableAmount, setAmountDifference]);
 
   useEffect(() => {
     if (
-      savings &&
-      savings.shortTermSavings &&
-      savings.longTermSavings &&
-      savings.shortTermSavings.currentAmount &&
-      savings.longTermSavings.currentAmount
+      savings?.shortTermSavings?.currentAmount &&
+      savings?.longTermSavings?.currentAmount
     ) {
       if (Number(amountDifference) > savings.shortTermSavings.currentAmount) {
         console.log("This action will draw funds from your long-term savings!");
@@ -233,11 +230,8 @@ const Envelope = () => {
 
   useEffect(() => {
     if (
-      income &&
-      income.regularIncome &&
-      income.regularIncome.value &&
-      envelope &&
-      envelope.budget &&
+      income?.regularIncome?.value &&
+      envelope?.budget &&
       budgetSum
     ) {
       const maxBudget =
@@ -400,8 +394,7 @@ const Envelope = () => {
                   <span
                     className={`funds-difference funds-difference--${budgetDifference > 0 ? "positive" : budgetDifference < 0 ? "negative" : ""}`}
                   >
-                    {envelope &&
-                      envelope.budget &&
+                    {envelope?.budget &&
                       budgetDifference !== 0 &&
                       `${budgetDifference > 0 ? "+" : "-"} ${fakeCurrency}${Math.abs(envelope.budget - Number(editableBudget)).toFixed(2)}`}
                   </span>

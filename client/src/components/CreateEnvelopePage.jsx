@@ -99,12 +99,7 @@ const CreateEnvelopePage = () => {
   }, [savings, newEnvelopeCurrentAmount, setNewEnvelopeCurrentAmount]);
 
   useEffect(() => {
-    if (
-      income &&
-      income.regularIncome &&
-      income.regularIncome.value &&
-      budgetSum
-    ) {
+    if (income?.regularIncome?.value && budgetSum !== undefined) {
       const availableBudget = income.regularIncome.value - budgetSum;
       if (parseFloat(newEnvelopeBudget) > availableBudget) {
         setNewEnvelopeBudget(availableBudget.toFixed(2).toString());
