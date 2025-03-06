@@ -76,7 +76,6 @@ const CreateGoalPage = () => {
       <header className="create-goal-page__header">
         <div className="create-goal-page__nav-back">
           <Button
-            type="button"
             className="button button--back"
             onClick={() => navigate("/goals")}
           >

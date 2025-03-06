@@ -153,7 +153,6 @@ const CreateExpensePage = () => {
       <header className="create-expense-page__header">
         <div className="create-expense-page__nav-back">
           <Button
-            type="button"
             className="button button--back"
             onClick={() =>
               navigate(

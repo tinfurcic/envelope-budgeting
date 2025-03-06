@@ -166,7 +166,6 @@ const PickMultipleSources = ({
           return (
             <Button
               key={source.id}
-              type="button"
               className={`button button--source ${
                 isDisabled
                   ? "disabled inactive"

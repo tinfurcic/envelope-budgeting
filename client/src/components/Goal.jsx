@@ -219,7 +219,6 @@ const Goal = () => {
 
           <div className="goal__header-bar">
             <Button
-              type="button"
               className="button button--back"
               onClick={() => navigate("/goals")}
             >
@@ -227,7 +226,6 @@ const Goal = () => {
             </Button>
 
             <Button
-              type="button"
               className="button button--edit"
               onClick={toggleEditInfoMode}
               extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
@@ -240,7 +238,6 @@ const Goal = () => {
 
             {!isSavingInfoDisabled && isEditingInfo && (
               <Button
-                type="button"
                 className="button button--edit"
                 onClick={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
@@ -259,7 +256,6 @@ const Goal = () => {
             <div className="goal__edit-controls">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
-                  type="button"
                   className="button button--edit"
                   onClick={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
@@ -269,7 +265,6 @@ const Goal = () => {
               )}
               {!isEditingInfo && (
                 <Button
-                  type="button"
                   className={`button button--edit`}
                   onClick={toggleEditNumbersMode}
                   extraStyle={

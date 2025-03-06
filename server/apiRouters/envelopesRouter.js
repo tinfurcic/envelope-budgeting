@@ -6,6 +6,7 @@ import {
   updateEnvelope,
   batchUpdateEnvelopeOrders,
   batchDeleteEnvelopes,
+  batchDeleteAndReorderEnvelopes,
   deleteEnvelope,
 } from "../envelope.js";
 
@@ -71,22 +72,83 @@ envelopesRouter.post("/", async (req, res) => {
 envelopesRouter.patch("/delete", async (req, res) => {
   const { deletedEnvelopeIds } = req.body;
 
-  // Validate request body
   if (!Array.isArray(deletedEnvelopeIds) || deletedEnvelopeIds.length === 0) {
-    return res.status(400).json({ error: "Invalid input: Must provide an array of envelope IDs to delete." });
+    return res.status(400).json({
+      error:
+        "Invalid input: Must provide a non-empty array of envelope IDs to delete.",
+    });
   }
 
-  for (let i = 0; i < deletedEnvelopeIds.length; i++) {
-    if (!Number.isInteger(deletedEnvelopeIds[i])) {
-      return res.status(400).json({ error: `Invalid ID at index ${i}: Must be an integer.` });
-    }
+  if (!deletedEnvelopeIds.every(Number.isInteger)) {
+    return res.status(400).json({
+      error: "Invalid input: All envelope IDs must be integers.",
+    });
+  }
+
+  if (!req.userId) {
+    return res.status(401).json({ error: "Unauthorized: Missing user ID." });
   }
 
   try {
     await batchDeleteEnvelopes(req.userId, deletedEnvelopeIds);
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Error deleting envelopes:", error.message);
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
+  }
+});
+
+envelopesRouter.patch("/batch-delete-reorder", async (req, res) => {
+  const { deletedEnvelopeIds, updatedEnvelopeIds } = req.body;
+
+  if (
+    !Array.isArray(deletedEnvelopeIds) ||
+    !Array.isArray(updatedEnvelopeIds)
+  ) {
+    return res.status(400).json({
+      error: "Invalid input: Must provide arrays for deleted and updated IDs.",
+    });
+  }
+
+  if (
+    !deletedEnvelopeIds.every(Number.isInteger) ||
+    !updatedEnvelopeIds.every(Number.isInteger)
+  ) {
+    return res.status(400).json({
+      error: "Invalid input: All envelope IDs must be integers.",
+    });
+  }
+
+  try {
+    await batchDeleteAndReorderEnvelopes(
+      req.userId,
+      deletedEnvelopeIds,
+      updatedEnvelopeIds,
+    );
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error in batch delete and reorder:", error.message);
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
+  }
+});
+
+envelopesRouter.patch("/", async (req, res) => {
+  const { updatedEnvelopes } = req.body;
+
+  if (
+    !Array.isArray(updatedEnvelopes) ||
+    updatedEnvelopes.length === 0 ||
+    !updatedEnvelopes.every(Number.isInteger)
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Must provide a non-empty array of envelope IDs." });
+  }
+
+  try {
+    await batchUpdateEnvelopeOrders(req.userId, updatedEnvelopes);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error in batch envelope order update:", error.message);
     res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
@@ -109,34 +171,6 @@ envelopesRouter.patch("/:id", async (req, res) => {
     res.status(200).json(updatedEnvelope);
   } catch (error) {
     console.error("Error updating envelope:", error.message);
-    res.status(500).send({ error: `Internal server error: ${error.message}` });
-  }
-});
-
-envelopesRouter.patch("/", async (req, res) => {
-  const { updatedEnvelopes } = req.body;
-
-  if (!Array.isArray(updatedEnvelopes) || updatedEnvelopes.length === 0) {
-    return res.status(400).send({ error: "Invalid input: Must provide an array of envelopes to update." });
-  }
-
-  // Validate each envelope object (only ID and newOrder are relevant)
-  for (const envelope of updatedEnvelopes) {
-    if (
-      typeof envelope !== "object" ||
-      envelope === null ||
-      !Number.isInteger(envelope.id) ||
-      !Number.isInteger(envelope.newOrder) // Only allow integer values for newOrder
-    ) {
-      return res.status(400).send({ error: "Invalid envelope data format." });
-    }
-  }
-
-  try {
-    await batchUpdateEnvelopeOrders(req.userId, updatedEnvelopes);
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("Error in batch envelope order update:", error.message);
     res.status(500).send({ error: `Internal server error: ${error.message}` });
   }
 });

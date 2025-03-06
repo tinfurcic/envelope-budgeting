@@ -25,6 +25,41 @@ export const updateEnvelope = async (
   }
 };
 
+export const batchUpdateEnvelopeOrders = async (envelopes) => {
+  try {
+    const res = await axiosInstance.patch("/envelopes", { envelopes });
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error updating envelope:", error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+export const batchDeleteAndReorderEnvelopes = async (
+  deletedEnvelopeIds,
+  updatedEnvelopeIds,
+) => {
+  if (
+    !Array.isArray(deletedEnvelopeIds) ||
+    !Array.isArray(updatedEnvelopeIds)
+  ) {
+    throw new Error("Invalid input: Both parameters must be arrays.");
+  }
+  try {
+    const res = await axiosInstance.patch("/envelopes/batch-delete-reorder", {
+      deletedEnvelopeIds,
+      updatedEnvelopeIds,
+    });
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error(
+      "Error in batch delete and reorder request:",
+      error.response?.data || error.message,
+    );
+    return { success: false, error: error.message };
+  }
+};
+
 export const updateExpense = async (
   id,
   amount,

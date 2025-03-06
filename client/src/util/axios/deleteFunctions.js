@@ -10,6 +10,21 @@ export const deleteEnvelope = async (id) => {
   }
 };
 
+export const batchDeleteEnvelopes = async (deletedEnvelopeIds) => {
+  try {
+    await axiosInstance.patch("/envelopes/delete", {
+      deletedEnvelopeIds,
+    });
+    return { success: true, message: "Envelope(s) successfully deleted." };
+  } catch (error) {
+    console.error(
+      "Error deleting envelope(s):",
+      error.response?.data || error.message,
+    );
+    return { success: false, error: error.message };
+  }
+};
+
 export const deleteExpense = async (id) => {
   try {
     await axiosInstance.delete(`/expenses/${id}`);

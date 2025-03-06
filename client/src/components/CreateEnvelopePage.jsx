@@ -121,7 +121,6 @@ const CreateEnvelopePage = () => {
       <header className="create-envelope-page__header">
         <div className="create-envelope-page__nav-back">
           <Button
-            type="button"
             className="button button--back"
             onClick={() => navigate("/envelopes")}
           >

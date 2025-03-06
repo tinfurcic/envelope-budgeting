@@ -229,11 +229,7 @@ const Envelope = () => {
   }, [savings, amountDifference, setEditableAmount]);
 
   useEffect(() => {
-    if (
-      income?.regularIncome?.value &&
-      envelope?.budget &&
-      budgetSum
-    ) {
+    if (income?.regularIncome?.value && envelope?.budget && budgetSum) {
       const maxBudget =
         income.regularIncome.value - budgetSum + envelope.budget;
       if (parseFloat(editableBudget) > maxBudget) {
@@ -300,7 +296,6 @@ const Envelope = () => {
 
           <div className="envelope__header-bar">
             <Button
-              type="button"
               className="button button--back"
               onClick={() => navigate("/envelopes")}
             >
@@ -309,7 +304,6 @@ const Envelope = () => {
 
             {!isEditingNumbers && (
               <Button
-                type="button"
                 className="button button--edit"
                 onClick={toggleEditInfoMode}
                 extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
@@ -323,7 +317,6 @@ const Envelope = () => {
 
             {!isSavingInfoDisabled && isEditingInfo && (
               <Button
-                type="button"
                 className="button button--edit"
                 onClick={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
@@ -351,7 +344,6 @@ const Envelope = () => {
             <div className="envelope__edit-controls">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
-                  type="button"
                   className="button button--edit"
                   onClick={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
@@ -361,7 +353,6 @@ const Envelope = () => {
               )}
               {!isEditingInfo && (
                 <Button
-                  type="button"
                   className={`button button--edit`}
                   onClick={toggleEditNumbersMode}
                   extraStyle={
@@ -468,7 +459,6 @@ const Envelope = () => {
           className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
         >
           <Button
-            type="button"
             className={`button button--new-expense`}
             onClick={() =>
               navigate("/expense", {

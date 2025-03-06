@@ -46,7 +46,6 @@ const PickCategory = ({
         {["envelope", "savings"].map((category) => (
           <Button
             key={category}
-            type="button"
             className={`button button--category ${activeCategory === category ? "active" : "inactive"}`}
             onClick={() => handleClick(category)}
             disabled={false}

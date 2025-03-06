@@ -49,6 +49,20 @@
     background-color: transparent;
   }
 
+  &--envelope-corner {
+    padding: 0;
+    border-radius: 50%;
+    box-shadow: none;
+    background-color: transparent;
+  }
+
+  &--shift {
+    padding: 0;
+    border-radius: 50%;
+    box-shadow: none;
+    background-color: transparent;
+  }
+
   &--category {
     flex-grow: 1;
 

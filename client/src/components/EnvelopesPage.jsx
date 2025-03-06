@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, arrayMove } from "@dnd-kit/sortable";
+import { restrictToParentElement } from "@dnd-kit/modifiers";
+import { batchDeleteAndReorderEnvelopes } from "../util/axios/updateFunctions";
 import useScreenSize from "../hooks/useScreenSize";
 import useOverlapping from "../hooks/useOverlapping";
 import expenseIcon from "../media/expense.png";
@@ -20,20 +24,97 @@ const EnvelopesPage = () => {
     [envelopes],
   );
 
+  const [isManageMode, setIsManageMode] = useState(false);
+  const [toDelete, setToDelete] = useState([]); // Tracks envelopes marked for deletion
+  const [reorderedEnvelopes, setReorderedEnvelopes] = useState([...envelopes]); // Tracks reordering changes
+  const reorderedIds = reorderedEnvelopes
+    .map((env) => env.id)
+    .filter((envId) => !toDelete.includes(envId));
+
+  const handleSave = async () => {
+    try {
+      const response = await batchDeleteAndReorderEnvelopes(
+        toDelete,
+        reorderedIds,
+      );
+      if (!response.success) {
+        throw new Error("Failed to save changes.");
+      }
+
+      setToDelete([]);
+      console.log("Changes saved successfully!");
+    } catch (error) {
+      console.error("Error saving changes:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    // This is a temporary flicker-preventing solution
+    // Ideally, there should be a "Saving changes..." message indicator (during which deleting and reordering is disabled)
+    // that disappears only when new envelopes are fetched with the real-time listener, and reorderedEnvelopes is updated
+    setIsManageMode(false);
+  }, [envelopes]);
+
+  useEffect(() => {
+    const disableScroll = (e) => e.preventDefault();
+
+    if (isManageMode) {
+      document.addEventListener("touchmove", disableScroll, { passive: false });
+    } else {
+      document.removeEventListener("touchmove", disableScroll);
+    }
+
+    return () => {
+      document.removeEventListener("touchmove", disableScroll);
+    };
+  }, [isManageMode]);
+
+  const toggleManageMode = () => {
+    setIsManageMode(!isManageMode);
+    setReorderedEnvelopes([...envelopes]);
+  };
+
+  const handleDragStart = () => {
+    document.body.style.overflow = "hidden"; // Prevent scrolling
+    document.body.style.touchAction = "none"; // Prevent gestures
+  };
+
+  const handleDragEnd = (event) => {
+    document.body.style.overflow = ""; // Restore scrolling
+    document.body.style.touchAction = "";
+
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setReorderedEnvelopes((prevOrder) => {
+      const oldIndex = prevOrder.findIndex((env) => env.id === active.id);
+      const newIndex = prevOrder.findIndex((env) => env.id === over.id);
+      return arrayMove(prevOrder, oldIndex, newIndex);
+    });
+  };
+
   return (
     <div className="envelopes-page">
       <div className="envelopes-page__header">
         <h1 className="envelopes-page__heading">My Envelopes</h1>
         <Button
-          type="button"
           className="button button--blue"
           onClick={() => navigate("/create-envelope")}
         >
           New Envelope
         </Button>
       </div>
+      <div className="envelopes-page__smth">
+        <Button className="button button--blue" onClick={toggleManageMode}>
+          Manage Envelopes
+        </Button>
+      </div>
+      <div className="envelopes-page__smth-else">
+        <Button className="button button--blue" onClick={handleSave}>
+          Save
+        </Button>
+      </div>
 
-      {/* Add grid/slider view button */}
       <div className="envelopes-page__envelopes">
         {loadingEnvelopes ? (
           <span className="envelopes-page__loading-message">
@@ -49,10 +130,35 @@ const EnvelopesPage = () => {
               You don't have any envelopes yet. Create one!
             </span>
           </div>
+        ) : isManageMode ? (
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToParentElement]}
+          >
+            <SortableContext items={reorderedEnvelopes.map((env) => env.id)}>
+              <div className="envelopes-page__cards-container">
+                {reorderedEnvelopes.map((envelope) => (
+                  <EnvelopeCard
+                    key={envelope.id}
+                    envelope={envelope}
+                    isManageMode={isManageMode}
+                    toDelete={toDelete}
+                    setToDelete={setToDelete}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         ) : (
           <div className="envelopes-page__cards-container">
             {envelopes.map((envelope) => (
-              <EnvelopeCard key={envelope.id} envelope={envelope} />
+              <EnvelopeCard
+                key={envelope.id}
+                envelope={envelope}
+                isManageMode={isManageMode}
+              />
             ))}
           </div>
         )}
@@ -62,7 +168,6 @@ const EnvelopesPage = () => {
         className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
       >
         <Button
-          type="button"
           className={`button button--new-expense`}
           onClick={() => navigate("/expense")}
         >
