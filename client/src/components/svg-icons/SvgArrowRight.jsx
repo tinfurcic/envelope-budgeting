@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgArrowRightIcon = ({ fillColor, strokeColor }) => {
+const SvgArrowRight = ({ fillColor, strokeColor }) => {
   return (
     <div className="svg-container">
       <svg
@@ -19,4 +19,4 @@ const SvgArrowRightIcon = ({ fillColor, strokeColor }) => {
   );
 };
 
-export default SvgArrowRightIcon;
+export default SvgArrowRight;

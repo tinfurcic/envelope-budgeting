@@ -4,10 +4,10 @@ import { deleteGoal } from "../util/axios/deleteFunctions";
 import { updateGoal } from "../util/axios/updateFunctions";
 import useCSSVariable from "../hooks/useCSSVariable";
 import Button from "./Button";
-import SvgEditIcon from "./SvgEditIcon";
-import SvgCheckIcon from "./SvgCheckIcon";
+import SvgEdit from "./svg-icons/SvgEdit";
+import SvgCheck from "./svg-icons/SvgCheck";
+import SvgPiggyBank from "./svg-icons/SvgPiggyBank";
 import ProgressBar from "./ProgressBar";
-import SvgPiggyBankIcon from "./SvgPiggyBankIcon";
 
 const Goal = () => {
   const { id } = useParams();
@@ -230,7 +230,7 @@ const Goal = () => {
               onClick={toggleEditInfoMode}
               extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
             >
-              <SvgEditIcon
+              <SvgEdit
                 fillColor={isEditingInfo ? goalColor : "black"}
                 strokeColor={isEditingInfo ? goalColor : "black"}
               />
@@ -242,7 +242,7 @@ const Goal = () => {
                 onClick={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
-                <SvgCheckIcon fillColor="black" strokeColor="black" />
+                <SvgCheck fillColor="black" strokeColor="black" />
               </Button>
             )}
           </div>
@@ -260,7 +260,7 @@ const Goal = () => {
                   onClick={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
-                  <SvgCheckIcon fillColor="black" strokeColor="black" />
+                  <SvgCheck fillColor="black" strokeColor="black" />
                 </Button>
               )}
               {!isEditingInfo && (
@@ -271,7 +271,7 @@ const Goal = () => {
                     isEditingNumbers ? { backgroundColor: "black" } : {}
                   }
                 >
-                  <SvgPiggyBankIcon
+                  <SvgPiggyBank
                     piggyColor={isEditingNumbers ? "pink" : "black"}
                     coinColor={isEditingNumbers ? "gold" : "black"}
                     numberColor={isEditingNumbers ? "gold" : "black"}

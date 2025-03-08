@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgDeleteIcon = ({ fillColor, strokeColor }) => {
+const SvgDelete = ({ fillColor, strokeColor }) => {
   return (
     <div className="svg-container">
       <svg
@@ -26,4 +26,4 @@ const SvgDeleteIcon = ({ fillColor, strokeColor }) => {
   );
 };
 
-export default SvgDeleteIcon;
+export default SvgDelete;

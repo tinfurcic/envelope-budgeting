@@ -47,8 +47,6 @@ export const getGoalById = async (userId, goalId) => {
 };
 
 // Create a new goal for a user
-// By adding `|| ""` after a property, I can make sending through request body optional
-// It's probably better to make user actions pass some values by default
 export const createGoal = async (
   userId,
   name,

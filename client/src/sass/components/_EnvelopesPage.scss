@@ -20,6 +20,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    margin: 1.5rem 0 0.5rem 0;
+  }
+
+  &__heading {
+    margin: 0
   }
 
   &__cards-container {
@@ -31,6 +37,18 @@
     justify-items: stretch;
     gap: 3vw;
     margin: 0 2%;
+  }
+}
+
+.manage-envelopes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 1rem 0.5rem;
+
+  &__saving-message {
+    margin: 0 1rem 0 0;
+    font-size: 1.125rem;
   }
 }
 

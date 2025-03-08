@@ -5,9 +5,9 @@ import expenseIcon from "../media/expense.png";
 import useCSSVariable from "../hooks/useCSSVariable";
 import useOverlapping from "../hooks/useOverlapping";
 import useScreenSize from "../hooks/useScreenSize";
-import SvgEditIcon from "./SvgEditIcon";
-import SvgCheckIcon from "./SvgCheckIcon";
-import SvgEnvelopeCash from "./SvgEnvelopeCash";
+import SvgEdit from "./svg-icons/SvgEdit";
+import SvgCheck from "./svg-icons/SvgCheck";
+import SvgEnvelopeCash from "./svg-icons/SvgEnvelopeCash";
 import ProgressBar from "./ProgressBar";
 import ExpensesTable from "./ExpensesTable";
 import Button from "./Button";
@@ -308,7 +308,7 @@ const Envelope = () => {
                 onClick={toggleEditInfoMode}
                 extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
               >
-                <SvgEditIcon
+                <SvgEdit
                   fillColor={isEditingInfo ? editableColor : "black"}
                   strokeColor={isEditingInfo ? editableColor : "black"}
                 />
@@ -321,7 +321,7 @@ const Envelope = () => {
                 onClick={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
-                <SvgCheckIcon fillColor="black" strokeColor="black" />
+                <SvgCheck fillColor="black" strokeColor="black" />
               </Button>
             )}
           </div>
@@ -348,7 +348,7 @@ const Envelope = () => {
                   onClick={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
-                  <SvgCheckIcon fillColor="black" strokeColor="black" />
+                  <SvgCheck fillColor="black" strokeColor="black" />
                 </Button>
               )}
               {!isEditingInfo && (

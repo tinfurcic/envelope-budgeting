@@ -2,7 +2,7 @@ import React from "react";
 import { useOutletContext } from "react-router-dom";
 import CurrencyDropdown from "./CurrencyDropdown";
 import Button from "./Button";
-import SvgEditIcon from "./SvgEditIcon";
+import SvgEdit from "./svg-icons/SvgEdit";
 import Logout from "./Logout";
 
 const ProfilePage = () => {
@@ -30,7 +30,7 @@ const ProfilePage = () => {
             Income <span className="funds__category__info">ⓘ</span>
             <div className="funds__category__edit-icon">
               <Button className="button button--edit" onClick={null}>
-                <SvgEditIcon strokeColor="black" fillColor="black" />
+                <SvgEdit strokeColor="black" fillColor="black" />
               </Button>
             </div>
           </h3>
@@ -55,7 +55,7 @@ const ProfilePage = () => {
             Savings <span className="funds__category__info">ⓘ</span>
             <div className="funds__category__edit-icon">
               <Button className="button button--edit" onClick={null}>
-                <SvgEditIcon strokeColor="black" fillColor="black" />
+                <SvgEdit strokeColor="black" fillColor="black" />
               </Button>
             </div>
           </h3>

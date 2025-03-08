@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgShiftIcon = ({ fillColor, strokeColor }) => {
+const SvgShift = ({ fillColor, strokeColor }) => {
   return (
     <div className="svg-container">
       <svg
@@ -19,4 +19,4 @@ const SvgShiftIcon = ({ fillColor, strokeColor }) => {
   );
 };
 
-export default SvgShiftIcon;
+export default SvgShift;

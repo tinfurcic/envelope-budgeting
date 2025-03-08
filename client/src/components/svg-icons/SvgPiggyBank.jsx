@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgPiggyBankIcon = ({ piggyColor, coinColor, numberColor }) => {
+const SvgPiggyBank = ({ piggyColor, coinColor, numberColor }) => {
   return (
     <div className="svg-container">
       <svg
@@ -28,4 +28,4 @@ const SvgPiggyBankIcon = ({ piggyColor, coinColor, numberColor }) => {
   );
 };
 
-export default SvgPiggyBankIcon;
+export default SvgPiggyBank;

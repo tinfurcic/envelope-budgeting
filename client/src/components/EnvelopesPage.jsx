@@ -5,11 +5,13 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { batchDeleteAndReorderEnvelopes } from "../util/axios/updateFunctions";
+import { arraysAreEqual } from "../util/arraysAreEqual";
 import useScreenSize from "../hooks/useScreenSize";
 import useOverlapping from "../hooks/useOverlapping";
 import expenseIcon from "../media/expense.png";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "./Button";
+import SvgGear from "./svg-icons/SvgGear";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
@@ -31,7 +33,11 @@ const EnvelopesPage = () => {
     .map((env) => env.id)
     .filter((envId) => !toDelete.includes(envId));
 
+  const changesAreMade = isManageMode && (!arraysAreEqual(envelopes, reorderedEnvelopes) || toDelete.length !== 0);
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       const response = await batchDeleteAndReorderEnvelopes(
         toDelete,
@@ -40,18 +46,16 @@ const EnvelopesPage = () => {
       if (!response.success) {
         throw new Error("Failed to save changes.");
       }
-
       setToDelete([]);
       console.log("Changes saved successfully!");
     } catch (error) {
       console.error("Error saving changes:", error.message);
     }
   };
-
+  
   useEffect(() => {
-    // This is a temporary flicker-preventing solution
-    // Ideally, there should be a "Saving changes..." message indicator (during which deleting and reordering is disabled)
-    // that disappears only when new envelopes are fetched with the real-time listener, and reorderedEnvelopes is updated
+    // saving actually lasts considerably shorter, but this simplifies conditional rendering
+    setIsSaving(false);
     setIsManageMode(false);
   }, [envelopes]);
 
@@ -95,7 +99,7 @@ const EnvelopesPage = () => {
 
   return (
     <div className="envelopes-page">
-      <div className="envelopes-page__header">
+      <header className="envelopes-page__header">
         <h1 className="envelopes-page__heading">My Envelopes</h1>
         <Button
           className="button button--blue"
@@ -103,16 +107,27 @@ const EnvelopesPage = () => {
         >
           New Envelope
         </Button>
-      </div>
-      <div className="envelopes-page__smth">
+      </header>
+      <div className="manage-envelopes">
         <Button className="button button--blue" onClick={toggleManageMode}>
-          Manage Envelopes
+          <div className={`button__gear-icon ${isSaving ? "button__gear-icon--saving" : isManageMode ? "button__gear-icon--active" : ""}`}>
+            <SvgGear fillColor="black" />
+          </div>
+          Manage envelopes
         </Button>
-      </div>
-      <div className="envelopes-page__smth-else">
-        <Button className="button button--blue" onClick={handleSave}>
-          Save
-        </Button>
+        {changesAreMade && 
+          <>
+            {isSaving ? (
+              <p className="manage-envelopes__saving-message">
+                Saving...
+              </p>
+            ) : (
+              <Button className="button button--green" onClick={isSaving ? null : handleSave}>
+                Save changes
+              </Button>
+            )}
+          </>
+        }
       </div>
 
       <div className="envelopes-page__envelopes">
@@ -144,8 +159,11 @@ const EnvelopesPage = () => {
                     key={envelope.id}
                     envelope={envelope}
                     isManageMode={isManageMode}
+                    isSaving={isSaving}
                     toDelete={toDelete}
                     setToDelete={setToDelete}
+                    loadingEnvelopes={loadingEnvelopes}
+                    syncingEnvelopes={syncingEnvelopes}
                   />
                 ))}
               </div>

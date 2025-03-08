@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Button from "./Button";
-import SvgDeleteIcon from "../components/SvgDeleteIcon";
+import SvgDelete from "./svg-icons/SvgDelete";
+import SvgRestore from "./svg-icons/SvgRestore";
 
-const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
+const EnvelopeCard = ({ envelope, isManageMode, isSaving, toDelete, setToDelete, loadingEnvelopes, syncingEnvelopes }) => {
   const envelopeRef = useRef(null);
   const navigate = useNavigate();
   const fakeCurrency = "€";
-
   const markedForDeletion = toDelete?.includes(envelope.id);
 
   const toggleDelete = () => {
@@ -22,6 +22,8 @@ const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: envelope.id });
+
+  const dragListeners = isSaving ? {} : listeners;
 
   useEffect(() => {
     const updateFontSize = () => {
@@ -38,12 +40,12 @@ const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
     updateFontSize(); // Initial calculation
 
     return () => window.removeEventListener("resize", updateFontSize);
-  }, [envelope]); // ✅ Runs whenever envelope changes (important for DnD updates!)
+  }, [envelope]);
 
   return (
     <div
       className="envelope-card-wrapper"
-      ref={setNodeRef} // ✅ Directly use setNodeRef here (no need for useCallback)
+      ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -54,15 +56,15 @@ const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
       {...(isManageMode ? attributes : {})}
       {...(isManageMode
         ? {
-            ...listeners,
+            ...dragListeners,
             onPointerDown: (e) => {
               if (e.target.closest("[data-no-dnd]")) return;
-              listeners.onPointerDown?.(e);
+              dragListeners.onPointerDown?.(e);
             },
           }
         : {})}
     >
-      {isManageMode && (
+      {isManageMode && !isSaving && (
         <div className="envelope-card-wrapper__corner-button" data-no-dnd>
           <Button
             className="button button--envelope-corner"
@@ -73,9 +75,10 @@ const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
             }}
           >
             {markedForDeletion ? (
-              <SvgDeleteIcon fillColor="lightblue" strokeColor="black" />
+              <SvgRestore fillColor="#10bc66" strokeColor="black" />
             ) : (
-              <SvgDeleteIcon fillColor="red" strokeColor="black" />
+              <SvgDelete fillColor="red" strokeColor="black" />
+              
             )}
           </Button>
         </div>
@@ -83,10 +86,10 @@ const EnvelopeCard = ({ envelope, isManageMode, toDelete, setToDelete }) => {
 
       <div
         className="envelope-card"
-        ref={envelopeRef} // ✅ Separate from setNodeRef
+        ref={envelopeRef}
         style={{
           backgroundColor: envelope.color,
-          opacity: markedForDeletion ? 0.5 : 1,
+          opacity: markedForDeletion ? 0.4 : 1,
         }}
       >
         <div className="envelope-card__name">
