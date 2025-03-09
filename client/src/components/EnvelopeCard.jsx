@@ -6,7 +6,15 @@ import Button from "./Button";
 import SvgDelete from "./svg-icons/SvgDelete";
 import SvgRestore from "./svg-icons/SvgRestore";
 
-const EnvelopeCard = ({ envelope, isManageMode, isSaving, toDelete, setToDelete, loadingEnvelopes, syncingEnvelopes }) => {
+const EnvelopeCard = ({
+  envelope,
+  isManageMode,
+  isSaving,
+  toDelete,
+  setToDelete,
+  loadingEnvelopes,
+  syncingEnvelopes,
+}) => {
   const envelopeRef = useRef(null);
   const navigate = useNavigate();
   const fakeCurrency = "€";
@@ -74,12 +82,7 @@ const EnvelopeCard = ({ envelope, isManageMode, isSaving, toDelete, setToDelete,
               toggleDelete();
             }}
           >
-            {markedForDeletion ? (
-              <SvgRestore fillColor="#10bc66" strokeColor="black" />
-            ) : (
-              <SvgDelete fillColor="red" strokeColor="black" />
-              
-            )}
+            {markedForDeletion ? <SvgRestore /> : <SvgDelete />}
           </Button>
         </div>
       )}

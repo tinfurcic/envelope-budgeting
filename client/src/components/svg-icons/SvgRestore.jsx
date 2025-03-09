@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgRestore = ({ fillColor, strokeColor }) => {
+const SvgRestore = ({ fillColor = "#10bc66", strokeColor = "black" }) => {
   return (
     <div className="svg-container">
       <svg

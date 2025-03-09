@@ -151,19 +151,9 @@
     background-color: transparent;
     color: gray;
   }
-
   &__gear-icon {
     display: inline-block;
     width: 1.125rem;
-    transition: transform 0.3s ease;
-
-    &--active {
-      animation: spin 2s linear infinite;
-    }
-
-    &--saving {
-      animation: spin 0.5s linear infinite;
-    }
   }
 }
 

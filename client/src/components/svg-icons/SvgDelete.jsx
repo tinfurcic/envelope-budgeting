@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgDelete = ({ fillColor, strokeColor }) => {
+const SvgDelete = ({ fillColor = "red", strokeColor = "black" }) => {
   return (
     <div className="svg-container">
       <svg

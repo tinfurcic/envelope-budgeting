@@ -1,12 +1,48 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import anime from "animejs/lib/anime.es.js";
 
-const SvgGear = ({ fillColor }) => {
+const SvgGear = ({
+  fillColor = "black",
+  isActive = false,
+  isSaving = false,
+}) => {
+  const gearRef = useRef(null);
+
+  useEffect(() => {
+    if (gearRef.current) {
+      // Stop any existing animation before creating a new one
+      anime.remove(gearRef.current);
+
+      const rotationSpeed = isSaving ? 0.5 : isActive ? 2 : 0; // 0 = no rotation
+
+      // Start or update animation
+      if (rotationSpeed > 0) {
+        anime({
+          targets: gearRef.current,
+          rotate: "+=360", // Rotate 360 degrees infinitely
+          duration: rotationSpeed * 1000, // Duration in milliseconds
+          easing: "linear",
+          loop: true, // Infinite loop
+        });
+      }
+    }
+  }, [isActive, isSaving]); // Re-run animation if these states change
+
   return (
     <div className="svg-container">
-      <svg fill={fillColor} version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" 
-        width="100%" height="100%" viewBox="0 0 369.793 369.792"
+      <svg
+        ref={gearRef}
+        className="svg-gear"
+        fill={fillColor}
+        version="1.1"
+        id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg"
+        width="100%"
+        height="100%"
+        viewBox="0 0 369.793 369.792"
       >
-        <path d="M320.83,140.434l-1.759-0.627l-6.87-16.399l0.745-1.685c20.812-47.201,19.377-48.609,15.925-52.031L301.11,42.61
+        <path
+          d="M320.83,140.434l-1.759-0.627l-6.87-16.399l0.745-1.685c20.812-47.201,19.377-48.609,15.925-52.031L301.11,42.61
           c-1.135-1.126-3.128-1.918-4.846-1.918c-1.562,0-6.293,0-47.294,18.57L247.326,60l-16.916-6.812l-0.679-1.684
           C210.45,3.762,208.475,3.762,203.677,3.762h-39.205c-4.78,0-6.957,0-24.836,47.825l-0.673,1.741l-16.828,6.86l-1.609-0.669
           C92.774,47.819,76.57,41.886,72.346,41.886c-1.714,0-3.714,0.769-4.854,1.892l-27.787,27.16

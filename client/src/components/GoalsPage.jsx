@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import GoalCard from "./GoalCard";
 import Button from "./Button";

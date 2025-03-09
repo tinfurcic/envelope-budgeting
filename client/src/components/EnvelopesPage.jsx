@@ -33,7 +33,9 @@ const EnvelopesPage = () => {
     .map((env) => env.id)
     .filter((envId) => !toDelete.includes(envId));
 
-  const changesAreMade = isManageMode && (!arraysAreEqual(envelopes, reorderedEnvelopes) || toDelete.length !== 0);
+  const changesAreMade =
+    isManageMode &&
+    (!arraysAreEqual(envelopes, reorderedEnvelopes) || toDelete.length !== 0);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -52,13 +54,19 @@ const EnvelopesPage = () => {
       console.error("Error saving changes:", error.message);
     }
   };
-  
+
   useEffect(() => {
     // saving actually lasts considerably shorter, but this simplifies conditional rendering
     setIsSaving(false);
     setIsManageMode(false);
   }, [envelopes]);
 
+  const toggleManageMode = () => {
+    setIsManageMode(!isManageMode);
+    setReorderedEnvelopes([...envelopes]);
+  };
+
+  // disable scrolling on touchmove events (only drag&drop)
   useEffect(() => {
     const disableScroll = (e) => e.preventDefault();
 
@@ -72,11 +80,6 @@ const EnvelopesPage = () => {
       document.removeEventListener("touchmove", disableScroll);
     };
   }, [isManageMode]);
-
-  const toggleManageMode = () => {
-    setIsManageMode(!isManageMode);
-    setReorderedEnvelopes([...envelopes]);
-  };
 
   const handleDragStart = () => {
     document.body.style.overflow = "hidden"; // Prevent scrolling
@@ -110,24 +113,29 @@ const EnvelopesPage = () => {
       </header>
       <div className="manage-envelopes">
         <Button className="button button--blue" onClick={toggleManageMode}>
-          <div className={`button__gear-icon ${isSaving ? "button__gear-icon--saving" : isManageMode ? "button__gear-icon--active" : ""}`}>
-            <SvgGear fillColor="black" />
+          <div className="button__gear-icon">
+            <SvgGear
+              fillColor="black"
+              isActive={isManageMode}
+              isSaving={isSaving}
+            />
           </div>
           Manage envelopes
         </Button>
-        {changesAreMade && 
+        {changesAreMade && (
           <>
             {isSaving ? (
-              <p className="manage-envelopes__saving-message">
-                Saving...
-              </p>
+              <p className="manage-envelopes__saving-message">Saving...</p>
             ) : (
-              <Button className="button button--green" onClick={isSaving ? null : handleSave}>
+              <Button
+                className="button button--green"
+                onClick={isSaving ? null : handleSave}
+              >
                 Save changes
               </Button>
             )}
           </>
-        }
+        )}
       </div>
 
       <div className="envelopes-page__envelopes">

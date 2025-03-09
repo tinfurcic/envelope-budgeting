@@ -39,7 +39,6 @@ const Goal = () => {
   }
 
   const fakeCurrency = "€";
-  const backgroundColor = useCSSVariable("--background-color");
   const goalColor = useCSSVariable("--goal-color");
 
   const handleDelete = async (isAbandoning) => {
