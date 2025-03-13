@@ -113,6 +113,7 @@ const EnvelopesPage = () => {
       </header>
       <div className="manage-envelopes">
         <Button className="button button--blue" onClick={toggleManageMode}>
+          {/* On click, show a "Drag&drop to reorder!" popup with a "Don't show again" checkbox */}
           <div className="button__gear-icon">
             <SvgGear
               fillColor="black"

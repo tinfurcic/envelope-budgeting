@@ -2,16 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { deleteGoal } from "../util/axios/deleteFunctions";
 import { updateGoal } from "../util/axios/updateFunctions";
+import { bareMinimumToAchieveGoal } from "../util/bareMinimumToAchieveGoal";
+import { daysUntilNextMonth } from "../util/daysUntilNextMonth";
+import { dateDifference } from "../util/dateDifference";
 import useCSSVariable from "../hooks/useCSSVariable";
-import Button from "./Button";
-import SvgEdit from "./svg-icons/SvgEdit";
+import SvgCalendarVar from "./svg-icons/SvgCalendar";
 import SvgCheck from "./svg-icons/SvgCheck";
+import SvgDeadlineVar from "./svg-icons/SvgDeadline";
+import SvgEdit from "./svg-icons/SvgEdit";
+import SvgGlowingStar from "./svg-icons/SvgGlowingStar";
 import SvgPiggyBank from "./svg-icons/SvgPiggyBank";
+import SvgSnailVar from "./svg-icons/SvgSnail";
+import SvgWhiteFlag from "./svg-icons/SvgWhiteFlag";
+import Button from "./Button";
 import ProgressBar from "./ProgressBar";
 
 const Goal = () => {
   const { id } = useParams();
-  const { goals, loadingGoals, syncingGoals, savings } = useOutletContext();
+  const { goals, loadingGoals, syncingGoals, savings, date } =
+    useOutletContext();
   const navigate = useNavigate();
 
   const goal = goals.find((g) => g.id.toString() === id);
@@ -23,7 +32,10 @@ const Goal = () => {
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isEditingNumbers, setIsEditingNumbers] = useState(false);
 
-  const [accumulatedDifference, setAccumulatedDifference] = useState(0);
+  let accumulatedDifference = null;
+  if (goal?.accumulated !== undefined) {
+    accumulatedDifference = Number(editableAccumulated) - goal.accumulated;
+  }
 
   let isSavingInfoDisabled = true;
   let isSavingNumbersDisabled = true;
@@ -41,6 +53,26 @@ const Goal = () => {
   const fakeCurrency = "€";
   const goalColor = useCSSVariable("--goal-color");
 
+  let barelyAchieve = null;
+  if (
+    goal &&
+    goal.accumulated !== undefined &&
+    goal.goalAmount &&
+    goal.deadline
+  ) {
+    barelyAchieve = bareMinimumToAchieveGoal(
+      goal.goalAmount - goal.accumulated,
+      goal.deadline,
+    );
+  }
+
+  let daysUntilDeadline = null;
+  if (goal?.deadline) {
+    daysUntilDeadline = dateDifference(date, goal.deadline);
+  }
+
+  // when abandoning, the sum money from the goal (i.e. long term savings) is moved to short term savings
+  // when deleting a completed goal, the money stays in long term savings
   const handleDelete = async (isAbandoning) => {
     const result = await deleteGoal(id, isAbandoning);
     if (!result.success) {
@@ -122,7 +154,7 @@ const Goal = () => {
       console.error(result.error);
     } else {
       // display success message
-      console.log("Envelope successfully updated!");
+      console.log("Goal successfully updated!");
       toggleEditInfoMode();
     }
   };
@@ -158,21 +190,38 @@ const Goal = () => {
   };
 
   useEffect(() => {
-    if (goal?.accumulated !== undefined) {
-      setAccumulatedDifference(Number(editableAccumulated) - goal.accumulated);
-    } else {
-    }
-  }, [goal, editableAccumulated, setAccumulatedDifference]);
-
-  useEffect(() => {
-    if (savings?.shortTermSavings?.currentAmount) {
+    if (
+      savings?.shortTermSavings?.currentAmount !== undefined &&
+      goal?.accumulated !== undefined &&
+      goal?.goalAmount
+    ) {
       if (
-        Number(accumulatedDifference) > savings.shortTermSavings.currentAmount
+        Number(accumulatedDifference) >=
+          savings.shortTermSavings.currentAmount &&
+        Number(editableAccumulated) > goal.goalAmount
       ) {
-        setEditableAccumulated(savings.shortTermSavings.currentAmount);
+        const boundary = Math.min(
+          savings.shortTermSavings.currentAmount + goal.accumulated,
+          goal.goalAmount,
+        );
+        setEditableAccumulated(boundary);
+      } else if (
+        Number(accumulatedDifference) >= savings.shortTermSavings.currentAmount
+      ) {
+        setEditableAccumulated(
+          savings.shortTermSavings.currentAmount + goal.accumulated,
+        );
+      } else if (Number(editableAccumulated) > goal.goalAmount) {
+        setEditableAccumulated(goal.goalAmount);
       }
     }
-  }, [savings, accumulatedDifference, setEditableAccumulated]);
+  }, [
+    savings,
+    goal,
+    accumulatedDifference,
+    editableAccumulated,
+    setEditableAccumulated,
+  ]);
 
   return (
     <div className="goal">
@@ -251,8 +300,26 @@ const Goal = () => {
       <main>
         <div className="goal__overview">
           <div className="goal__subheading-container">
-            <h2 className="goal__subheading">Goal overview</h2>
-            <div className="goal__edit-controls">
+            <div className="goal__subheading-container__group">
+              <h2 className="goal__subheading">Goal overview</h2>
+              {goal?.accumulated !== goal?.goalAmount ? (
+                <Button
+                  className="button button--abandon-goal"
+                  onClick={() => handleDelete("true")}
+                >
+                  <SvgWhiteFlag />
+                </Button>
+              ) : (
+                <Button
+                  className="button button--complete-goal"
+                  onClick={() => handleDelete("false")}
+                >
+                  <SvgGlowingStar />
+                </Button>
+              )}
+            </div>
+
+            <div className="goal__subheading-container__group">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
                   className="button button--edit"
@@ -271,17 +338,22 @@ const Goal = () => {
                   }
                 >
                   <SvgPiggyBank
-                    piggyColor={isEditingNumbers ? "pink" : "black"}
-                    coinColor={isEditingNumbers ? "gold" : "black"}
-                    numberColor={isEditingNumbers ? "gold" : "black"}
+                    piggyColor={isEditingNumbers ? "#e59fc2" : "black"}
+                    coinColor={isEditingNumbers ? "#bcbc10" : "black"}
+                    numberColor={isEditingNumbers ? "#bcbc10" : "black"}
                   />
                 </Button>
               )}
             </div>
           </div>
           <ProgressBar
-            budget={goal?.goalAmount ?? 1}
-            amount={goal?.accumulated ?? 0}
+            whole={goal?.goalAmount ?? 1}
+            part={goal?.monthStart ?? 0}
+            secondPart={
+              goal?.accumulated !== undefined && goal?.monthStart !== undefined
+                ? goal.accumulated - goal.monthStart
+                : 0
+            }
             loading={loadingGoals}
             syncing={syncingGoals}
           />
@@ -290,7 +362,7 @@ const Goal = () => {
               className="goal__edit-funds"
               style={{ backgroundColor: goalColor }}
             >
-              <div className="envelope__edit-funds__item">
+              <div className="goal__edit-funds__item">
                 <div className="label-difference-container">
                   <label className="label" htmlFor="amount">
                     New Amount
@@ -321,12 +393,26 @@ const Goal = () => {
               </div>
             </div>
           )}
+
+          <ul className="goal__stats-list">
+            <li className="goal__stats-list__item">
+              <SvgCalendarVar size={30} />
+              New income in {daysUntilNextMonth()} days
+            </li>
+            <li className="goal__stats-list__item">
+              <SvgSnailVar size={30} />
+              Min. monthly allocation: {fakeCurrency}
+              {barelyAchieve}
+            </li>
+            <li className="goal__stats-list__item">
+              <SvgDeadlineVar size={30} />
+              Deadline in {daysUntilDeadline} days
+            </li>
+          </ul>
         </div>
       </main>
     </div>
   );
 };
-
-// overview of sums put aside towards this goal?
 
 export default Goal;

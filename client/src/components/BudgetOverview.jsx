@@ -20,8 +20,8 @@ const BudgetOverview = () => {
     <div className="budget-overview">
       <h2 className="budget-overview__heading">Budget overview</h2>
       <ProgressBar
-        budget={totalBudget}
-        amount={totalCurrentAmount}
+        whole={totalBudget}
+        part={totalCurrentAmount}
         loading={loadingEnvelopes}
         syncing={syncingEnvelopes}
       />

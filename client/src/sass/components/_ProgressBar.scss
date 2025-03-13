@@ -1,12 +1,12 @@
 @use "../base/global";
-
-.progress-bar-container {
+.progress-bar {
   position: relative;
   height: 2rem;
   border: 1px solid black;
   border-radius: 1rem;
   overflow: hidden;
   font-size: 1.125rem;
+  display: flex;
 
   &--thin {
     height: 1.25rem;
@@ -14,12 +14,32 @@
     background-color: white;
   }
 
-  &__progress-bar {
-    --bar-width: 10%;
+  &__bar {
+    --bar-width: 50%;
     width: var(--bar-width);
     height: 100%;
-    border-radius: 1rem 0 0 1rem;
     background-color: global.$primary-green;
+    transition: width 0.5s ease-out;
+
+    position: relative;
+  }
+
+  &__negative-bar {
+    --negative-bar-width: 20%;
+    width: var(--negative-bar-width);
+    background-color: global.$tertiary-green;
+    height: 100%;
+    transition: width 0.5s ease-out;
+
+    position: absolute;
+    right: 0;
+  }
+
+  &__positive-bar {
+    --positive-bar-width: 50%;
+    width: var(--positive-bar-width);
+    background-color: global.$secondary-green;
+    height: 100%;
     transition: width 0.5s ease-out;
   }
 

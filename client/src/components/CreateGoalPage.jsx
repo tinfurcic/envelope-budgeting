@@ -41,7 +41,6 @@ const CreateGoalPage = () => {
       newGoalName,
       Number(newGoalAmount),
       newGoalDeadline,
-      0, // accumulated
       newGoalDescription,
     );
 

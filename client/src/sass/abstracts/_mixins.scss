@@ -146,6 +146,7 @@
       flex-direction: column;
       row-gap: 1rem;
       padding: 1rem;
+      border-left: 1px solid black;
     }
   }
 
@@ -171,7 +172,7 @@
   }
 
   &__name-input {
-    margin: 1rem 0 0.5rem 1rem;
+    margin: 1rem 1rem 0.5rem 1rem;
     padding: 0 0 0 0.5rem;
     border: none;
     border-bottom: 2px solid black;
@@ -199,7 +200,7 @@
 
   &__description-input {
     min-height: 33px;
-    margin: 0 0 1rem 1rem;
+    margin: 0 1rem 1rem 1rem;
     padding: 0.5rem 0 0.5rem 0.5rem;
 
     letter-spacing: typography.$letter-spacing-normal;
@@ -223,15 +224,16 @@
     align-items: center;
 
     margin-right: 0.5rem;
+
+    &__group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
   }
 
   &__subheading {
     margin: 0.5rem 0;
-  }
-
-  &__edit-controls {
-    display: flex;
-    gap: 1rem;
   }
 
   &__color-input {

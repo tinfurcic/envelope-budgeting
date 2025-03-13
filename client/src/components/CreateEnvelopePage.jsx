@@ -103,6 +103,7 @@ const CreateEnvelopePage = () => {
       const availableBudget = income.regularIncome.value - budgetSum;
       if (parseFloat(newEnvelopeBudget) > availableBudget) {
         setNewEnvelopeBudget(availableBudget.toFixed(2).toString());
+        // and display a "Total assigned budget can't exceed regular income!" message
       }
     }
   }, [income, newEnvelopeBudget, budgetSum]);

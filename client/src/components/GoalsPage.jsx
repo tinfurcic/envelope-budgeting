@@ -46,4 +46,7 @@ const GoalsPage = () => {
   );
 };
 
+// show short-/long-term savings?
+// show percentage of income set aside this month toward achieving goals?
+
 export default GoalsPage;

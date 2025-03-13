@@ -45,7 +45,7 @@ goalsRouter.get("/:id", async (req, res) => {
 });
 
 goalsRouter.post("/", async (req, res) => {
-  const { name, goalAmount, deadline, accumulated, description } = req.body;
+  const { name, goalAmount, deadline, description } = req.body;
   if (!name || !goalAmount) {
     return res.status(400).send({ error: "Invalid goal data" });
   }
@@ -56,7 +56,6 @@ goalsRouter.post("/", async (req, res) => {
       name,
       goalAmount,
       deadline,
-      accumulated,
       description,
     );
     res.status(201).json(newGoal);

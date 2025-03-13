@@ -56,15 +56,26 @@
     background-color: transparent;
   }
 
+  &--abandon-goal {
+    width: 2rem;
+    height: 2rem;
+    box-shadow: none;
+    background-color: transparent;
+    outline: 1px dashed black;
+  }
+
+  &--complete-goal {
+    width: 2rem;
+    height: 2rem;
+    box-shadow: none;
+    background-color: black;
+  }
+
   &--shift {
     padding: 0;
     border-radius: 50%;
     box-shadow: none;
     background-color: transparent;
-  }
-
-  &--manage-envelopes {
-    border: 1px solid red;
   }
 
   &--category {

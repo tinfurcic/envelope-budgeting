@@ -7,14 +7,16 @@ $padding: 0.25rem;
   position: relative;
 
   &__corner-button {
+    --width-and-height: 1.5rem;
+    --corner-offset: -0.5rem;
     position: absolute;
     z-index: 3;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: var(--width-and-height);
+    height: var(--width-and-height);
     border-radius: 50%;
 
-    top: -0.5rem;
-    right: -0.5rem;
+    top: var(--corner-offset);
+    right: var(--corner-offset);
   }
 }
 

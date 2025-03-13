@@ -52,7 +52,6 @@ export const createGoal = async (
   name,
   goalAmount,
   deadline,
-  accumulated,
   description,
 ) => {
   try {
@@ -73,8 +72,9 @@ export const createGoal = async (
       name,
       goalAmount: parseFloat(goalAmount),
       deadline,
-      accumulated: parseFloat(accumulated),
+      accumulated: 0,
       description: description,
+      monthStart: 0,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };

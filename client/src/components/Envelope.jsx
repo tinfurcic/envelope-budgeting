@@ -341,7 +341,7 @@ const Envelope = () => {
         <div className="envelope__overview">
           <div className="envelope__subheading-container">
             <h2 className="envelope__subheading">Budget overview</h2>
-            <div className="envelope__edit-controls">
+            <div className="envelope__subheading-container__group">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
                   className="button button--edit"
@@ -367,8 +367,8 @@ const Envelope = () => {
             </div>
           </div>
           <ProgressBar
-            budget={envelope?.budget ?? 1}
-            amount={envelope?.currentAmount ?? 0}
+            whole={envelope?.budget ?? 1}
+            part={envelope?.currentAmount ?? 0}
             loading={loadingEnvelopes}
             syncing={syncingEnvelopes}
           />

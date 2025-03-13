@@ -12,8 +12,6 @@ const EnvelopeCard = ({
   isSaving,
   toDelete,
   setToDelete,
-  loadingEnvelopes,
-  syncingEnvelopes,
 }) => {
   const envelopeRef = useRef(null);
   const navigate = useNavigate();
@@ -39,7 +37,7 @@ const EnvelopeCard = ({
         const { height } = envelopeRef.current.getBoundingClientRect();
         envelopeRef.current.style.setProperty(
           "--font-size",
-          `${height * 0.015}rem`,
+          `${height * 0.0135}rem`,
         );
       }
     };

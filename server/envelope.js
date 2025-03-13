@@ -263,10 +263,10 @@ export const updateEnvelope = async (
 
     const updates = {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      newBudget,
-      newCurrentAmount,
-      newDescription,
-      newColor,
+      budget: newBudget,
+      currentAmount: newCurrentAmount,
+      description: newDescription,
+      color: newColor,
       name: newName,
     };
     batch.update(envelopesRef.doc(envelopeId), updates);

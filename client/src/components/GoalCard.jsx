@@ -12,8 +12,8 @@ const GoalCard = ({ goal }) => {
     <div className="goal-card" onClick={() => navigate(`/goals/${goal.id}`)}>
       <p className="goal-card__name">{goal.name}</p>
       <ProgressBar
-        amount={goal.accumulated}
-        budget={goal.goalAmount}
+        whole={goal.goalAmount}
+        part={goal.accumulated}
         thin={true}
       />
       <p className="goal-card__deadline">
@@ -23,9 +23,6 @@ const GoalCard = ({ goal }) => {
       </p>
     </div>
   );
-
-  // estimated time of completion?
-  // progress bar showing the estimated increase at the end of this month
 };
 
 export default GoalCard;
