@@ -47,13 +47,11 @@ export const getGoalById = async (userId, goalId) => {
 };
 
 // Create a new goal for a user
-// By adding `|| ""` after a property, I can make sending through request body optional
-// It's probably better to make user actions pass some values by default
 export const createGoal = async (
   userId,
+  name,
   goalAmount,
   deadline,
-  monthlyAmount,
   description,
 ) => {
   try {
@@ -71,10 +69,12 @@ export const createGoal = async (
 
     const newGoal = {
       id: nextGoalId,
+      name,
       goalAmount: parseFloat(goalAmount),
       deadline,
-      monthlyAmount: parseFloat(monthlyAmount),
+      accumulated: 0,
       description: description,
+      monthStart: 0,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
@@ -99,44 +99,147 @@ export const createGoal = async (
 export const updateGoal = async (
   userId,
   goalId,
+  name,
   goalAmount,
   deadline,
-  monthlyAmount,
+  accumulated,
   description,
 ) => {
   try {
-    const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
-    if (goalAmount !== undefined) updates.goalAmount = parseFloat(goalAmount);
-    if (deadline !== undefined) updates.deadline = deadline;
-    if (monthlyAmount !== undefined)
-      updates.monthlyAmount = parseFloat(monthlyAmount);
-    if (description !== undefined) updates.description = description;
+    const userRef = db.collection("users").doc(userId);
+    const goalRef = userRef.collection("goals").doc(goalId);
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+    const longTermRef = userRef.collection("savings").doc("longTermSavings");
 
-    const goalRef = db
-      .collection("users")
-      .doc(userId)
-      .collection("goals")
-      .doc(goalId);
-    await goalRef.update(updates);
+    await db.runTransaction(async (transaction) => {
+      // Fetch current goal data
+      const goalDoc = await transaction.get(goalRef);
+      if (!goalDoc.exists) {
+        throw new Error("Goal not found.");
+      }
+      const goalData = goalDoc.data();
+      const previousAccumulated = goalData.accumulated;
 
-    return { id: goalId, ...updates };
+      // Calculate difference
+      const accumulatedValue =
+        accumulated !== undefined
+          ? parseFloat(accumulated)
+          : previousAccumulated;
+      const difference = accumulatedValue - previousAccumulated;
+
+      // Fetch current savings data
+      const shortTermDoc = await transaction.get(shortTermRef);
+      if (!shortTermDoc.exists) {
+        throw new Error("Short-term savings document not found.");
+      }
+      const shortTermAmount = shortTermDoc.data().currentAmount;
+
+      if (shortTermAmount < difference) {
+        throw new Error("Insufficient short-term savings.");
+      }
+
+      const longTermDoc = await transaction.get(longTermRef);
+      if (!longTermDoc.exists) {
+        throw new Error("Long-term savings document not found.");
+      }
+      const longTermAmount = longTermDoc.data().currentAmount;
+
+      // Update savings
+      transaction.update(shortTermRef, {
+        currentAmount: shortTermAmount - difference,
+      });
+
+      transaction.update(longTermRef, {
+        currentAmount: longTermAmount + difference,
+      });
+
+      // Prepare goal updates
+      const updates = {
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      if (name !== undefined) updates.name = name;
+      if (goalAmount !== undefined) updates.goalAmount = parseFloat(goalAmount);
+      if (deadline !== undefined) updates.deadline = deadline;
+      if (accumulated !== undefined) updates.accumulated = accumulatedValue;
+      if (description !== undefined) updates.description = description;
+
+      // Update goal
+      transaction.update(goalRef, updates);
+    });
+
+    return {
+      id: goalId,
+      name,
+      goalAmount,
+      deadline,
+      accumulated,
+      description,
+      updatedAt: new Date(),
+    };
   } catch (error) {
     console.error("Error updating goal:", error);
-    throw new Error("Failed to update the goal.");
+    throw new Error(error.message || "Failed to update the goal.");
   }
 };
 
 // Delete a goal for a user
-export const deleteGoal = async (userId, goalId) => {
+export const deleteAbandonedGoal = async (userId, goalId) => {
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const goalRef = userRef.collection("goals").doc(goalId);
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+    const longTermRef = userRef.collection("savings").doc("longTermSavings");
+
+    await db.runTransaction(async (transaction) => {
+      const goalDoc = await transaction.get(goalRef);
+      if (!goalDoc.exists) {
+        throw new Error("Goal not found.");
+      }
+      const accumulated = goalDoc.data().accumulated;
+
+      const shortTermDoc = await transaction.get(shortTermRef);
+      if (!shortTermDoc.exists) {
+        throw new Error("Short-term savings document not found.");
+      }
+      const shortTermAmount = shortTermDoc.data().currentAmount;
+
+      const longTermDoc = await transaction.get(longTermRef);
+      if (!longTermDoc.exists) {
+        throw new Error("Long-term savings document not found.");
+      }
+      const longTermAmount = longTermDoc.data().currentAmount;
+
+      transaction.update(shortTermRef, {
+        currentAmount: shortTermAmount + accumulated,
+      });
+
+      transaction.update(longTermRef, {
+        currentAmount: longTermAmount - accumulated,
+      });
+
+      transaction.delete(goalRef);
+    });
+
+    return { success: true, goalId };
+  } catch (error) {
+    console.error("Error deleting abandoned goal:", error);
+    throw new Error(error.message || "Failed to delete the abandoned goal.");
+  }
+};
+
+export const deleteCompletedGoal = async (userId, goalId) => {
   try {
     const goalRef = db
       .collection("users")
       .doc(userId)
       .collection("goals")
       .doc(goalId);
+
     await goalRef.delete();
+
+    return { success: true, goalId };
   } catch (error) {
-    console.error("Error deleting goal (Admin SDK):", error);
-    throw new Error("Failed to delete the goal.");
+    console.error("Error deleting completed goal:", error);
+    throw new Error("Failed to delete the completed goal.");
   }
 };

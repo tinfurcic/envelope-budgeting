@@ -35,7 +35,7 @@ expensesHistoryRouter.get("/:month", async (req, res) => {
   try {
     const { month } = req.params;
     const expensesHistory = await getExpensesInMonth(req.userId, month);
-    if (expensesHistory && expensesHistory.length > 0) {
+    if (expensesHistory && expensesHistory?.length > 0) {
       res.status(200).json(expensesHistory);
     } else {
       res.status(404).send({ error: "No expenses found for this month" });

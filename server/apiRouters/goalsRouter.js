@@ -4,7 +4,8 @@ import {
   getGoalById,
   createGoal,
   updateGoal,
-  deleteGoal,
+  deleteAbandonedGoal,
+  deleteCompletedGoal,
 } from "../goal.js";
 
 export const goalsRouter = express.Router();
@@ -44,18 +45,17 @@ goalsRouter.get("/:id", async (req, res) => {
 });
 
 goalsRouter.post("/", async (req, res) => {
-  const { goalAmount, deadline, monthlyAmount, description } = req.body;
-  if (!goalAmount || !deadline || !monthlyAmount) {
-    // You might want to make all properties mandatory, and just pass default/insignificant values if they don't matter
+  const { name, goalAmount, deadline, description } = req.body;
+  if (!name || !goalAmount) {
     return res.status(400).send({ error: "Invalid goal data" });
   }
 
   try {
     const newGoal = await createGoal(
       req.userId,
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
       description,
     );
     res.status(201).json(newGoal);
@@ -67,15 +67,16 @@ goalsRouter.post("/", async (req, res) => {
 
 goalsRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { goalAmount, deadline, monthlyAmount, description } = req.body;
+  const { name, goalAmount, deadline, accumulated, description } = req.body;
 
   try {
     const updatedGoal = await updateGoal(
       req.userId,
       id,
+      name,
       goalAmount,
       deadline,
-      monthlyAmount,
+      accumulated,
       description,
     );
     res.status(200).json(updatedGoal);
@@ -87,13 +88,18 @@ goalsRouter.patch("/:id", async (req, res) => {
 
 goalsRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
+  const { abandoned } = req.query;
 
   try {
-    await deleteGoal(req.userId, id);
-    res.status(204).send();
+    if (abandoned === "true") {
+      await deleteAbandonedGoal(req.userId, id);
+    } else {
+      await deleteCompletedGoal(req.userId, id);
+    }
+    res.status(200).json({ success: true, id });
   } catch (error) {
     console.error("Error deleting goal:", error.message);
-    res.status(500).send({ error: `Internal server error: ${error.message}` });
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 });
 

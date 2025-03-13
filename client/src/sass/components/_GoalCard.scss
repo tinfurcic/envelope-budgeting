@@ -1,0 +1,21 @@
+@use "../base/global";
+
+.goal-card {
+  border: 1px solid global.$primary-yellow;
+  background-color: global.$goal-color;
+  border-radius: 15px;
+  padding: 0.5rem;
+
+  cursor: pointer;
+
+  &__name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+  }
+
+  &__deadline {
+    margin: 0.25rem 0 0 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

@@ -1,8 +1,14 @@
 import React, { Fragment, useState } from "react";
 import Button from "./Button";
 
-const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
-  const [activeCategory, setActiveCategory] = useState("");
+const PickCategory = ({
+  sourceCategory,
+  handleCategoryChange,
+  activeCategoryFromLocation,
+}) => {
+  const [activeCategory, setActiveCategory] = useState(
+    activeCategoryFromLocation ?? "",
+  );
 
   const handleClick = (category) => {
     handleCategoryChange(category);
@@ -40,7 +46,6 @@ const PickCategory = ({ sourceCategory, handleCategoryChange }) => {
         {["envelope", "savings"].map((category) => (
           <Button
             key={category}
-            type="button"
             className={`button button--category ${activeCategory === category ? "active" : "inactive"}`}
             onClick={() => handleClick(category)}
             disabled={false}

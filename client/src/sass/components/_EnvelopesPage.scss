@@ -6,6 +6,10 @@
   overflow-y: auto;
   height: 100%;
 
+  &__envelopes {
+    padding: 0.5rem 0;
+  }
+
   &__loading-message {
     display: flex;
     justify-content: center;
@@ -16,6 +20,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    margin: 1.5rem 0 0.5rem 0;
+  }
+
+  &__heading {
+    margin: 0;
   }
 
   &__cards-container {
@@ -25,7 +35,20 @@
       minmax(EnvelopeCard.$min-width, 1fr)
     );
     justify-items: stretch;
-    gap: 10px;
+    gap: 3vw;
+    margin: 0 2.25%;
+  }
+}
+
+.manage-envelopes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0.5rem 1rem 0.5rem;
+
+  &__saving-message {
+    margin: 0 1rem 0 0;
+    font-size: 1.125rem;
   }
 }
 

@@ -48,7 +48,6 @@ const CurrencyDropdown = () => {
       {hasChanged && selectedValue !== "" && (
         <div className="currency-dropdown-container__save-btn">
           <Button
-            type="button"
             className="button button--green"
             onClick={handleSave}
             isDisabled={!hasChanged || selectedValue === ""}

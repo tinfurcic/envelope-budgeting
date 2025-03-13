@@ -1,6 +1,6 @@
 @use "../abstracts/mixins";
 
-.new-expense-page {
+.create-expense-page {
   @include mixins.form-page-styles;
 }
 

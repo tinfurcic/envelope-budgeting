@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { updateEnvelope } from "../util/axios/updateFunctions";
+import expenseIcon from "../media/expense.png";
 import useCSSVariable from "../hooks/useCSSVariable";
-import SvgEditIcon from "./SvgEditIcon";
+import useOverlapping from "../hooks/useOverlapping";
+import useScreenSize from "../hooks/useScreenSize";
+import SvgEdit from "./svg-icons/SvgEdit";
+import SvgCheck from "./svg-icons/SvgCheck";
+import SvgEnvelopeCash from "./svg-icons/SvgEnvelopeCash";
 import ProgressBar from "./ProgressBar";
 import ExpensesTable from "./ExpensesTable";
 import Button from "./Button";
 import Colors from "./Colors";
-import SvgCheckIcon from "./SvgCheckIcon";
 
 const Envelope = () => {
   const { id } = useParams();
   const {
     envelopes,
+    loadingEnvelopes,
+    syncingEnvelopes,
     expenses,
     loadingExpenses,
     syncingExpenses,
@@ -21,6 +27,16 @@ const Envelope = () => {
     budgetSum,
   } = useOutletContext();
   const navigate = useNavigate();
+
+  const { isSmall } = useScreenSize();
+
+  const isButtonOverlapping = useOverlapping(
+    ".envelope",
+    ".new-expense-button",
+    [".envelope__latest-expenses"],
+    500,
+    [envelopes],
+  );
 
   const envelope = envelopes.find((env) => env.id.toString() === id);
 
@@ -34,8 +50,25 @@ const Envelope = () => {
   const [editableBudget, setEditableBudget] = useState("");
   const [budgetDifference, setBudgetDifference] = useState(0);
   const [amountDifference, setAmountDifference] = useState(0);
-  const [isSavingInfoDisabled, setIsSavingInfoDisabled] = useState(true);
-  const [isSavingNumbersDisabled, setIsSavingNumbersDisabled] = useState(true);
+
+  let isSavingInfoDisabled = true;
+  let isSavingNumbersDisabled = true;
+  if (
+    envelope &&
+    envelope.name !== undefined &&
+    envelope.description !== undefined &&
+    envelope.color &&
+    envelope.budget !== undefined &&
+    envelope.currentAmount !== undefined
+  ) {
+    isSavingInfoDisabled =
+      editableName === envelope.name &&
+      editableDescription === envelope.description &&
+      editableColor === envelope.color;
+    isSavingNumbersDisabled =
+      Number(editableBudget) === envelope.budget &&
+      Number(editableAmount) === envelope.currentAmount;
+  }
 
   const fakeCurrency = "€";
   const backgroundColor = useCSSVariable("--background-color");
@@ -77,6 +110,7 @@ const Envelope = () => {
     }
     setIsEditingInfo(!isEditingInfo);
   };
+
   const toggleEditNumbersMode = () => {
     if (
       envelope &&
@@ -100,7 +134,6 @@ const Envelope = () => {
     }
     setIsEditingNumbers(!isEditingNumbers);
   };
-  //end section
 
   // --- onChange and save handlers section ---
   const handleNameChange = (e) => {
@@ -151,51 +184,6 @@ const Envelope = () => {
       toggleEditNumbersMode();
     }
   };
-  //end section
-
-  // --- Enabling/showing // disabling/hiding save changes button section ---
-  useEffect(() => {
-    if (
-      envelope &&
-      envelope.name &&
-      envelope.description !== undefined &&
-      envelope.color
-    ) {
-      if (
-        editableName !== envelope.name ||
-        editableDescription !== envelope.description ||
-        editableColor !== envelope.color
-      ) {
-        setIsSavingInfoDisabled(false);
-      } else {
-        setIsSavingInfoDisabled(true);
-      }
-    }
-  }, [
-    envelope,
-    editableName,
-    editableDescription,
-    editableColor,
-    setIsSavingInfoDisabled,
-  ]);
-
-  useEffect(() => {
-    if (
-      envelope &&
-      envelope.budget !== undefined &&
-      envelope.currentAmount !== undefined
-    ) {
-      if (
-        Number(editableBudget) !== envelope.budget ||
-        Number(editableAmount) !== envelope.currentAmount
-      ) {
-        setIsSavingNumbersDisabled(false);
-      } else {
-        setIsSavingNumbersDisabled(true);
-      }
-    }
-  }, [envelope, editableBudget, editableAmount, setIsSavingNumbersDisabled]);
-  //end section
 
   // --- Number inputs handling section ---
   const handleValueChange = (event, setValue) => {
@@ -208,24 +196,21 @@ const Envelope = () => {
   };
 
   useEffect(() => {
-    if (envelope && envelope.budget) {
+    if (envelope?.budget) {
       setBudgetDifference(editableBudget - envelope.budget);
     }
   }, [envelope, editableBudget, setBudgetDifference]);
 
   useEffect(() => {
-    if (envelope && envelope.currentAmount) {
+    if (envelope?.currentAmount) {
       setAmountDifference(editableAmount - envelope.currentAmount);
     }
   }, [envelope, editableAmount, setAmountDifference]);
 
   useEffect(() => {
     if (
-      savings &&
-      savings.shortTermSavings &&
-      savings.longTermSavings &&
-      savings.shortTermSavings.currentAmount &&
-      savings.longTermSavings.currentAmount
+      savings?.shortTermSavings?.currentAmount &&
+      savings?.longTermSavings?.currentAmount
     ) {
       if (Number(amountDifference) > savings.shortTermSavings.currentAmount) {
         console.log("This action will draw funds from your long-term savings!");
@@ -244,22 +229,14 @@ const Envelope = () => {
   }, [savings, amountDifference, setEditableAmount]);
 
   useEffect(() => {
-    if (
-      income &&
-      income.regularIncome &&
-      income.regularIncome.value &&
-      envelope &&
-      envelope.budget &&
-      budgetSum
-    ) {
+    if (income?.regularIncome?.value && envelope?.budget && budgetSum) {
       const maxBudget =
         income.regularIncome.value - budgetSum + envelope.budget;
       if (parseFloat(editableBudget) > maxBudget) {
         setEditableBudget(maxBudget.toFixed(2).toString());
       }
     }
-  }, [income, editableBudget, budgetSum]);
-  //end section
+  }, [envelope, income, editableBudget, budgetSum]);
 
   // Load latest expenses
   useEffect(() => {
@@ -271,16 +248,6 @@ const Envelope = () => {
       );
     }
   }, [expenses, envelope]);
-
-  if (!envelope) {
-    return (
-      <>
-        <p>Envelope not found.</p>
-        <p>Ah.</p>
-        <p>If only this was a proper error page with some navigation...</p>
-      </>
-    );
-  }
 
   return (
     <div className="envelope">
@@ -296,9 +263,18 @@ const Envelope = () => {
                 className="envelope__name-input"
                 value={editableName}
                 onChange={handleNameChange}
+                maxLength="30"
               />
             ) : (
-              <h1 className="envelope__name">{editableName}</h1>
+              <h1
+                className={`envelope__name ${loadingEnvelopes || syncingEnvelopes ? "envelope__name--small" : ""}`}
+              >
+                {loadingEnvelopes
+                  ? "Loading name..."
+                  : syncingEnvelopes
+                    ? "Syncing name"
+                    : editableName}
+              </h1>
             )}
 
             {isEditingInfo ? (
@@ -309,42 +285,43 @@ const Envelope = () => {
               />
             ) : (
               <p className="envelope__description">
-                {editableDescription || "No description"}
+                {loadingEnvelopes
+                  ? "Loading description..."
+                  : syncingEnvelopes
+                    ? "Syncing description"
+                    : editableDescription || "No description"}
               </p>
             )}
           </div>
 
           <div className="envelope__header-bar">
-            <button
-              type="button"
-              className="envelope__back-button"
+            <Button
+              className="button button--back"
               onClick={() => navigate("/envelopes")}
             >
               X
-            </button>
+            </Button>
 
             {!isEditingNumbers && (
               <Button
-                type="button"
                 className="button button--edit"
                 onClick={toggleEditInfoMode}
                 extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
               >
-                <SvgEditIcon
+                <SvgEdit
                   fillColor={isEditingInfo ? editableColor : "black"}
                   strokeColor={isEditingInfo ? editableColor : "black"}
                 />
               </Button>
             )}
 
-            {isEditingInfo && !isSavingInfoDisabled && (
+            {!isSavingInfoDisabled && isEditingInfo && (
               <Button
-                type="button"
                 className="button button--edit"
                 onClick={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
-                <SvgCheckIcon fillColor="black" strokeColor="black" />
+                <SvgCheck fillColor="black" strokeColor="black" />
               </Button>
             )}
           </div>
@@ -364,44 +341,43 @@ const Envelope = () => {
         <div className="envelope__overview">
           <div className="envelope__subheading-container">
             <h2 className="envelope__subheading">Budget overview</h2>
-            <div className="envelope__edit-controls">
+            <div className="envelope__subheading-container__group">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
-                  type="button"
                   className="button button--edit"
                   onClick={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
-                  <SvgCheckIcon fillColor="black" strokeColor="black" />
+                  <SvgCheck fillColor="black" strokeColor="black" />
                 </Button>
               )}
               {!isEditingInfo && (
                 <Button
-                  type="button"
                   className={`button button--edit`}
                   onClick={toggleEditNumbersMode}
                   extraStyle={
                     isEditingNumbers ? { backgroundColor: "black" } : {}
                   }
                 >
-                  <SvgEditIcon
+                  <SvgEnvelopeCash
                     fillColor={isEditingNumbers ? backgroundColor : "black"}
-                    strokeColor={isEditingNumbers ? backgroundColor : "black"}
                   />
                 </Button>
               )}
             </div>
           </div>
           <ProgressBar
-            budget={envelope.budget}
-            amount={envelope.currentAmount}
+            whole={envelope?.budget ?? 1}
+            part={envelope?.currentAmount ?? 0}
+            loading={loadingEnvelopes}
+            syncing={syncingEnvelopes}
           />
           {isEditingNumbers && (
             <div
-              className="edit-envelope-funds"
+              className="envelope__edit-funds"
               style={{ backgroundColor: editableColor }}
             >
-              <div className="edit-envelope-funds__item">
+              <div className="envelope__edit-funds__item">
                 <div className="label-difference-container">
                   <label className="label" htmlFor="budget">
                     New Budget
@@ -409,8 +385,7 @@ const Envelope = () => {
                   <span
                     className={`funds-difference funds-difference--${budgetDifference > 0 ? "positive" : budgetDifference < 0 ? "negative" : ""}`}
                   >
-                    {envelope &&
-                      envelope.budget &&
+                    {envelope?.budget &&
                       budgetDifference !== 0 &&
                       `${budgetDifference > 0 ? "+" : "-"} ${fakeCurrency}${Math.abs(envelope.budget - Number(editableBudget)).toFixed(2)}`}
                   </span>
@@ -430,7 +405,7 @@ const Envelope = () => {
                 </div>
               </div>
 
-              <div className="edit-envelope-funds__item">
+              <div className="envelope__edit-funds__item">
                 <div className="label-difference-container">
                   <label className="label" htmlFor="amount">
                     New Amount
@@ -479,6 +454,32 @@ const Envelope = () => {
         </div>
 
         <h2 className="envelope__subheading">This month's expenses</h2>
+
+        <div
+          className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
+        >
+          <Button
+            className={`button button--new-expense`}
+            onClick={() =>
+              navigate("/expense", {
+                state: {
+                  category: "envelope",
+                  sourceData: {
+                    id: envelope.id,
+                    type: "envelope",
+                    name: envelope.name,
+                    amount: 0,
+                    order: envelope.order,
+                  },
+                  activeCategory: "envelope",
+                  sourceId: envelope.id,
+                },
+              })
+            }
+          >
+            <img src={expenseIcon} alt="New expense" />
+          </Button>
+        </div>
       </main>
     </div>
   );

@@ -21,7 +21,9 @@
     "express": "^4.21.0",
     "firebase": "^11.0.2",
     "firebase-admin": "^13.0.0",
-    "normalize-scss": "^8.0.0"
+    "normalize-scss": "^8.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7",

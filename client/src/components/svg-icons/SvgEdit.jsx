@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgEditIcon = ({ fillColor, strokeColor }) => {
+const SvgEdit = ({ fillColor, strokeColor }) => {
   return (
     <div className="svg-container">
       <svg
@@ -19,4 +19,4 @@ const SvgEditIcon = ({ fillColor, strokeColor }) => {
   );
 };
 
-export default SvgEditIcon;
+export default SvgEdit;

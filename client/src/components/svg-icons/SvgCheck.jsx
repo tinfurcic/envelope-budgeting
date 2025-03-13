@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgCheckIcon = ({ fillColor, strokeColor }) => (
+const SvgCheck = ({ fillColor, strokeColor }) => (
   <div className="svg-container">
     <svg
       width="100%"
@@ -18,4 +18,4 @@ const SvgCheckIcon = ({ fillColor, strokeColor }) => (
   </div>
 );
 
-export default SvgCheckIcon;
+export default SvgCheck;

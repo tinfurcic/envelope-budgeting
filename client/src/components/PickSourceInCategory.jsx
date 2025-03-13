@@ -97,7 +97,6 @@ const PickSourceInCategory = ({
                 return (
                   <Button
                     key={envelope.id}
-                    type="button"
                     className={`button button--source ${isDisabled ? "disabled inactive" : selectedSourceId === envelope.id ? "active" : "inactive"}`}
                     extraStyle={{ "--envelope-color": envelope.color }}
                     onClick={(e) =>
@@ -124,7 +123,6 @@ const PickSourceInCategory = ({
                   return (
                     <Button
                       key={savingsCategory.id}
-                      type="button"
                       className={`button button--source ${isDisabled ? "disabled inactive" : selectedSourceId === savingsCategory.id ? "active" : "inactive"}`}
                       extraStyle={{
                         "--envelope-color": savingsCategory.color,

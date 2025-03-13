@@ -1,0 +1,5 @@
+@use "../abstracts/mixins";
+
+.create-goal-page {
+  @include mixins.form-page-styles;
+}

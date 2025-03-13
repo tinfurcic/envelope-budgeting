@@ -192,17 +192,14 @@ export const updateEnvelope = async (
       longTermRef.get(),
     ]);
 
-    if (!envelopeMetadataDoc.exists) {
-      throw new Error("Metadata not found.");
-    }
-    if (!incomeDoc.exists) {
-      throw new Error("Regular income document not found.");
-    }
-    if (!envelopeDoc.exists) {
-      throw new Error("Envelope not found.");
-    }
-    if (!shortTermDoc.exists || !longTermDoc.exists) {
-      throw new Error("Savings documents not found.");
+    if (
+      !envelopeMetadataDoc.exists ||
+      !incomeDoc.exists ||
+      !envelopeDoc.exists ||
+      !shortTermDoc.exists ||
+      !longTermDoc.exists
+    ) {
+      throw new Error("Required document(s) not found.");
     }
 
     const { count, budgetSum = 0 } = envelopeMetadataDoc.data();
@@ -218,8 +215,6 @@ export const updateEnvelope = async (
       newCurrentAmount !== undefined
         ? parseFloat(newCurrentAmount)
         : currentAmount;
-
-    // Calculate new total budget
     const newTotalBudget = budgetSum - currentBudget + updatedBudget;
     if (newTotalBudget > regularIncome) {
       throw new Error(
@@ -227,24 +222,20 @@ export const updateEnvelope = async (
       );
     }
 
-    // Validate newOrder (using count from metadata)
     if (newOrder < 1 || newOrder > count || !Number.isInteger(newOrder)) {
       throw new Error(
         `Invalid order number. It must be a positive integer between 1 and ${count}.`,
       );
     }
 
-    // Savings handling
     let shortTermSavings = shortTermDoc.data().currentAmount;
     let longTermSavings = longTermDoc.data().currentAmount;
     let remainingAmount = updatedAmount - currentAmount;
 
     if (remainingAmount > 0) {
-      // Need to withdraw from savings
       if (remainingAmount > shortTermSavings + longTermSavings) {
         throw new Error("Not enough funds in savings to cover the increase.");
       }
-
       if (remainingAmount <= shortTermSavings) {
         shortTermSavings -= remainingAmount;
       } else {
@@ -253,58 +244,77 @@ export const updateEnvelope = async (
         longTermSavings -= remainingAmount;
       }
     } else if (remainingAmount < 0) {
-      // Need to refund to short-term savings
       shortTermSavings += Math.abs(remainingAmount);
     }
 
     const batch = db.batch();
-
     if (newOrder !== currentOrder) {
-      if (newOrder < currentOrder) {
-        // Move the envelope to an earlier position
-        const envelopesToUpdate = await envelopesRef
-          .where("order", ">=", newOrder)
-          .where("order", "<", currentOrder)
-          .get();
-
-        envelopesToUpdate.forEach((doc) => {
-          batch.update(doc.ref, { order: doc.data().order + 1 });
-        });
-      } else {
-        // Move the envelope to a later position
-        const envelopesToUpdate = await envelopesRef
-          .where("order", ">", currentOrder)
-          .where("order", "<=", newOrder)
-          .get();
-
-        envelopesToUpdate.forEach((doc) => {
-          batch.update(doc.ref, { order: doc.data().order - 1 });
-        });
-      }
+      const envelopesToUpdate = await envelopesRef
+        .where("order", ">=", Math.min(newOrder, currentOrder))
+        .where("order", "<=", Math.max(newOrder, currentOrder))
+        .get();
+      envelopesToUpdate.forEach((doc) => {
+        const updatedOrder =
+          doc.data().order + (newOrder < currentOrder ? 1 : -1);
+        batch.update(doc.ref, { order: updatedOrder });
+      });
       batch.update(envelopesRef.doc(envelopeId), { order: newOrder });
     }
 
-    // Other updates
-    const updates = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
-    if (newName) updates.name = newName;
-    if (newBudget !== undefined) updates.budget = updatedBudget;
-    if (newCurrentAmount !== undefined) updates.currentAmount = updatedAmount;
-    if (newDescription !== undefined) updates.description = newDescription;
-    if (newColor !== undefined) updates.color = newColor;
-
+    const updates = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      budget: newBudget,
+      currentAmount: newCurrentAmount,
+      description: newDescription,
+      color: newColor,
+      name: newName,
+    };
     batch.update(envelopesRef.doc(envelopeId), updates);
     batch.update(envelopeMetadataRef, { budgetSum: newTotalBudget });
-
-    // Update savings
     batch.update(shortTermRef, { currentAmount: shortTermSavings });
     batch.update(longTermRef, { currentAmount: longTermSavings });
 
     await batch.commit();
-
     return { id: envelopeId, ...updates, order: newOrder };
   } catch (error) {
     console.error("Error updating envelope:", error);
     throw new Error("Failed to update the envelope.");
+  }
+};
+
+export const batchUpdateEnvelopeOrders = async (userId, updatedEnvelopeIds) => {
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const envelopesRef = userRef.collection("envelopes");
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+
+    const envelopeMetadataDoc = await envelopeMetadataRef.get();
+    if (!envelopeMetadataDoc.exists)
+      throw new Error("Envelope metadata not found.");
+    const { count } = envelopeMetadataDoc.data();
+
+    // Ensure array length matches metadata count
+    if (updatedEnvelopeIds.length !== count) {
+      throw new Error(
+        `Invalid envelope count. Expected ${count}, but received ${updatedEnvelopeIds.length}.`,
+      );
+    }
+
+    // Batch update envelopes (new order equals index + 1)
+    const batch = db.batch();
+    updatedEnvelopeIds.forEach((envId, index) => {
+      const envelopeRef = envelopesRef.doc(envId.toString()); // Firestore requires string ID
+      batch.update(envelopeRef, {
+        order: index + 1,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    await batch.commit();
+    return { success: true };
+  } catch (error) {
+    console.error("Error in batch order update:", error);
+    throw new Error("Failed to update envelope orders.");
   }
 };
 
@@ -322,14 +332,12 @@ export const deleteEnvelope = async (userId, envelopeId) => {
       shortTermRef.get(),
     ]);
 
-    if (!envelopeMetadataDoc.exists) {
-      throw new Error("Metadata not found.");
-    }
-    if (!envelopeDoc.exists) {
-      throw new Error("Envelope not found.");
-    }
-    if (!shortTermDoc.exists) {
-      throw new Error("Short-term savings document not found.");
+    if (
+      !envelopeMetadataDoc.exists ||
+      !envelopeDoc.exists ||
+      !shortTermDoc.exists
+    ) {
+      throw new Error("Required document(s) not found.");
     }
 
     const { count, budgetSum = 0 } = envelopeMetadataDoc.data();
@@ -337,28 +345,18 @@ export const deleteEnvelope = async (userId, envelopeId) => {
     const envelopeOrder = envelopeData.order;
     const envelopeBudget = envelopeData.budget;
     const envelopeCurrentAmount = envelopeData.currentAmount;
-
-    // Calculate new total budget
     const newTotalBudget = budgetSum - envelopeBudget;
-
-    // Refund to shortTermSavings
     const shortTermSavings = shortTermDoc.data().currentAmount || 0;
     const updatedShortTermSavings = shortTermSavings + envelopeCurrentAmount;
 
-    // Get all envelopes with `order` greater than the deleted envelope
     const envelopesRef = userRef.collection("envelopes");
     const envelopesSnapshot = await envelopesRef
       .where("order", ">", envelopeOrder)
       .get();
-
     const batch = db.batch();
-
-    // Update `order` for envelopes that need to shift
-    envelopesSnapshot.docs.forEach((doc) => {
-      const envelopeToUpdateRef = doc.ref;
-      const updatedOrder = doc.data().order - 1; // Shift order down by 1
-      batch.update(envelopeToUpdateRef, { order: updatedOrder });
-    });
+    envelopesSnapshot.docs.forEach((doc) =>
+      batch.update(doc.ref, { order: doc.data().order - 1 }),
+    );
 
     batch.delete(envelopeRef);
     batch.update(envelopeMetadataRef, {
@@ -367,10 +365,171 @@ export const deleteEnvelope = async (userId, envelopeId) => {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.update(shortTermRef, { currentAmount: updatedShortTermSavings });
-
     await batch.commit();
   } catch (error) {
-    console.error("Error deleting envelope (Admin SDK):", error);
+    console.error("Error deleting envelope:", error);
     throw new Error("Failed to delete the envelope.");
+  }
+};
+
+export const batchDeleteEnvelopes = async (userId, deletedEnvelopeIds) => {
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+    const envelopesRef = userRef.collection("envelopes");
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+
+    const [envelopeMetadataDoc, shortTermDoc, envelopesSnapshot] =
+      await Promise.all([
+        envelopeMetadataRef.get(),
+        shortTermRef.get(),
+        envelopesRef.orderBy("order").get(), // Ensure ordered retrieval
+      ]);
+
+    if (!envelopeMetadataDoc.exists)
+      throw new Error("Envelope metadata not found.");
+    if (!shortTermDoc.exists)
+      throw new Error("Short-term savings document not found.");
+
+    const { budgetSum = 0 } = envelopeMetadataDoc.data();
+    const shortTermSavings = shortTermDoc.data().currentAmount;
+
+    let newTotalBudget = budgetSum;
+    let deletedBudgets = 0;
+    let deletedAmounts = 0;
+
+    const batch = db.batch();
+
+    const envelopes = envelopesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const newOrderList = [];
+    let orderCounter = 1;
+
+    envelopes.forEach((env) => {
+      if (deletedEnvelopeIds.includes(Number(env.id))) {
+        deletedBudgets += env.budget;
+        deletedAmounts += env.currentAmount;
+        batch.delete(envelopesRef.doc(env.id.toString()));
+      } else {
+        newOrderList.push({ id: env.id, newOrder: orderCounter++ });
+      }
+    });
+
+    newTotalBudget -= deletedBudgets;
+    const updatedShortTermSavings = shortTermSavings + deletedAmounts;
+
+    // Apply new order values to remaining envelopes
+    newOrderList.forEach(({ id, newOrder }) => {
+      batch.update(envelopesRef.doc(id.toString()), { order: newOrder });
+    });
+
+    // Update metadata and savings
+    batch.update(envelopeMetadataRef, {
+      count: newOrderList.length,
+      budgetSum: newTotalBudget,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    batch.update(shortTermRef, { currentAmount: updatedShortTermSavings });
+
+    // Commit batch updates
+    await batch.commit();
+    return { success: true };
+  } catch (error) {
+    console.error("Error in batch envelope deletion:", error.message);
+    throw new Error("Failed to delete envelopes.");
+  }
+};
+
+export const batchDeleteAndReorderEnvelopes = async (
+  userId,
+  deletedEnvelopeIds,
+  updatedEnvelopeIds,
+) => {
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const envelopeMetadataRef = userRef.collection("envelopes").doc("metadata");
+    const envelopesRef = userRef.collection("envelopes");
+    const shortTermRef = userRef.collection("savings").doc("shortTermSavings");
+
+    const [envelopeMetadataDoc, shortTermDoc, envelopesSnapshot] =
+      await Promise.all([
+        envelopeMetadataRef.get(),
+        shortTermRef.get(),
+        envelopesRef.orderBy("order").get(),
+      ]);
+
+    if (!envelopeMetadataDoc.exists)
+      throw new Error("Envelope metadata not found.");
+    if (!shortTermDoc.exists)
+      throw new Error("Short-term savings document not found.");
+
+    const { count, budgetSum = 0 } = envelopeMetadataDoc.data();
+    const shortTermSavings = shortTermDoc.data().currentAmount;
+
+    // Convert fetched envelopes to a map for quick lookup
+    const envelopes = new Map(
+      envelopesSnapshot.docs.map((doc) => [
+        Number(doc.id),
+        { id: doc.id, ...doc.data() },
+      ]),
+    );
+
+    // Validation: Ensure there are exactly `count` distinct positive integer IDs
+    const allIds = new Set([...deletedEnvelopeIds, ...updatedEnvelopeIds]);
+
+    if (
+      allIds.size !== count || // Ensure no duplicates and correct length
+      ![...allIds].every((id) => Number.isInteger(id) && id > 0) // Ensure all are positive integers
+    ) {
+      throw new Error(
+        `Invalid envelope IDs. Expected exactly ${count} distinct positive integers.`,
+      );
+    }
+
+    let newTotalBudget = budgetSum;
+    let deletedBudgets = 0;
+    let deletedAmounts = 0;
+    const batch = db.batch();
+
+    // Process deletions
+    deletedEnvelopeIds.forEach((envId) => {
+      const envelope = envelopes.get(envId);
+      if (!envelope) throw new Error(`Envelope with ID ${envId} not found.`);
+
+      deletedBudgets += envelope.budget;
+      deletedAmounts += envelope.currentAmount;
+      batch.delete(envelopesRef.doc(envId.toString()));
+    });
+
+    newTotalBudget -= deletedBudgets;
+    const updatedShortTermSavings = shortTermSavings + deletedAmounts;
+
+    // Process reordering
+    updatedEnvelopeIds.forEach((envId, index) => {
+      batch.update(envelopesRef.doc(envId.toString()), {
+        order: index + 1,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    // Update metadata and savings
+    batch.update(envelopeMetadataRef, {
+      count: updatedEnvelopeIds.length,
+      budgetSum: newTotalBudget,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    batch.update(shortTermRef, { currentAmount: updatedShortTermSavings });
+
+    // Commit batch updates
+    await batch.commit();
+    return { success: true };
+  } catch (error) {
+    console.error("Error in batch delete and reorder:", error.message);
+    throw new Error("Failed to process envelope deletions and reordering.");
   }
 };
