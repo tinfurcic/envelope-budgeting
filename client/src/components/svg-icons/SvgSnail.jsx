@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgSnailVar = ({ size }) => {
+const SvgSnail = ({ size }) => {
   return (
     <div className="svg-container">
       <svg
@@ -88,4 +88,4 @@ const SvgSnailVar = ({ size }) => {
   );
 };
 
-export default SvgSnailVar;
+export default SvgSnail;

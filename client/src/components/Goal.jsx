@@ -6,13 +6,13 @@ import { bareMinimumToAchieveGoal } from "../util/bareMinimumToAchieveGoal";
 import { daysUntilNextMonth } from "../util/daysUntilNextMonth";
 import { dateDifference } from "../util/dateDifference";
 import useCSSVariable from "../hooks/useCSSVariable";
-import SvgCalendarVar from "./svg-icons/SvgCalendar";
+import SvgCalendarFirst from "./svg-icons/SvgCalendarFirst";
 import SvgCheck from "./svg-icons/SvgCheck";
-import SvgDeadlineVar from "./svg-icons/SvgDeadline";
+import SvgDeadline from "./svg-icons/SvgDeadline";
 import SvgEdit from "./svg-icons/SvgEdit";
 import SvgGlowingStar from "./svg-icons/SvgGlowingStar";
 import SvgPiggyBank from "./svg-icons/SvgPiggyBank";
-import SvgSnailVar from "./svg-icons/SvgSnail";
+import SvgSnail from "./svg-icons/SvgSnail";
 import SvgWhiteFlag from "./svg-icons/SvgWhiteFlag";
 import Button from "./Button";
 import ProgressBar from "./ProgressBar";
@@ -303,12 +303,14 @@ const Goal = () => {
             <div className="goal__subheading-container__group">
               <h2 className="goal__subheading">Goal overview</h2>
               {goal?.accumulated !== goal?.goalAmount ? (
-                <Button
-                  className="button button--abandon-goal"
-                  onClick={() => handleDelete("true")}
-                >
-                  <SvgWhiteFlag />
-                </Button>
+                isEditingNumbers && (
+                  <Button
+                    className="button button--abandon-goal"
+                    onClick={() => handleDelete("true")}
+                  >
+                    <SvgWhiteFlag />
+                  </Button>
+                )
               ) : (
                 <Button
                   className="button button--complete-goal"
@@ -396,18 +398,23 @@ const Goal = () => {
 
           <ul className="goal__stats-list">
             <li className="goal__stats-list__item">
-              <SvgCalendarVar size={30} />
+              <SvgCalendarFirst size={30} />
               New income in {daysUntilNextMonth()} days
             </li>
-            <li className="goal__stats-list__item">
-              <SvgSnailVar size={30} />
-              Min. monthly allocation: {fakeCurrency}
-              {barelyAchieve}
-            </li>
-            <li className="goal__stats-list__item">
-              <SvgDeadlineVar size={30} />
-              Deadline in {daysUntilDeadline} days
-            </li>
+            {goal?.deadline && (
+              <>
+                {console.log(goal.deadline)}
+                <li className="goal__stats-list__item">
+                  <SvgSnail size={30} />
+                  Min. monthly allocation: {fakeCurrency}
+                  {barelyAchieve}
+                </li>
+                <li className="goal__stats-list__item">
+                  <SvgDeadline size={30} />
+                  Deadline in {daysUntilDeadline} days
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </main>

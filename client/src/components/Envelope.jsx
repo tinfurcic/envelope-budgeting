@@ -9,7 +9,7 @@ import SvgEdit from "./svg-icons/SvgEdit";
 import SvgCheck from "./svg-icons/SvgCheck";
 import SvgEnvelopeCash from "./svg-icons/SvgEnvelopeCash";
 import ProgressBar from "./ProgressBar";
-import ExpensesTable from "./ExpensesTable";
+import SimpleExpensesTable from "./SimpleExpensesTable";
 import Button from "./Button";
 import Colors from "./Colors";
 
@@ -25,6 +25,7 @@ const Envelope = () => {
     income,
     savings,
     budgetSum,
+    date,
   } = useOutletContext();
   const navigate = useNavigate();
 
@@ -40,7 +41,7 @@ const Envelope = () => {
 
   const envelope = envelopes.find((env) => env.id.toString() === id);
 
-  const [latestExpenses, setLatestExpenses] = useState(null);
+  const [thisMonthsExpenses, setThisMonthsExpenses] = useState(null);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isEditingNumbers, setIsEditingNumbers] = useState(false);
   const [editableName, setEditableName] = useState(null);
@@ -241,13 +242,15 @@ const Envelope = () => {
   // Load latest expenses
   useEffect(() => {
     if (envelope && expenses) {
-      setLatestExpenses(
-        expenses.filter((expense) =>
-          expense.sources.some((source) => source.id === envelope.id),
+      setThisMonthsExpenses(
+        expenses.filter(
+          (expense) =>
+            expense.sources.some((source) => source.id === envelope.id) &&
+            expense.date.slice(0, 7) === date.slice(0, 7),
         ),
       );
     }
-  }, [expenses, envelope]);
+  }, [expenses, envelope, date]);
 
   return (
     <div className="envelope">
@@ -437,23 +440,21 @@ const Envelope = () => {
           )}
         </div>
         <div className="envelope__latest-expenses">
-          <h2 className="envelope__subheading">Latest expenses</h2>
-          {loadingExpenses || latestExpenses === null ? (
+          <h2 className="envelope__subheading">This month's expenses</h2>
+          {loadingExpenses || thisMonthsExpenses === null ? (
             <p>Loading expenses...</p>
           ) : syncingExpenses ? (
             <p>Syncing expenses...</p>
-          ) : latestExpenses.length === 0 ? (
-            <p>No expenses this month.</p>
+          ) : thisMonthsExpenses.length === 0 ? (
+            <p>No expenses.</p>
           ) : (
-            <ExpensesTable
+            <SimpleExpensesTable
               dateWindow="latest"
-              expenses={latestExpenses}
+              expenses={thisMonthsExpenses}
               envelope={envelope}
             />
           )}
         </div>
-
-        <h2 className="envelope__subheading">This month's expenses</h2>
 
         <div
           className={`new-expense-button ${isButtonOverlapping ? "overlapping" : ""} ${isSmall ? "large-margin" : "small-margin"}`}
@@ -461,7 +462,7 @@ const Envelope = () => {
           <Button
             className={`button button--new-expense`}
             onClick={() =>
-              navigate("/expense", {
+              navigate("/create-expense", {
                 state: {
                   category: "envelope",
                   sourceData: {

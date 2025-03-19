@@ -196,7 +196,7 @@ const EnvelopesPage = () => {
       >
         <Button
           className={`button button--new-expense`}
-          onClick={() => navigate("/expense")}
+          onClick={() => navigate("/create-expense")}
         >
           <img src={expenseIcon} alt="New expense" />
         </Button>

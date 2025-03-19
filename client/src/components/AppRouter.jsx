@@ -12,6 +12,7 @@ import GoalsPage from "./GoalsPage";
 import Envelope from "./Envelope";
 import Goal from "./Goal";
 import ProfilePage from "./ProfilePage";
+import Expenses from "./Expenses";
 
 function AppRouter() {
   return (
@@ -39,7 +40,9 @@ function AppRouter() {
         <Route path="/goals" element={<GoalsPage />} />
         <Route path="/goals/:id" element={<Goal />} />
         <Route path="/create-goal" element={<CreateGoalPage />} />
-        <Route path="/expense" element={<CreateExpensePage />} />
+        <Route path="/create-expense" element={<CreateExpensePage />} />
+        <Route path="/expenses" element={<Expenses />} />
+        <Route path="/expenses/:yearMonth" element={<Expenses />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>

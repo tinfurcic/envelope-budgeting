@@ -1,6 +1,6 @@
 import React from "react";
 
-const SvgDeadlineVar = ({ size }) => {
+const SvgDeadline = ({ size }) => {
   return (
     <div className="svg-container">
       <svg
@@ -43,4 +43,4 @@ const SvgDeadlineVar = ({ size }) => {
   );
 };
 
-export default SvgDeadlineVar;
+export default SvgDeadline;

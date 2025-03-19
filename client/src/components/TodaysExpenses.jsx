@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import Button from "./Button";
-import ExpensesTable from "./ExpensesTable";
+import SimpleExpensesTable from "./SimpleExpensesTable";
 
 const TodaysExpenses = () => {
+  const navigate = useNavigate();
   const { expenses, loadingExpenses, syncingExpenses, date } =
     useOutletContext();
 
@@ -19,7 +20,10 @@ const TodaysExpenses = () => {
     <div className="todays-expenses">
       <div className="todays-expenses__header">
         <h2 className="todays-expenses__heading">Today's expenses</h2>
-        <Button className="button button--blue" onClick={null}>
+        <Button
+          className="button button--blue"
+          onClick={() => navigate(`/expenses/${date.slice(0, 7)}`)}
+        >
           All expenses
         </Button>
       </div>
@@ -32,7 +36,7 @@ const TodaysExpenses = () => {
         ) : todaysExpenses.length === 0 ? (
           <p>No expenses today.</p>
         ) : (
-          <ExpensesTable dateWindow="today" expenses={todaysExpenses} />
+          <SimpleExpensesTable dateWindow="today" expenses={todaysExpenses} />
         )}
       </div>
     </div>
