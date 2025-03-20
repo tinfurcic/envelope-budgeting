@@ -159,6 +159,11 @@ const CreateExpensePage = () => {
                 `/envelopes${sourceIdFromLocation ? `/${sourceIdFromLocation}` : ""}`,
               )
             }
+            /*onTouchEnd={() =>
+              navigate(
+                `/envelopes${sourceIdFromLocation ? `/${sourceIdFromLocation}` : ""}`,
+              )
+            }*/
           >
             X
           </Button>

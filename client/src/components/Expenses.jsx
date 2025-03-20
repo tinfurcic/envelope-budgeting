@@ -29,11 +29,11 @@ const Expenses = () => {
     const newDate = new Date(selectedDate);
     newDate.setMonth(newDate.getMonth() + delta);
 
-    const currentYearMonth = date.slice(0,7);
+    const currentYearMonth = date.slice(0, 7);
     const newYearMonth = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, "0")}`;
 
     if (newYearMonth > currentYearMonth) return;
-    
+
     navigate(`/expenses/${newYearMonth}`);
   };
 
@@ -44,6 +44,7 @@ const Expenses = () => {
         <Button
           className="button button--month-switch"
           onClick={() => changeMonth(-1)}
+          //onTouchEnd={() => changeMonth(-1)}
         >
           <SvgArrowLeft fillColor="white" strokeColor="black" />
         </Button>
@@ -51,6 +52,7 @@ const Expenses = () => {
         <Button
           className="button button--month-switch"
           onClick={() => changeMonth(1)}
+          //onTouchEnd={() => changeMonth(1)}
         >
           <SvgArrowRight fillColor="white" strokeColor="black" />
         </Button>

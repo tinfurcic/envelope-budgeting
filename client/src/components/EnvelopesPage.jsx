@@ -107,12 +107,17 @@ const EnvelopesPage = () => {
         <Button
           className="button button--blue"
           onClick={() => navigate("/create-envelope")}
+          //onTouchEnd={() => navigate("/create-envelope")}
         >
           New Envelope
         </Button>
       </header>
       <div className="manage-envelopes">
-        <Button className="button button--blue" onClick={toggleManageMode}>
+        <Button
+          className="button button--blue"
+          onClick={toggleManageMode}
+          //onTouchEnd={toggleManageMode}
+        >
           {/* On click, show a "Drag&drop to reorder!" popup with a "Don't show again" checkbox */}
           <div className="button__gear-icon">
             <SvgGear
@@ -131,6 +136,7 @@ const EnvelopesPage = () => {
               <Button
                 className="button button--green"
                 onClick={isSaving ? null : handleSave}
+                //onTouchEnd={isSaving ? null : handleSave}
               >
                 Save changes
               </Button>
@@ -197,6 +203,7 @@ const EnvelopesPage = () => {
         <Button
           className={`button button--new-expense`}
           onClick={() => navigate("/create-expense")}
+          //onTouchEnd={() => navigate("/create-expense")}
         >
           <img src={expenseIcon} alt="New expense" />
         </Button>

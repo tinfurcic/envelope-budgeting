@@ -301,6 +301,7 @@ const Envelope = () => {
             <Button
               className="button button--back"
               onClick={() => navigate("/envelopes")}
+              //onTouchEnd={() => navigate("/envelopes")}
             >
               X
             </Button>
@@ -309,6 +310,7 @@ const Envelope = () => {
               <Button
                 className="button button--edit"
                 onClick={toggleEditInfoMode}
+                //onTouchEnd={toggleEditInfoMode}
                 extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
               >
                 <SvgEdit
@@ -322,6 +324,7 @@ const Envelope = () => {
               <Button
                 className="button button--edit"
                 onClick={handleSaveInfo}
+                //onTouchEnd={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
                 <SvgCheck fillColor="black" strokeColor="black" />
@@ -349,6 +352,7 @@ const Envelope = () => {
                 <Button
                   className="button button--edit"
                   onClick={handleSaveNumbers}
+                  //onTouchEnd={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
                   <SvgCheck fillColor="black" strokeColor="black" />
@@ -358,6 +362,7 @@ const Envelope = () => {
                 <Button
                   className={`button button--edit`}
                   onClick={toggleEditNumbersMode}
+                  //onTouchEnd={toggleEditNumbersMode}
                   extraStyle={
                     isEditingNumbers ? { backgroundColor: "black" } : {}
                   }
@@ -477,6 +482,22 @@ const Envelope = () => {
                 },
               })
             }
+            /*onTouchEnd={() =>
+              navigate("/create-expense", {
+                state: {
+                  category: "envelope",
+                  sourceData: {
+                    id: envelope.id,
+                    type: "envelope",
+                    name: envelope.name,
+                    amount: 0,
+                    order: envelope.order,
+                  },
+                  activeCategory: "envelope",
+                  sourceId: envelope.id,
+                },
+              })
+            }*/
           >
             <img src={expenseIcon} alt="New expense" />
           </Button>

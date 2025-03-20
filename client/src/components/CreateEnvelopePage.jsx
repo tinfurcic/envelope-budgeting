@@ -124,6 +124,7 @@ const CreateEnvelopePage = () => {
           <Button
             className="button button--back"
             onClick={() => navigate("/envelopes")}
+            //onTouchEnd={() => navigate("/envelopes")}
           >
             X
           </Button>

@@ -40,6 +40,7 @@ const Colors = ({
             style={{ backgroundColor: color }}
             key={color}
             onClick={() => handleClick(color)}
+            //onTouchEnd={() => handleClick(color)}
           ></button>
         ))}
       </div>

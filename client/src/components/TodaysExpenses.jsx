@@ -23,6 +23,7 @@ const TodaysExpenses = () => {
         <Button
           className="button button--blue"
           onClick={() => navigate(`/expenses/${date.slice(0, 7)}`)}
+          //onTouchEnd={() => navigate(`/expenses/${date.slice(0, 7)}`)}
         >
           All expenses
         </Button>

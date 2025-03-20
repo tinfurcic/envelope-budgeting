@@ -269,6 +269,7 @@ const Goal = () => {
             <Button
               className="button button--back"
               onClick={() => navigate("/goals")}
+              //onTouchEnd={() => navigate("/goals")}
             >
               X
             </Button>
@@ -276,6 +277,7 @@ const Goal = () => {
             <Button
               className="button button--edit"
               onClick={toggleEditInfoMode}
+              //onTouchEnd={toggleEditInfoMode}
               extraStyle={isEditingInfo ? { backgroundColor: "black" } : {}}
             >
               <SvgEdit
@@ -288,6 +290,7 @@ const Goal = () => {
               <Button
                 className="button button--edit"
                 onClick={handleSaveInfo}
+                //onTouchEnd={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
                 <SvgCheck fillColor="black" strokeColor="black" />
@@ -307,6 +310,7 @@ const Goal = () => {
                   <Button
                     className="button button--abandon-goal"
                     onClick={() => handleDelete("true")}
+                    //onTouchEnd={() => handleDelete("true")}
                   >
                     <SvgWhiteFlag />
                   </Button>
@@ -315,6 +319,7 @@ const Goal = () => {
                 <Button
                   className="button button--complete-goal"
                   onClick={() => handleDelete("false")}
+                  //onTouchEnd={() => handleDelete("false")}
                 >
                   <SvgGlowingStar />
                 </Button>
@@ -326,6 +331,7 @@ const Goal = () => {
                 <Button
                   className="button button--edit"
                   onClick={handleSaveNumbers}
+                  //onTouchEnd={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
                   <SvgCheck fillColor="black" strokeColor="black" />
@@ -335,6 +341,7 @@ const Goal = () => {
                 <Button
                   className={`button button--edit`}
                   onClick={toggleEditNumbersMode}
+                  //onTouchEnd={toggleEditNumbersMode}
                   extraStyle={
                     isEditingNumbers ? { backgroundColor: "black" } : {}
                   }

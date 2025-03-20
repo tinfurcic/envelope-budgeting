@@ -29,7 +29,7 @@ const ProfilePage = () => {
           <h3 className="funds__category no-margin">
             Income <span className="funds__category__info">ⓘ</span>
             <div className="funds__category__edit-icon">
-              <Button className="button button--edit" onClick={null}>
+              <Button className="button button--edit">
                 <SvgEdit strokeColor="black" fillColor="black" />
               </Button>
             </div>
@@ -54,7 +54,7 @@ const ProfilePage = () => {
           <h3 className="funds__category no-margin">
             Savings <span className="funds__category__info">ⓘ</span>
             <div className="funds__category__edit-icon">
-              <Button className="button button--edit" onClick={null}>
+              <Button className="button button--edit">
                 <SvgEdit strokeColor="black" fillColor="black" />
               </Button>
             </div>
