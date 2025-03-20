@@ -24,3 +24,4 @@ yarn-debug.log*
 yarn-error.log*
 
 firebase-adminsdk.json
+hosting.*.cache
