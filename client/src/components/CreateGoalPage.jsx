@@ -77,6 +77,7 @@ const CreateGoalPage = () => {
           <Button
             className="button button--back"
             onClick={() => navigate("/goals")}
+            //onTouchEnd={() => navigate("/goals")}
           >
             X
           </Button>
@@ -165,7 +166,7 @@ const CreateGoalPage = () => {
             <Button
               type="submit"
               className="button button--green"
-              isDisabled={isDisabled}
+              //isDisabled={isDisabled}
             >
               Set Goal
             </Button>

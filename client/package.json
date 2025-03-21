@@ -21,6 +21,7 @@
     "react-router-dom": "^6.28.0",
     "resolve-url-loader": "^5.0.0",
     "rollup-plugin-terser": "^7.0.2",
+    "roughjs": "^4.6.6",
     "serialize-javascript": "^6.0.2",
     "serve": "^14.2.4",
     "svgo": "^3.3.2",

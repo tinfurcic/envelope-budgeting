@@ -1,5 +1,11 @@
 @use "../base/global";
 
+.profile-page {
+  &__heading {
+    margin: 1.5rem 0 0.5rem 0;
+  }
+}
+
 .funds {
   &__category {
     display: flex;

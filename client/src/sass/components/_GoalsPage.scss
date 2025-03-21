@@ -1,8 +1,14 @@
 .goals-page {
+  &__heading {
+    margin: 0;
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    margin: 1.5rem 0 0.5rem 0;
   }
 
   &__goals {

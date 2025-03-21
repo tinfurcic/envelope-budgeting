@@ -71,11 +71,13 @@
     background-color: black;
   }
 
-  &--shift {
+  &--month-switch {
+    width: 2rem;
+    height: 2rem;
     padding: 0;
     border-radius: 50%;
-    box-shadow: none;
     background-color: transparent;
+    box-shadow: none;
   }
 
   &--category {
@@ -152,7 +154,7 @@
   }
 
   &:disabled {
-    pointer-events: none;
+    //pointer-events: none;
     opacity: 0.6;
   }
 

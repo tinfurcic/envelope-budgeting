@@ -9,7 +9,11 @@ const GoalCard = ({ goal }) => {
   const { date } = useOutletContext();
 
   return (
-    <div className="goal-card" onClick={() => navigate(`/goals/${goal.id}`)}>
+    <div
+      className="goal-card"
+      onClick={() => navigate(`/goals/${goal.id}`)}
+      //onTouchEnd={() => navigate(`/goals/${goal.id}`)}
+    >
       <p className="goal-card__name">{goal.name}</p>
       <ProgressBar
         whole={goal.goalAmount}

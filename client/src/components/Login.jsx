@@ -17,6 +17,7 @@ const Login = () => {
 
   const handleSubmit = async (event, email, password) => {
     event.preventDefault();
+    console.log("Submitting form"); // Debug log
     try {
       const authFunction = isNewUser
         ? createUserWithEmailAndPassword
@@ -55,7 +56,11 @@ const Login = () => {
       <h1 className="login-page__greeting">
         {isNewUser ? "Sign up" : "Log in"}
       </h1>
-      <p className="login-page__switch-mode" onClick={toggleIsNewUser}>
+      <p
+        className="login-page__switch-mode"
+        onClick={toggleIsNewUser}
+        //onTouchEnd={toggleIsNewUser}
+      >
         {isNewUser ? "Already have an account?" : "Don't have an acount yet?"}
       </p>
       <form
@@ -82,7 +87,7 @@ const Login = () => {
           className="form-input"
         />
         <div className="login-page__form__submit-btn">
-          <Button type="submit" className="button button--login" onClick={null}>
+          <Button type="submit" className="button button--login">
             {isNewUser ? "Sign up" : "Log in"}
           </Button>
         </div>

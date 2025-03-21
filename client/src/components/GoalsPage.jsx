@@ -14,6 +14,7 @@ const GoalsPage = () => {
         <Button
           className="button button--blue"
           onClick={() => navigate("/create-goal")}
+          //onTouchEnd={() => navigate("/create-goal")}
         >
           New Goal
         </Button>

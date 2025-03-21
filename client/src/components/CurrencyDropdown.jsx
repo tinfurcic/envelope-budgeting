@@ -50,6 +50,7 @@ const CurrencyDropdown = () => {
           <Button
             className="button button--green"
             onClick={handleSave}
+            //onTouchEnd={handleSave}
             isDisabled={!hasChanged || selectedValue === ""}
           >
             Save

@@ -5,6 +5,7 @@ const Button = ({
   className,
   extraStyle,
   onClick,
+  //onTouchEnd,
   isDisabled = false,
   children,
 }) => {
@@ -14,6 +15,7 @@ const Button = ({
       className={className}
       style={extraStyle}
       onClick={onClick}
+      //onTouchEnd={onTouchEnd}
       disabled={isDisabled}
     >
       {children}

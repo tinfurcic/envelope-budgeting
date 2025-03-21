@@ -48,6 +48,7 @@ const PickCategory = ({
             key={category}
             className={`button button--category ${activeCategory === category ? "active" : "inactive"}`}
             onClick={() => handleClick(category)}
+            //onTouchEnd={() => handleClick(category)}
             disabled={false}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}

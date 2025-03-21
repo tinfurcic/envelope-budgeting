@@ -104,6 +104,11 @@ const PickSourceInCategory = ({
                         target: { value: envelope.id },
                       })
                     }
+                    /*onTouchEnd={(e) =>
+                      handleSelectedSourceChange({
+                        target: { value: envelope.id },
+                      })
+                    }*/
                     disabled={isDisabled}
                   >
                     {envelope.name} ({fakeCurrency}
@@ -133,6 +138,11 @@ const PickSourceInCategory = ({
                           target: { value: savingsCategory.id },
                         })
                       }
+                      /*onTouchEnd={(e) =>
+                        handleSelectedSourceChange({
+                          target: { value: savingsCategory.id },
+                        })
+                      }*/
                       disabled={isDisabled}
                     >
                       {savingsCategory.name || "asdf"} ({fakeCurrency}

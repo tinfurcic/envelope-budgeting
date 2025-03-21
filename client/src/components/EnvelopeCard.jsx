@@ -59,6 +59,9 @@ const EnvelopeCard = ({
       onClick={
         isManageMode ? undefined : () => navigate(`/envelopes/${envelope.id}`)
       }
+      /*onTouchEnd={
+        isManageMode ? undefined : () => navigate(`/envelopes/${envelope.id}`)
+      }*/
       {...(isManageMode ? attributes : {})}
       {...(isManageMode
         ? {
@@ -79,6 +82,11 @@ const EnvelopeCard = ({
               e.preventDefault();
               toggleDelete();
             }}
+            /*onTouchEnd={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              toggleDelete();
+            }}*/
           >
             {markedForDeletion ? <SvgRestore /> : <SvgDelete />}
           </Button>

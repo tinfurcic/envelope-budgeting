@@ -1,5 +1,5 @@
 @use "../abstracts/mixins";
 
-.expenses-table {
+.simple-expenses-table {
   @include mixins.rough-table-styles;
 }

@@ -178,6 +178,7 @@ const PickMultipleSources = ({
                 "--envelope-text-color": textColor,
               }}
               onClick={() => handleChoice(source.id)}
+              //onTouchEnd={() => handleChoice(source.id)}
               disabled={isDisabled}
             >
               <span className="button--source__name">{source.name}</span>{" "}

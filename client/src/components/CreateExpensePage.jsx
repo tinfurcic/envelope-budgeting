@@ -159,6 +159,11 @@ const CreateExpensePage = () => {
                 `/envelopes${sourceIdFromLocation ? `/${sourceIdFromLocation}` : ""}`,
               )
             }
+            /*onTouchEnd={() =>
+              navigate(
+                `/envelopes${sourceIdFromLocation ? `/${sourceIdFromLocation}` : ""}`,
+              )
+            }*/
           >
             X
           </Button>
@@ -270,7 +275,7 @@ const CreateExpensePage = () => {
 
           <div className="form-item">
             <label className="form-label" htmlFor="description">
-              Description (optional)
+              Description (recommended)
             </label>
             <input
               className="form-input"
