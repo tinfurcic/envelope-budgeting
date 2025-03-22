@@ -1,7 +1,7 @@
-@use "../abstracts/mixins";
+@use "../mixins/form-page-styles" as *;
 
 .create-expense-page {
-  @include mixins.form-page-styles;
+  @include form-page-styles;
 }
 
 .source-mode {

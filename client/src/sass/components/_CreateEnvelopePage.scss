@@ -1,5 +1,5 @@
-@use "../abstracts/mixins";
+@use "../mixins/form-page-styles" as *;
 
 .create-envelope-page {
-  @include mixins.form-page-styles;
+  @include form-page-styles;
 }

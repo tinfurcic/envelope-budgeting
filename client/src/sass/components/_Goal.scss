@@ -1,9 +1,10 @@
-@use "../abstracts/mixins";
+@use "../mixins/page-header-styles" as *;
+@use "../mixins/page-main-section-styles" as *;
 @use "../base/global";
 
 .goal {
-  @include mixins.page-header-styles;
-  @include mixins.page-main-section-styles;
+  @include page-header-styles;
+  @include page-main-section-styles;
 
   &__header {
     background-color: global.$goal-color;

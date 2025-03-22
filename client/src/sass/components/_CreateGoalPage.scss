@@ -1,5 +1,5 @@
-@use "../abstracts/mixins";
+@use "../mixins/form-page-styles" as *;
 
 .create-goal-page {
-  @include mixins.form-page-styles;
+  @include form-page-styles;
 }

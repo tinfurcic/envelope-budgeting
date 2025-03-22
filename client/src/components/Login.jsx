@@ -17,7 +17,6 @@ const Login = () => {
 
   const handleSubmit = async (event, email, password) => {
     event.preventDefault();
-    console.log("Submitting form"); // Debug log
     try {
       const authFunction = isNewUser
         ? createUserWithEmailAndPassword

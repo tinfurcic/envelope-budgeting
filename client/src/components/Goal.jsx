@@ -410,7 +410,6 @@ const Goal = () => {
             </li>
             {goal?.deadline && (
               <>
-                {console.log(goal.deadline)}
                 <li className="goal__stats-list__item">
                   <SvgSnail size={30} />
                   Min. monthly allocation: {fakeCurrency}
