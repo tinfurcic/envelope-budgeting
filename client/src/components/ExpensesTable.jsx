@@ -37,12 +37,20 @@ const ExpensesTable = ({ expenses }) => {
           </tr>
         </thead>
         <tbody className="expenses-table__table__body">
-          {expenses.map((expense) => (
+        {expenses.map((expense) => {
+          const day = Number(expense.date.slice(8));
+          const suffix = ["st", "nd", "rd", "th"][
+            (day % 10 === 1 && day !== 11) ? 0 :
+            (day % 10 === 2 && day !== 12) ? 1 :
+            (day % 10 === 3 && day !== 13) ? 2 : 3
+          ];
+
+          return (
             <tr key={expense.id} className="expenses-table__table__row">
-              <td className="expenses-table__table__cell">
-                {expense.date.slice(8)}.
+              <td className="expenses-table__table__cell" style={{wordBreak: "normal"}}>
+                {day}{suffix}
               </td>
-              <td className="expenses-table__table__cell">
+              <td className="expenses-table__table__cell" style={{wordBreak: "normal"}}>
                 {fakeCurrency}
                 {expense.amount}
               </td>
@@ -52,13 +60,13 @@ const ExpensesTable = ({ expenses }) => {
               <td className="expenses-table__table__cell">
                 {expense.description}
               </td>
-
               <td className="expenses-table__table__cell">
                 {expense.isLockedIn ? "Yes" : "No"}
               </td>
             </tr>
-          ))}
-        </tbody>
+          );
+        })}
+      </tbody>
       </table>
     </div>
   );
