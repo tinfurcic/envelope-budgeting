@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
 import { collection, onSnapshot } from "firebase/firestore";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../components/profile/AuthContext";
 
 const useIncomeListener = () => {
   const { user } = useAuth();
