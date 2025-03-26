@@ -39,7 +39,8 @@ export const useRoughTableBorders = (tableRef, svgRef, dependencies = []) => {
     const handleResize = () => {
       const newWidth = window.innerWidth;
       const newHeight = window.innerHeight;
-      const { width: prevWidth, height: prevHeight } = lastViewportSizeRef.current;
+      const { width: prevWidth, height: prevHeight } =
+        lastViewportSizeRef.current;
 
       // Only redraw if width changes or height changes significantly
       const heightChange = Math.abs(newHeight - prevHeight);

@@ -1,16 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import CurrencyDropdown from "./CurrencyDropdown";
+import currenciesBasic from "../util/currencies-basic.json";
+import { updateSettings } from "../util/axios/updateFunctions";
 import Button from "./Button";
 import SvgEdit from "./svg-icons/SvgEdit";
 import Logout from "./Logout";
+import Dropdown from "./Dropdown";
 
 const ProfilePage = () => {
-  const { totalIncome, fullDate } = useOutletContext();
+  const { totalIncome, settings, loadingSettings, syncingSettings, fullDate } =
+    useOutletContext();
+  const [selectedCurrency, setSelectedCurrency] = useState(
+    settings?.currencyType?.value,
+  );
+  const [hasChanged, setHasChanged] = useState(false);
+
+  useEffect(() => {
+    if (settings?.currencyType?.value) {
+      setSelectedCurrency(settings.currencyType.value);
+    }
+  }, [settings]);
+
+  useEffect(() => {
+    if (settings?.currencyType?.value) {
+      setHasChanged(selectedCurrency !== settings.currencyType.value);
+    }
+  }, [selectedCurrency, settings]);
+
+  const currencyCodes = Object.entries(currenciesBasic).map(([code]) => code);
+
   const fakeCurrency = "€";
   const fakeExtraIncome = 1500;
   const fakeShortTermSavings = 432;
   const fakeLongTermSavings = 18500;
+
+  const handleSaveSettings = async (currency, enableDebt) => {
+    // save to firebase
+    // display saving.../success/error message
+    // specifically disable submitting the empty string
+    const result = await updateSettings(currency, enableDebt);
+
+    if (!result.success) {
+      // display error message
+      console.error(result.error);
+    } else {
+      // display success message
+      console.log("Settings successfully updated!");
+      setHasChanged(false);
+    }
+    return;
+  };
 
   return (
     <div className="profile-page">
@@ -18,7 +57,31 @@ const ProfilePage = () => {
       <div className="settings">
         <h2 className="settings__heading">Settings</h2>
         <div className="settings__currency">
-          <CurrencyDropdown />
+          {loadingSettings ? (
+            <p>Loading settings...</p>
+          ) : syncingSettings ? (
+            <p>Syncing settings</p>
+          ) : (
+            <>
+              Currency{" "}
+              <Dropdown
+                options={currencyCodes}
+                selectedCurrency={selectedCurrency}
+                setSelectedCurrency={setSelectedCurrency}
+              />
+            </>
+          )}
+          {hasChanged && (
+            <Button
+              className="button button--green"
+              onClick={() => handleSaveSettings(selectedCurrency, false)}
+              //onTouchEnd={handleSave}
+              isDisabled={!hasChanged}
+              extraStyle={{ marginLeft: "auto" }}
+            >
+              Save
+            </Button>
+          )}
         </div>
         <div className="funds">
           <h2 className="funds__heading no-margin">My funds</h2>

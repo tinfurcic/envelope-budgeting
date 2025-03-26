@@ -19,19 +19,21 @@ const Expenses = () => {
 
   return (
     <div className="expenses">
-      <Button className="button button--back-arrow" onClick={() => navigate("/home")}>
+      <Button
+        className="button button--back-arrow"
+        onClick={() => navigate("/home")}
+      >
         <span className="button--back-arrow__arrow">{"<---"}</span>
         <span className="button--back-arrow__text">Home</span>
       </Button>
       <h1 className="expenses__heading">All expenses</h1>
       <MonthNavigation year={year} month={month} currentDate={date} />
-      <div className="expenses__sort-toolbar">
-
-      </div>
-      {expensesThisMonth?.length > 0 ?
-        <ExpensesTable expenses={expensesThisMonth} /> :
+      <div className="expenses__sort-toolbar"></div>
+      {expensesThisMonth?.length > 0 ? (
+        <ExpensesTable expenses={expensesThisMonth} />
+      ) : (
         <p>No expenses this month.</p>
-      }
+      )}
     </div>
   );
 };

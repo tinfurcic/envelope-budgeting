@@ -79,7 +79,7 @@ usersRouter.post("/", async (req, res) => {
 
     // Initialize settings collection
     batch.set(userRef.collection("settings").doc("currencyType"), {
-      value: "USD",
+      value: "EUR",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     batch.set(userRef.collection("settings").doc("enableDebt"), {

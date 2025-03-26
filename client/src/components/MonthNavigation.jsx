@@ -36,9 +36,7 @@ const MonthNavigation = ({ year, month, currentDate }) => {
       >
         <SvgArrowLeft fillColor="white" strokeColor="black" />
       </Button>
-      <div className="month-navigation__month">
-        {formattedDate}
-      </div>
+      <div className="month-navigation__month">{formattedDate}</div>
       <Button
         className="button button--month-switch"
         onClick={() => changeMonth(1)}
@@ -47,7 +45,7 @@ const MonthNavigation = ({ year, month, currentDate }) => {
         <SvgArrowRight fillColor="white" strokeColor="black" />
       </Button>
     </nav>
-  )
-}
+  );
+};
 
 export default MonthNavigation;
