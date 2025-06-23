@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
 import { collection, onSnapshot } from "firebase/firestore";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../components/profile/AuthContext";
 
 const useSettingsListener = () => {
   const { user } = useAuth();
-  const [settings, setSettings] = useState([]);
+  const [settings, setSettings] = useState({});
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [syncingSettings, setSyncingSettings] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);

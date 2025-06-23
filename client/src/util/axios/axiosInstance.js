@@ -3,6 +3,7 @@ import { getToken } from "../tokenService.js";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:4001/api",
+  //baseURL: "https://envelope-budgeting.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

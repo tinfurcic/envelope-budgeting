@@ -1,8 +1,7 @@
-@use "../base/global";
-@use "../base/typography";
-@use "../abstracts/mixins";
+@use "../mixins/page-header-styles" as *;
+@use "../mixins/page-main-section-styles" as *;
 
 .envelope {
-  @include mixins.page-header-styles;
-  @include mixins.page-main-section-styles;
+  @include page-header-styles;
+  @include page-main-section-styles;
 }

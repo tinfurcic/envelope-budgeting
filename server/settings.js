@@ -29,12 +29,18 @@ export const updateSettings = async (userId, currencyType, enableDebt) => {
       .doc(userId)
       .collection("settings");
 
-    await Promise.all([
-      settingsRef
-        .doc("currencyType")
-        .set({ value: currencyType }, { merge: true }),
-      settingsRef.doc("enableDebt").set({ value: enableDebt }, { merge: true }),
-    ]);
+    // Create a batch
+    const batch = db.batch();
+
+    const currencyTypeRef = settingsRef.doc("currencyType");
+    const enableDebtRef = settingsRef.doc("enableDebt");
+
+    // Add set operations to the batch
+    batch.set(currencyTypeRef, { value: currencyType }, { merge: true });
+    batch.set(enableDebtRef, { value: enableDebt }, { merge: true });
+
+    // Commit the batch
+    await batch.commit();
 
     return { currencyType, enableDebt };
   } catch (error) {

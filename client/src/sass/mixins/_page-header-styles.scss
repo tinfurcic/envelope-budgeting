@@ -1,0 +1,99 @@
+@use "../base/typography";
+
+@mixin page-header-styles {
+  &__header {
+    background-color: var(--envelope-color);
+    width: 100vw;
+    margin-left: -0.5rem;
+
+    display: flex;
+    flex-direction: column;
+
+    &-row {
+      min-height: 10rem;
+      display: flex;
+    }
+
+    &-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      overflow: hidden; // !!!
+    }
+
+    &-bar {
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
+      padding: 1rem;
+      border-left: 1px solid black;
+    }
+  }
+
+  &__name {
+    margin: 1rem 0 0.5rem 1rem;
+    padding: 0 0 0 0.5rem;
+    border-bottom: 2px solid transparent;
+
+    font-size: 2.5rem;
+    font-weight: 400;
+    line-height: typography.$line-height-base;
+    letter-spacing: typography.$letter-spacing-normal;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    cursor: default;
+
+    &--small {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__name-input {
+    margin: 1rem 1rem 0.5rem 1rem;
+    padding: 0 0 0 0.5rem;
+    border: none;
+    border-bottom: 2px solid black;
+
+    font-size: 2.5rem;
+    line-height: typography.$line-height-base;
+    letter-spacing: typography.$letter-spacing-normal;
+    background-color: var(--envelope-color);
+    filter: brightness(90%);
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__description {
+    margin: 0 0 1rem 1rem;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+
+    letter-spacing: typography.$letter-spacing-normal;
+    line-height: typography.$line-height-base;
+
+    word-break: break-word;
+  }
+
+  &__description-input {
+    min-height: 33px;
+    margin: 0 1rem 0 1rem;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+
+    letter-spacing: typography.$letter-spacing-normal;
+    line-height: typography.$line-height-base;
+
+    background-color: transparent;
+    border: none;
+    border: 1px dashed black;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
