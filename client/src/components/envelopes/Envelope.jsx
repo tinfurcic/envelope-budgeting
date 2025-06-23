@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { updateEnvelope } from "../../util/axios/updateFunctions";
-import expenseIcon from "../../media/expense.png";
 import useCSSVariable from "../../hooks/useCSSVariable";
 import useOverlapping from "../../hooks/useOverlapping";
 import useScreenSize from "../../hooks/useScreenSize";
-import SvgEdit from "../svg-icons/SvgEdit";
-import SvgCheck from "../svg-icons/SvgCheck";
-import SvgEnvelopeCash from "../svg-icons/SvgEnvelopeCash";
+import SvgEdit from "../dynamic-icons/SvgEdit";
+import SvgEnvelopeCash from "../dynamic-icons/SvgEnvelopeCash";
 import ProgressBar from "../ui/ProgressBar";
 import SimpleExpensesTable from "../ui/SimpleExpensesTable";
 import Button from "../ui/Button";
@@ -322,12 +320,14 @@ const Envelope = () => {
 
             {!isSavingInfoDisabled && isEditingInfo && (
               <Button
-                className="button button--edit"
+                className="button button--tick"
                 onClick={handleSaveInfo}
                 //onTouchEnd={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
-                <SvgCheck fillColor="black" strokeColor="black" />
+                <svg>
+                  <use href="#tick" />
+                </svg>
               </Button>
             )}
           </div>
@@ -350,17 +350,19 @@ const Envelope = () => {
             <div className="envelope__subheading-container__group">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
-                  className="button button--edit"
+                  className="button button--tick"
                   onClick={handleSaveNumbers}
                   //onTouchEnd={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
-                  <SvgCheck fillColor="black" strokeColor="black" />
+                  <svg>
+                    <use href="#tick" />
+                  </svg>
                 </Button>
               )}
               {!isEditingInfo && (
                 <Button
-                  className={`button button--edit`}
+                  className={`button button--edit-funds`}
                   onClick={toggleEditNumbersMode}
                   //onTouchEnd={toggleEditNumbersMode}
                   extraStyle={
@@ -451,7 +453,7 @@ const Envelope = () => {
           ) : syncingExpenses ? (
             <p>Syncing expenses...</p>
           ) : thisMonthsExpenses.length === 0 ? (
-            <p>No expenses.</p>
+            <p>No expenses.</p> // fix transparency when overlapping with "No expenses." text
           ) : (
             <SimpleExpensesTable
               dateWindow="latest"
@@ -499,7 +501,9 @@ const Envelope = () => {
               })
             }*/
           >
-            <img src={expenseIcon} alt="New expense" />
+            <svg width="40" height="40">
+              <use href="#new-expense" />
+            </svg>
           </Button>
         </div>
       </main>

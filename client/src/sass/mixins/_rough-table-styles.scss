@@ -28,6 +28,11 @@
 
     &__header {
       font-size: 1.2rem;
+      white-space: nowrap;
+
+      &--icons {
+        line-height: 1;
+      }
     }
 
     &__body {

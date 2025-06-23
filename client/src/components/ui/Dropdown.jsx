@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import SvgArrowDown from "../svg-icons/SvgArrowDown";
 
 const Dropdown = ({ options, selectedCurrency, setSelectedCurrency }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -129,7 +128,11 @@ const Dropdown = ({ options, selectedCurrency, setSelectedCurrency }) => {
         className={`dropdown__button ${isOpen ? "dropdown__button--active" : "dropdown__button--inactive"}`}
       >
         {selectedCurrency}
-        <SvgArrowDown />
+        {
+          <svg width="24" height="24">
+            <use href="#arrow-down" />
+          </svg>
+        }
       </button>
 
       {/* Custom dropdown options */}

@@ -1,7 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import SvgArrowLeft from "../../svg-icons/SvgArrowLeft";
-import SvgArrowRight from "../../svg-icons/SvgArrowRight";
 import Button from "../../ui/Button";
 
 const MonthNavigation = ({ year, month, currentDate }) => {
@@ -34,7 +32,9 @@ const MonthNavigation = ({ year, month, currentDate }) => {
         onClick={() => changeMonth(-1)}
         //onTouchEnd={() => changeMonth(-1)}
       >
-        <SvgArrowLeft fillColor="white" strokeColor="black" />
+        <svg>
+          <use href="#arrow-left-circled" />
+        </svg>
       </Button>
       <div className="month-navigation__month">{formattedDate}</div>
       <Button
@@ -42,7 +42,9 @@ const MonthNavigation = ({ year, month, currentDate }) => {
         onClick={() => changeMonth(1)}
         //onTouchEnd={() => changeMonth(1)}
       >
-        <SvgArrowRight fillColor="white" strokeColor="black" />
+        <svg>
+          <use href="#arrow-right-circled" />
+        </svg>
       </Button>
     </nav>
   );

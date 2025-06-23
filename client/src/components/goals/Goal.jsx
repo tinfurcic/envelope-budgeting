@@ -6,14 +6,8 @@ import { bareMinimumToAchieveGoal } from "../../util/bareMinimumToAchieveGoal";
 import { daysUntilNextMonth } from "../../util/daysUntilNextMonth";
 import { dateDifference } from "../../util/dateDifference";
 import useCSSVariable from "../../hooks/useCSSVariable";
-import SvgCalendarFirst from "../svg-icons/SvgCalendarFirst";
-import SvgCheck from "../svg-icons/SvgCheck";
-import SvgDeadline from "../svg-icons/SvgDeadline";
-import SvgEdit from "../svg-icons/SvgEdit";
-import SvgGlowingStar from "../svg-icons/SvgGlowingStar";
-import SvgPiggyBank from "../svg-icons/SvgPiggyBank";
-import SvgSnail from "../svg-icons/SvgSnail";
-import SvgWhiteFlag from "../svg-icons/SvgWhiteFlag";
+import SvgEdit from "../dynamic-icons/SvgEdit";
+import SvgPiggyBank from "../dynamic-icons/SvgPiggyBank";
 import Button from "../ui/Button";
 import ProgressBar from "../ui/ProgressBar";
 
@@ -288,12 +282,14 @@ const Goal = () => {
 
             {!isSavingInfoDisabled && isEditingInfo && (
               <Button
-                className="button button--edit"
+                className="button button--tick"
                 onClick={handleSaveInfo}
                 //onTouchEnd={handleSaveInfo}
                 isDisabled={isSavingInfoDisabled}
               >
-                <SvgCheck fillColor="black" strokeColor="black" />
+                <svg>
+                  <use href="#tick" />
+                </svg>
               </Button>
             )}
           </div>
@@ -312,7 +308,9 @@ const Goal = () => {
                     onClick={() => handleDelete("true")}
                     //onTouchEnd={() => handleDelete("true")}
                   >
-                    <SvgWhiteFlag />
+                    <svg>
+                      <use href="#white-flag" />
+                    </svg>
                   </Button>
                 )
               ) : (
@@ -321,7 +319,9 @@ const Goal = () => {
                   onClick={() => handleDelete("false")}
                   //onTouchEnd={() => handleDelete("false")}
                 >
-                  <SvgGlowingStar />
+                  <svg>
+                    <use href="#glowing-star" />
+                  </svg>
                 </Button>
               )}
             </div>
@@ -329,12 +329,14 @@ const Goal = () => {
             <div className="goal__subheading-container__group">
               {isEditingNumbers && !isSavingNumbersDisabled && (
                 <Button
-                  className="button button--edit"
+                  className="button button--tick"
                   onClick={handleSaveNumbers}
                   //onTouchEnd={handleSaveNumbers}
                   isDisabled={isSavingNumbersDisabled}
                 >
-                  <SvgCheck fillColor="black" strokeColor="black" />
+                  <svg>
+                    <use href="#tick" />
+                  </svg>
                 </Button>
               )}
               {!isEditingInfo && (
@@ -405,18 +407,24 @@ const Goal = () => {
 
           <ul className="goal__stats-list">
             <li className="goal__stats-list__item">
-              <SvgCalendarFirst size={30} />
+              <svg width="30" height="30">
+                <use href="#calendar-first" />
+              </svg>
               New income in {daysUntilNextMonth()} days
             </li>
             {goal?.deadline && (
               <>
                 <li className="goal__stats-list__item">
-                  <SvgSnail size={30} />
+                  <svg width="30" height="30">
+                    <use href="#snail-detailed" />
+                  </svg>
                   Min. monthly allocation: {fakeCurrency}
                   {barelyAchieve}
                 </li>
                 <li className="goal__stats-list__item">
-                  <SvgDeadline size={30} />
+                  <svg width="30" height="30">
+                    <use href="#deadline" />
+                  </svg>
                   Deadline in {daysUntilDeadline} days
                 </li>
               </>

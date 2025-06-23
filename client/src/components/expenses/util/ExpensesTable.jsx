@@ -1,15 +1,15 @@
 import React, { useRef } from "react";
 import { useRoughTableBorders } from "../../../hooks/useRoughBorders";
-import SvgEnvelopeStack from "../../svg-icons/SvgEnvelopeStack";
-import SvgCoins from "../../svg-icons/SvgMoneyBag";
-import SvgCalendar from "../../svg-icons/SvgCalendar";
-import SvgReceipt from "../../svg-icons/SvgReceipt";
-import SvgLocked from "../../svg-icons/SvgLocked";
+import SvgEnvelopeStack from "../../dynamic-icons/SvgEnvelopeStack";
+import useCSSVariable from "../../../hooks/useCSSVariable";
+import useScreenSize from "../../../hooks/useScreenSize";
 
 const ExpensesTable = ({ expenses }) => {
   const fakeCurrency = "€";
   const tableRef = useRef(null);
   const svgRef = useRef(null);
+  const { screenWidth } = useScreenSize();
+  const backgroundColor = useCSSVariable("--background-color");
 
   useRoughTableBorders(tableRef, svgRef, [expenses]);
 
@@ -19,21 +19,44 @@ const ExpensesTable = ({ expenses }) => {
       <table ref={tableRef} className="expenses-table__table">
         <thead className="expenses-table__table__head">
           <tr className="expenses-table__table__row">
-            <th className="expenses-table__table__header">
-              <SvgCalendar />
-            </th>
-            <th className="expenses-table__table__header">
-              <SvgCoins />
-            </th>
-            <th className="expenses-table__table__header">
-              <SvgEnvelopeStack />
-            </th>
-            <th className="expenses-table__table__header">
-              <SvgReceipt />
-            </th>
-            <th className="expenses-table__table__header">
-              <SvgLocked />
-            </th>
+            {screenWidth < 600 ? (
+              <>
+                <th className="expenses-table__table__header expenses-table__table__header--icons">
+                  <svg width="32" height="32">
+                    <use href="#calendar" />
+                  </svg>
+                </th>
+                <th className="expenses-table__table__header expenses-table__table__header--icons">
+                  <svg width="32" height="32">
+                    <use href="#money-bag" />
+                  </svg>
+                </th>
+                <th className="expenses-table__table__header expenses-table__table__header--icons">
+                  <SvgEnvelopeStack
+                    width={32}
+                    backgroundColor={backgroundColor}
+                  />
+                </th>
+                <th className="expenses-table__table__header expenses-table__table__header--icons">
+                  <svg width="32" height="32">
+                    <use href="#invoice" />
+                  </svg>
+                </th>
+                <th className="expenses-table__table__header expenses-table__table__header--icons">
+                  <svg width="32" height="32">
+                    <use href="#square-lock" />
+                  </svg>
+                </th>
+              </>
+            ) : (
+              <>
+                <th className="expenses-table__table__header">Date</th>
+                <th className="expenses-table__table__header">Amount</th>
+                <th className="expenses-table__table__header">Sources</th>
+                <th className="expenses-table__table__header">Description</th>
+                <th className="expenses-table__table__header">Locked in</th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody className="expenses-table__table__body">

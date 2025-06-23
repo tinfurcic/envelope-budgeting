@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Button from "../ui/Button";
-import SvgDelete from "../svg-icons/SvgDelete";
-import SvgRestore from "../svg-icons/SvgRestore";
 
 const EnvelopeCard = ({
   envelope,
@@ -88,7 +86,17 @@ const EnvelopeCard = ({
               toggleDelete();
             }}*/
           >
-            {markedForDeletion ? <SvgRestore /> : <SvgDelete />}
+            {markedForDeletion ? (
+              <svg height="24" width="24">
+                <use href="#restore" />
+              </svg>
+            ) : (
+              <>
+                <svg height="24" width="24">
+                  <use href="#x-circled" />
+                </svg>
+              </>
+            )}
           </Button>
         </div>
       )}

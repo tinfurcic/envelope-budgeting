@@ -8,10 +8,9 @@ import { batchDeleteAndReorderEnvelopes } from "../../util/axios/updateFunctions
 import { arraysAreEqual } from "../../util/arraysAreEqual";
 import useScreenSize from "../../hooks/useScreenSize";
 import useOverlapping from "../../hooks/useOverlapping";
-import expenseIcon from "../../media/expense.png";
 import EnvelopeCard from "./EnvelopeCard";
 import Button from "../ui/Button";
-import SvgGear from "../svg-icons/SvgGear";
+import SvgGear from "../dynamic-icons/SvgGear";
 
 const EnvelopesPage = () => {
   const { envelopes, loadingEnvelopes, syncingEnvelopes } = useOutletContext();
@@ -205,7 +204,9 @@ const EnvelopesPage = () => {
           onClick={() => navigate("/create-expense")}
           //onTouchEnd={() => navigate("/create-expense")}
         >
-          <img src={expenseIcon} alt="New expense" />
+          <svg width="40" height="40">
+            <use href="#new-expense" />
+          </svg>
         </Button>
       </div>
     </div>
